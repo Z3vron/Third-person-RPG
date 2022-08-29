@@ -67,8 +67,8 @@ namespace Player_Movemnet{
         //figure out wayy to use pointers and addresses
         public int dropped_item_new_amount;
         
-        public float sprinting_stamina_cost = 1.5f;
-        public float jump_stamina_cost = 3.0f;
+       
+
         public bool player_grounded = false;
         public bool player_crouching = false;
         public bool locked_on_enemy = false;
@@ -78,6 +78,11 @@ namespace Player_Movemnet{
         //Should do Tooltip to every variable
         [Tooltip("Speed of character in m/s for walking")]
         [SerializeField] private float _walk_speed = 3.0f;
+        #region Stamina costs
+        [SerializeField] private float  _sprinting_stamina_cost = 1.5f;
+        [SerializeField] private float  _jump_stamina_cost = 3.0f;
+        [SerializeField] private float _dash_stamina_cost = 15;
+        #endregion
         [SerializeField] private float _sprint_speed = 9.0f;
         [SerializeField] private float _crouch_speed = 1.0f;
         [SerializeField] private float _player_speed_change_rate = 10.0f;
@@ -435,7 +440,7 @@ namespace Player_Movemnet{
                         _Player_target_speed = _crouch_speed;
                     }
                     else if(_input_handler.sprint_flag && _player_statistics.Current_stamina >0){
-                        _player_statistics.Take_stamina(sprinting_stamina_cost * Time.deltaTime);
+                        _player_statistics.Take_stamina(_sprinting_stamina_cost * Time.deltaTime);
                         _Player_target_speed = _sprint_speed;
                         _animator.SetFloat("Speed_percent",0.99f);//, 0.1f,Time.deltaTime); // last 2 arguments to smooth transision - now useless but great when i change 0.99f to player speed - fix the bug
                     }
@@ -485,11 +490,11 @@ namespace Player_Movemnet{
                 if(_Time_between_landing_next_jump >= 0.0f)
                     _Time_between_landing_next_jump -= Time.deltaTime;
 
-                if (_input_handler.jump_flag && _Time_between_landing_next_jump <=0.0f && _player_statistics.Current_stamina > jump_stamina_cost){
+                if (_input_handler.jump_flag && _Time_between_landing_next_jump <=0.0f && _player_statistics.Current_stamina > _jump_stamina_cost){
                     //_Player_velocity.y += Mathf.Sqrt(_jump_height * -2.0f * _gravity_force); // in theory should take care speed to jump higher - very high jumpo at stairs - not sure how it works
                    
                    // _Player_velocity = _Move;
-                   _player_statistics.Take_stamina(jump_stamina_cost);
+                   _player_statistics.Take_stamina(_jump_stamina_cost);
                     _Player_velocity.y = Mathf.Sqrt(_jump_height * -2.0f * _gravity_force);
                     _controller.Move(_Player_velocity * Time.deltaTime);
 
@@ -589,10 +594,10 @@ namespace Player_Movemnet{
             _target_group.AddMember(_closest_enemy.transform,1,2);
         }
         private void Handle_state_while_lock_on_enemy(){
-            if(_input_handler.dash_flag){
+            if(_input_handler.dash_flag && _player_statistics.Current_stamina > _dash_stamina_cost){
                 //Debug.Log(_Move * _dash_speed);
                 _controller.Move(_Move * _dash_speed);
-                _player_statistics.Take_stamina(15);
+                _player_statistics.Take_stamina(_dash_stamina_cost);
             }
                 
             if(_input_handler.switch_flag && enemies_lock_on.Count > 1){
