@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11e605f7b3e78d04db3a2da8783ebac1, type: 3}
+  m_Name: Fists
+  m_EditorClassIdentifier: 
+  Item_icon: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+  Item_name: Fists
+  max_stack_amount: 1
+  Item_weight: 0
+  Weapon_model: {fileID: 7228585429627651759, guid: 81c80efdabf1ef54197c43dda68f4a52, type: 3}
+  durability: 84
+  material_toughness: 1
+  unarmed: 1
+  Light_attack_damage: 5
+  Strong_attack_damage: 10
+  combo_dmg_bonus: 3
+  light_attack_stamina_cost: 2
+  strong_attack_stamina_cost: 4
+  combo_attack_stamina_cost: 6

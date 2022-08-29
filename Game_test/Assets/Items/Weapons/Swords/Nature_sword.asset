@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 082d0db37e73f434baee25e62ea8c906, type: 3}
+  m_Name: Nature_sword
+  m_EditorClassIdentifier: 
+  Item_icon: {fileID: 21300000, guid: 5e1865596ac8c6346be6dfff923059fa, type: 3}
+  Item_name: Nature sword
+  max_stack_amount: 1
+  Weapon_model: {fileID: 7228585429627651759, guid: 9298ed508f40da247bed9441b5a898b5, type: 3}
+  durability: 92
+  material_toughness: 1
+  unarmed: 0
+  Light_attack_damage: 35
+  Strong_attack_damage: 124
+  combo_dmg_bonus: 50
+  light_attack_stamina_cost: 8
+  strong_attack_stamina_cost: 15
+  combo_attack_stamina_cost: 26

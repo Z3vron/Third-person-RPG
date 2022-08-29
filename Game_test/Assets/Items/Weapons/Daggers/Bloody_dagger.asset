@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c50d51c558bb5c4194f728611ce1e19, type: 3}
+  m_Name: Bloody_dagger
+  m_EditorClassIdentifier: 
+  Item_icon: {fileID: 21300000, guid: 68d994ce6a5919f4ca853c2fdad1f913, type: 3}
+  Item_name: Bloody dagger
+  max_stack_amount: 1
+  Item_weight: 0
+  Weapon_model: {fileID: 7228585429627651759, guid: e55f9fbc89dbf5f46842646f9e285e90, type: 3}
+  durability: 92
+  material_toughness: 2
+  unarmed: 0
+  Light_attack_damage: 15
+  Strong_attack_damage: 20
+  combo_dmg_bonus: 9
+  light_attack_stamina_cost: 2
+  strong_attack_stamina_cost: 4
+  combo_attack_stamina_cost: 6
+  attack_speed_multiplayer: 1.5
