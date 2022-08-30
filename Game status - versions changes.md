@@ -1,3 +1,4 @@
+I started learning Unity Game Engine by creating my first game which of course isn't perfect (not even acceptably good but i have lots of fun in process of making it).
 This is my game - there are lots of bugs and issues with it but i am slowly repeairing them and adding some new features. Game doesn't look to good visualy but i never 
 intended to make visually pleasing game - I am not an artist but i like coding so i focus on writing mechanics for the game.
 
@@ -25,7 +26,7 @@ Known Bugs:
 - enemy sometimes when following player has big turn radious 
 - if in the arrea there are many dropped items and there is also an object to interact than errores sometimes occures - bad way of handling that in code - find new better way
 - if player hit ceiling he could stay there for a momenmt - character controleer is trying to move it but it cann't - my attempts of pushing player down didn't success
-- 
+- UI scaling, I used anchors and some parts of the UI scales correctly with the screen but some parts(known item info, player lvl, player exp bar) overlap on each oder, also dynamic size of item info isn't working alwayes(maybe i determin size in pixels and should determin some percent of screen size?) 
 
 Things that definitely need redoing:
 - animator system - for now i have almost none animations so that isn't such a big issue but later on, it will become massive one if i stay with current approach
