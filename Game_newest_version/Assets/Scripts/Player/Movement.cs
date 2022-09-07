@@ -102,7 +102,7 @@ namespace Player_Movemnet{
         [SerializeField] private float _Player_current_horizontal_speed;
         [SerializeField] private float _Player_target_speed;
         [SerializeField] private RaycastHit _hit;
-        [SerializeField] private bool _Active_action;
+        [SerializeField] private bool _active_action;
         [SerializeField] private float _Distance_to_interact = 0.9f;
         [SerializeField] private float _Touch_force = 80f;
         [SerializeField] private float _Door_side=0;
@@ -185,11 +185,11 @@ namespace Player_Movemnet{
             if(locked_on_enemy){
                 Handle_state_while_lock_on_enemy();
             }
-            _Active_action = GetComponent<Player_info>().active_animation;
+            _active_action = GetComponent<Player_info>().active_animation;
             Gravity();
             Ground_check();
             Ceiling_check();
-            if(!_Active_action){
+            if(!_active_action){
                 Equip_items();
                 if(!_player_inventory.inventory_open){
                     Lock_on_enemy();
@@ -263,9 +263,6 @@ namespace Player_Movemnet{
                 //Debug.Log(" random trigger enter");
             }
         }
-        // private void OnTriggerStay(Collider other) {
-        //     Debug.Log(other);
-        // }
         private void OnTriggerExit(Collider other){
             _trigger_colliders.RemoveAt(0);
             if(other.CompareTag("Trap")){
@@ -393,12 +390,6 @@ namespace Player_Movemnet{
             yield return new WaitForSeconds(4.5f);
             _object_to_interact.GetComponent<Renderer>().material.color = Color.white;
         }
-        // IEnumerator Activate_object_with_delay(float seconds, GameObject gameObject){
-        //     Debug.Log("Strong attack load bar");
-        //     yield return new WaitForSeconds(seconds);
-        //     gameObject.SetActive(true);
-
-        // }
         private void Attack(){
                 if(_input_handler.attack_light_flag){
                     //Debug.Log("Light attack button pressed");
@@ -483,54 +474,46 @@ namespace Player_Movemnet{
                 //_Player_velocity.y = - _Player_velocity.y;
                 // _controller.Move(_Player_velocity * Time.deltaTime);
             }
-              
-               
-            
             if(player_grounded && !player_crouching){
                 if(_Time_between_landing_next_jump >= 0.0f)
                     _Time_between_landing_next_jump -= Time.deltaTime;
 
                 if (_input_handler.jump_flag && _Time_between_landing_next_jump <=0.0f && _player_statistics.Current_stamina > _jump_stamina_cost){
                     //_Player_velocity.y += Mathf.Sqrt(_jump_height * -2.0f * _gravity_force); // in theory should take care speed to jump higher - very high jumpo at stairs - not sure how it works
-                   
-                   // _Player_velocity = _Move;
-                   _player_statistics.Take_stamina(_jump_stamina_cost);
+                    // _Player_velocity = _Move;
+                    _player_statistics.Take_stamina(_jump_stamina_cost * Time.deltaTime);
+                    //Debug.Log("Taken stamina: " + _jump_stamina_cost * Time.deltaTime);
                     _Player_velocity.y = Mathf.Sqrt(_jump_height * -2.0f * _gravity_force);
                     _controller.Move(_Player_velocity * Time.deltaTime);
-
-                
                 }
-
             // Debug.Log("X: " + move.x +"Y: " + _Player_velocity.y +"Z: " + move.z );
             // _controller.Move(new Vector3(move.x,_Player_velocity.y,move.z) * Time.deltaTime * _Player_speed);
             }
             else{
                 _Time_between_landing_next_jump = _Time_between_jumps;
             }
-
-          
         }
         private void Crouch(){
-             if(_input_handler.crouch_flag&& player_grounded){
+            if(_input_handler.crouch_flag&& player_grounded){
                 if(player_crouching){
                     player_crouching = false;
-                    _animator.SetBool("Crouching",false);
-                    Debug.Log("end crouching");
+                    _animator.CrossFadeInFixedTime("Idle",0.25f,0);
+                    //Debug.Log("end crouching");
                 }
                 else{
                     player_crouching = true;
-                    _animator.SetBool("Crouching",true);
-                    Debug.Log("start crouching");
+                    _animator.CrossFadeInFixedTime("Crouching",0.25f,0);
+                    //Debug.Log("start crouching");
                 }  
-             }
-             if(player_crouching){
+            }
+            if(player_crouching){
                 _controller.height = 1f;
                 _controller.center = (new Vector3(0,0.5f,0));
-             }
-             else{
+            }
+            else{
                 _controller.height = 1.68f;
                 _controller.center = (new Vector3(0,0.9f,0));
-             }
+            }
         }        
         private void Ground_check(){
             // player_grounded = _controller.isGrounded; // buggy as fuck
@@ -594,12 +577,7 @@ namespace Player_Movemnet{
             _target_group.AddMember(_closest_enemy.transform,1,2);
         }
         private void Handle_state_while_lock_on_enemy(){
-            if(_input_handler.dash_flag && _player_statistics.Current_stamina > _dash_stamina_cost){
-                //Debug.Log(_Move * _dash_speed);
-                _controller.Move(_Move * _dash_speed);
-                _player_statistics.Take_stamina(_dash_stamina_cost);
-            }
-                
+            Handle_dashes();
             if(_input_handler.switch_flag && enemies_lock_on.Count > 1){
                 if(enemies_lock_on.Count == _enemies_counter+1){
                     _enemies_counter = -1;
@@ -644,6 +622,16 @@ namespace Player_Movemnet{
             direction.y = 0;
             Quaternion target_rotation = Quaternion.LookRotation(direction);
             transform.rotation = Quaternion.Lerp(transform.rotation,target_rotation,_player_rotation_speed * Time.deltaTime);
+        }
+        private void Handle_dashes(){
+            if(_input_handler.dash_flag && _player_statistics.Current_stamina > _dash_stamina_cost){
+                //Debug.Log(_Move * _dash_speed);
+                if(_input_handler.walk_input.x < 0)
+                    _animator.CrossFade("Dash_left",0f,0);
+                else if(_input_handler.walk_input.x > 0)
+                    _animator.CrossFade("Dash_right",0f,0);
+                _player_statistics.Take_stamina(_dash_stamina_cost);
+            }
         }
         public bool Is_enemy_to_lock_on_visible(GameObject potential_enemy_to_lock_on){
             if(Physics.Linecast(transform.position,potential_enemy_to_lock_on.transform.position, out _hit)){
@@ -692,6 +680,7 @@ namespace Player_Movemnet{
             _input_handler.mouse_left_pressed_inv_flag = false;
             _input_handler.transfer_items_inv_flag = false;
             _input_handler.drop_items_inv_flag = false;
+            _input_handler.use_item_inv_flag = false;
             _input_handler.confirmed_action_inv_flag = false;
         }
     }

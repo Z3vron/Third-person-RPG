@@ -16,5 +16,6 @@ MonoBehaviour:
   Item_name: Whetstone
   max_stack_amount: 1
   Item_weight: 2
+  item_id: 63
   durability: 100
   grid_toughness: 3

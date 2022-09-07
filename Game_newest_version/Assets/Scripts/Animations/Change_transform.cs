@@ -25,5 +25,6 @@ public class Change_transform : MonoBehaviour
            //Debug.Log("Position:" + Animation_transform.transform.localPosition);
         }
         animation_transform.localPosition = new Vector3(0,0,0);
+        animation_transform.localRotation = new Quaternion(0,0,0,0);
     }
 }

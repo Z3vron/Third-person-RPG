@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7df593ce3adfebd4bad5e3957955fd28, type: 3}
+  m_Name: Healing_berry_02
+  m_EditorClassIdentifier: 
+  Item_icon: {fileID: 21300000, guid: 452b16caf8058e449bbf0fce3a4db31b, type: 3}
+  Item_name: Healing_berry_02
+  max_stack_amount: 20
+  Item_weight: 1
+  item_id: 62
+  health_restore_amount: 2
+  eating_time: 5

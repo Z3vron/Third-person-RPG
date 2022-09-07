@@ -16,6 +16,8 @@ public class Character_statistics : ScriptableObject{
     public bool Taken_stamina = false;
     public int level = 0;
 
+    
+
     public void Set_defaults_stats(float M_hp,float M_s,float R_hp,float R_s,float Strength,int base_level,int current_exp_base_0,int exp_for_level_1){
         Max_health = M_hp;
         Max_stamina = M_s;
@@ -28,6 +30,9 @@ public class Character_statistics : ScriptableObject{
         //current_exp= current_exp_base_0;
         level = base_level;
         //exp_to_next_level = exp_for_level_1;
+    }
+    private void Update() {
+        
     }
 
     public void Health_regen(){

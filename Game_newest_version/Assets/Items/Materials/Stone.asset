@@ -16,5 +16,6 @@ MonoBehaviour:
   Item_name: Stone
   max_stack_amount: 12
   Item_weight: 5
+  item_id: 83
   quality_class: 1
   size: 4

@@ -35,6 +35,16 @@ public class Inventory_slots : MonoBehaviour{
     public List<GameObject> inventory_items_images_slots = new List<GameObject>();
     public List<Slot> inventory_items_slots = new List<Slot>();
 
+    [Header("Potions")]
+    public GameObject potion_01;
+    public GameObject potion_02;
+    public GameObject potion_03;
+    public GameObject potion_04;
+    public GameObject potion_05;
+    public GameObject potion_06;
+    public List<GameObject> inventory_potions_images_slots = new List<GameObject>();
+    public List<Slot> inventory_potions_slots = new List<Slot>();
+
     private void Start() {
         gameObject.SetActive(false);
         //weapons
@@ -97,6 +107,27 @@ public class Inventory_slots : MonoBehaviour{
             inventory_items_slots[i].stack_amount = 0;
             inventory_items_slots[i].item = null;
         }
+
+        //Potions
+        
+        inventory_potions_images_slots.Add(potion_01);
+        inventory_potions_images_slots.Add(potion_02);
+        inventory_potions_images_slots.Add(potion_03);
+        inventory_potions_images_slots.Add(potion_04);
+        inventory_potions_images_slots.Add(potion_05);
+        inventory_potions_images_slots.Add(potion_06);
+
+        inventory_potions_slots.Add(potion_01.transform.parent.GetComponent<Drop_slot>().slot);
+        inventory_potions_slots.Add(potion_02.transform.parent.GetComponent<Drop_slot>().slot);
+        inventory_potions_slots.Add(potion_03.transform.parent.GetComponent<Drop_slot>().slot);
+        inventory_potions_slots.Add(potion_04.transform.parent.GetComponent<Drop_slot>().slot);
+        inventory_potions_slots.Add(potion_05.transform.parent.GetComponent<Drop_slot>().slot);
+        inventory_potions_slots.Add(potion_06.transform.parent.GetComponent<Drop_slot>().slot);
+
+       for(int i=0;i<6;i++){
+            inventory_potions_slots[i].stack_amount = 0;
+            inventory_potions_slots[i].item = null;
+        }
     }
     private void OnEnable() {
     
@@ -115,6 +146,10 @@ public class Inventory_slots : MonoBehaviour{
                 //Debug.Log("material");
                 inventory_materials_images_slots[position].GetComponent<Image>().sprite = item.Item_icon;
                 inventory_materials_images_slots[position].GetComponent<Image>().enabled = true;
+            }
+            else if(item is Potions){
+                inventory_potions_images_slots[position].GetComponent<Image>().sprite = item.Item_icon;
+                inventory_potions_images_slots[position].GetComponent<Image>().enabled = true;
             }
             else if(item is Item_info.Item){
                 // Debug.Log("item");

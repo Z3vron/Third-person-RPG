@@ -16,5 +16,6 @@ MonoBehaviour:
   Item_name: Quartz
   max_stack_amount: 2
   Item_weight: 3
+  item_id: 82
   quality_class: 1
   size: 1

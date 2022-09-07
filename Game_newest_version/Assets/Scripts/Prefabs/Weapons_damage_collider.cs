@@ -31,11 +31,18 @@ public class Weapons_damage_collider : MonoBehaviour{
             //Debug.Log("Hitted enemy");
         }
         if(other.CompareTag("Player")){
-            if(_isRight)
-                other.GetComponentInParent<Player_info>().player_stats.Take_damage(enemy_manager.enemy_stats.Raw_strength + enemy_manager.current_attack.damage  + enemy_weapons.right_hand_weapon.Light_attack_damage);
-            else
-                other.GetComponentInParent<Player_info>().player_stats.Take_damage(enemy_manager.enemy_stats.Raw_strength + enemy_manager.current_attack.damage+enemy_weapons.left_hand_weapon.Light_attack_damage);
-            //Debug.Log("Dont hit yourself");
+            if(other.GetComponentInParent<Player_info>().player_invulnerability){
+                Debug.Log("Player is player is invulnerable at that moment");
+                return;
+            }
+            else{
+                if(_isRight){
+                    other.GetComponentInParent<Player_info>().player_stats.Take_damage(enemy_manager.instance_enemy_stats.Raw_strength + enemy_manager.current_attack.damage  + enemy_weapons.right_hand_weapon.Light_attack_damage);
+                }
+                else
+                    other.GetComponentInParent<Player_info>().player_stats.Take_damage(enemy_manager.instance_enemy_stats.Raw_strength + enemy_manager.current_attack.damage+enemy_weapons.left_hand_weapon.Light_attack_damage);
+                    //Debug.Log("Dont hit yourself");
+            }
         }
     }
     public void Enable_collider(){

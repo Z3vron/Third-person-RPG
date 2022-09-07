@@ -1129,9 +1129,11 @@ MonoBehaviour:
   m_Placeholder: {fileID: 0}
   m_ItemText: {fileID: 3729456145900309714}
   m_ItemImage: {fileID: 0}
-  m_Value: -10
+  m_Value: -1
   m_Options:
     m_Options:
+    - m_Text: Use item (E)
+      m_Image: {fileID: 0}
     - m_Text: Transfer items (T)
       m_Image: {fileID: 0}
     - m_Text: Drop items (O)
@@ -1140,7 +1142,7 @@ MonoBehaviour:
       m_Image: {fileID: 0}
     - m_Text: Split items in half
       m_Image: {fileID: 0}
-    - m_Text: Repair
+    - m_Text: Repair item
       m_Image: {fileID: 0}
     - m_Text: Exit
       m_Image: {fileID: 0}

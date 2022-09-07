@@ -35,7 +35,9 @@ public class Object_inventory_slots : MonoBehaviour
     public void Remove_inventory_item_icon(int position, List<GameObject> list){
         list[position].GetComponent<Image>().sprite = null;
         list[position].GetComponent<Image>().enabled = false;
-        list[position].GetComponentInChildren<Text>().enabled = false;
+        //creation menu doesn't have text to display amount of items in specific slot
+        if( list[position].GetComponentInChildren<Text>() != null)
+            list[position].GetComponentInChildren<Text>().enabled = false;
     }
     public void Check_item_amount(int position, List<GameObject> icon_list, List<Slot> slot_list){
         if(slot_list[position].stack_amount > 1){

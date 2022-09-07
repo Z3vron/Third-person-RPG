@@ -21,7 +21,8 @@ public class Attack_state : State{
             enemy_manager.performing_action = true;
             //recovery_timer includes time for the attack animation so each attack recovery timer should be bigger or just change where i put this
             enemy_manager.current_recovery_time = enemy_manager.current_attack.recovery_time;
-            enemy_manager.animator.SetBool(enemy_manager.current_attack.animation_name,true);
+            //enemy_manager.animator.SetBool(enemy_manager.current_attack.animation_name,true);
+            enemy_manager.animator.CrossFade(enemy_manager.current_attack.animation_name,0f,0);
             //enemy_manager.current_attack = null;
             return combat_stance_state;
             

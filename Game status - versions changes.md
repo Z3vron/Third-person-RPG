@@ -2,6 +2,24 @@ I started learning Unity Game Engine by creating my first game which of course i
 This is my game - there are lots of bugs and issues with it but i am slowly repeairing them and adding some new features. Game doesn't look to good visualy but i never 
 intended to make visually pleasing game - I am not an artist but i like coding so i focus on writing mechanics for the game.
 
+
+Update 06.09.2022
+- Changed animations transitions from nodes(in future there would be to much arrows and chaos and bools/triggers) to transitions through code(Crossfade)
+- Stamina consumption - sometimes it's tricky - always inconsistent - jump action( function is called many times - framerate is unstable? - look in future)
+- Added new item type(inventory row): Potions - health potions restoring health
+- Make all animations independent from the player model - cleared some trash combine with it -  stiil need to update player model so that it won't have any animations
+- Did some code cleaning - extra functions that work on data of diffrent type (Potions,Materials etc) - think more on Generics
+- Added player invulnerability during dashes
+- Fixed error connected to killing enemy while not in lock on state
+- Fixed error with transfering items between inventories - no idea how it occuried - simple fix but inventories code could me more clean and simple
+- Crafting system is looking for ingredients in both material and item list, could optimize to use less code(write extra function for it - maybe using generics - i want to use it)
+- Added item-id parameter(variable into item class) so that items could be recognise if they are the same object(used in stacking items in inv, copies of the same scriptable object aren't he same) - need to change code in some places to use this new variable - code could be cleaner - this solution solves few issues from the past but i don't exactly remeber where this  issue occure 
+
+- Think on animations layers - could use/play few aniamtions at the same time (lower body is moving while upper is attacking etc???)
+- Think on seperating Inventories script to few smaller scripts
+- Think on a way to handle destroyinh item option menu when mouse was pressed outisde of dropdown, existing system isn't ideal
+
+
 Version 1.04
 Fetaures included/done in most part:
 - player can walk,jum,sprint and crouch

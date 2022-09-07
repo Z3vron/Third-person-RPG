@@ -19,6 +19,7 @@ namespace Player_inventory_info{
         public Weapon_info.Weapon unarmed;
         public Armor_info.Armour player_armour;
         public List<Weapon_info.Weapon> inventory_weapons_slots = new List<Weapon_info.Weapon>();
+        public List<Potions> inventory_potions_slots = new List<Potions>();
         public List<Materials> inventory_materials_slots = new List<Materials>();
         public List<Item_info.Item> inventory_items_slots = new List<Item_info.Item>();
         public bool inventory_open = false;
@@ -312,8 +313,11 @@ namespace Player_inventory_info{
         public void Remove_item_from_player_inv(Slot slot){
             if(slot.item is Weapon_info.Weapon)
                 inventory_weapons_slots.RemoveAt(slot.slot_number);
-            else if(slot.item is Materials)
+            else if(slot.item is Potions)
+                inventory_potions_slots.RemoveAt(slot.slot_number);
+            else if(slot.item is Materials){
                 inventory_materials_slots.RemoveAt(slot.slot_number);
+            }  
             else if(slot.item is Item_info.Item){
                 inventory_items_slots.RemoveAt(slot.slot_number);
             }
@@ -321,6 +325,9 @@ namespace Player_inventory_info{
         public void Add_item_to_player_inv_list(Item_info.Item item){
             if(item is Weapon_info.Weapon && inventory_weapons_slots.Count < 6){
                 inventory_weapons_slots.Add((Weapon_info.Weapon)item);
+            }
+            else if(item is Potions && inventory_potions_slots.Count < 6){
+                inventory_potions_slots.Add((Potions) item);
             }   
             else if(item is Materials && inventory_materials_slots.Count < 6){
                 inventory_materials_slots.Add((Materials) item);

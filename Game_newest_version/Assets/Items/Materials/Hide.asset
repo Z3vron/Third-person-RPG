@@ -16,6 +16,7 @@ MonoBehaviour:
   Item_name: Hide
   max_stack_amount: 10
   Item_weight: 1.6
+  item_id: 81
   quality_class: 1
   size: 3
   hide_thickness: 0.6

@@ -55,8 +55,7 @@ namespace Attack{
                             Debug.Log("fist combo attack animation here ");
                         }
                         else{
-                            _animator.SetBool("Light_combo_attack",true);
-                            _animator.SetBool("Active_animation",true);
+                            _animator.CrossFade("Light_attack_combo",0f,0);
                         }       
                         // Debug.Log("Damage given to enemy without armour: " + damage_given_left + damage_given_right);
                     }
@@ -131,8 +130,10 @@ namespace Attack{
                 Dagger dagger = (Dagger)_player_inventory.current_weapon_for_left_hand;
                 _animator.SetFloat("Attack_speed_multiplayer",dagger.attack_speed_multiplayer);
             }
-            _animator.SetBool("Light_attack_left",true);
-            _animator.SetBool("Active_animation",true);
+            else{
+                _animator.SetFloat("Attack_speed_multiplayer",1);
+            }
+            _animator.CrossFade("Light_attack_left",0f,0);
             _player_stats.Take_stamina(_player_inventory.current_weapon_for_left_hand.light_attack_stamina_cost);
         }
         public void Start_right_light_attack(){
@@ -140,8 +141,10 @@ namespace Attack{
                 Dagger dagger = (Dagger)_player_inventory.current_weapon_for_right_hand;
                 _animator.SetFloat("Attack_speed_multiplayer",dagger.attack_speed_multiplayer);
             }
-            _animator.SetBool("Light_attack_right",true);
-            _animator.SetBool("Active_animation",true);
+            else{
+                _animator.SetFloat("Attack_speed_multiplayer",1);
+            }
+            _animator.CrossFade("Light_attack_right",0f,0);//,-1,3,0.9f);
             _player_stats.Take_stamina(_player_inventory.current_weapon_for_right_hand.light_attack_stamina_cost);
         }
     }

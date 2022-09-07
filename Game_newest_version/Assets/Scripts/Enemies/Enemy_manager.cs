@@ -97,10 +97,9 @@ public class Enemy_manager : MonoBehaviour
     private void Handle_death(){
          if(instance_enemy_stats.Current_health <= 0){
             player.GetComponent<Player_info>().player_stats.current_exp += instance_enemy_stats.exp_reward;
-            
             if(player.GetComponent<Player_Movemnet.Movement>().enemies_lock_on.Contains(gameObject))
                 player.GetComponent<Player_Movemnet.Movement>().enemies_lock_on.Remove(gameObject);
-            if(player.GetComponent<Player_Movemnet.Movement>().enemies_lock_on.Count == 0)
+            if(player.GetComponent<Player_Movemnet.Movement>().enemies_lock_on.Count == 0 && player.GetComponent<Player_Movemnet.Movement>().locked_on_enemy)
                 player.GetComponent<Player_Movemnet.Movement>().Release_lock_on_enemy();
             Destroy(gameObject);
             Destroy(_instance_enemy_HUD);

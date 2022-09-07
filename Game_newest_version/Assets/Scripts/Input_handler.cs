@@ -50,6 +50,7 @@ public class Input_handler : MonoBehaviour
         public bool mouse_left_pressed_inv_flag;
         public bool transfer_items_inv_flag;
         public bool drop_items_inv_flag;
+        public bool use_item_inv_flag;
         public bool inventory_close_inv_flag;
         public bool confirmed_action_inv_flag;
         public Vector2 mouse_position;
@@ -59,6 +60,7 @@ public class Input_handler : MonoBehaviour
         private InputAction _mouse_left_pressed_inv_action;
         private InputAction _transfer_items_inv_action;
         private InputAction _drop_items_inv_action;
+        private InputAction _use_item_inv_action;
         private InputAction _confirm_action_inv_action;
         private InputAction _mouse_pos;
     #endregion
@@ -89,6 +91,7 @@ public class Input_handler : MonoBehaviour
         _mouse_left_pressed_inv_action = _player_input.actions["Left_click"];
         _transfer_items_inv_action = _player_input.actions["Transfer_items"];
         _drop_items_inv_action = _player_input.actions["Drop_items"];
+        _use_item_inv_action = _player_input.actions["Use"];
         _confirm_action_inv_action = _player_input.actions["Confirm"];
         _mouse_pos = _player_input.actions["Point"];
         
@@ -135,6 +138,7 @@ public class Input_handler : MonoBehaviour
         if(_mouse_left_pressed_inv_action.triggered) mouse_left_pressed_inv_flag = true;{}
         if(_transfer_items_inv_action.triggered)     transfer_items_inv_flag = true;{}
         if(_drop_items_inv_action.triggered)         drop_items_inv_flag = true;{}
+        if(_use_item_inv_action.triggered)           use_item_inv_flag = true;{}
         if(_confirm_action_inv_action.triggered) confirmed_action_inv_flag = true;{}
         mouse_position = _mouse_pos.ReadValue<Vector2>();
                
