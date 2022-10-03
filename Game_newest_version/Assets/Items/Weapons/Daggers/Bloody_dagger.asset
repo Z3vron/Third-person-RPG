@@ -16,11 +16,15 @@ MonoBehaviour:
   Item_name: Bloody dagger
   max_stack_amount: 1
   Item_weight: 0
-  item_id: 2
+  item_id: 2.01
   Weapon_model: {fileID: 7228585429627651759, guid: e55f9fbc89dbf5f46842646f9e285e90, type: 3}
-  durability: 92
+  durability: 100
   material_toughness: 2
   unarmed: 0
+  weapon_lvl: 0
+  poison_damage: 0
+  poison_duration: 0
+  isPoisoned: 0
   Light_attack_damage: 15
   Strong_attack_damage: 20
   combo_dmg_bonus: 9

@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f931609abece724f955bfbf7c0ec3e1, type: 3}
+  m_Name: Rapier_01
+  m_EditorClassIdentifier: 
+  Item_icon: {fileID: 21300000, guid: 70790f151824f2f48b92e9e4cc60edbb, type: 3}
+  Item_name: Rapier_01
+  max_stack_amount: 1
+  Item_weight: 0
+  item_id: 3.01
+  Weapon_model: {fileID: 5332455628491345753, guid: 78019d99fdbab32438ae33a59da18c2e, type: 3}
+  durability: 100
+  material_toughness: 0.5
+  unarmed: 0
+  weapon_lvl: 2
+  poison_damage: 0
+  poison_duration: 0
+  isPoisoned: 0
+  Light_attack_damage: 40
+  Strong_attack_damage: 50
+  combo_dmg_bonus: 15
+  light_attack_stamina_cost: 7
+  strong_attack_stamina_cost: 17
+  combo_attack_stamina_cost: 20
+  attack_speed_multiplayer: 1.15
+  critical_damage_bonus: 2

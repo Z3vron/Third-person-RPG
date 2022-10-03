@@ -71,7 +71,7 @@ namespace Player_Movemnet{
 
         public bool player_grounded = false;
         public bool player_crouching = false;
-        public bool locked_on_enemy = false;
+        
       
         // public bool Door_touched = false; // variable used to control door in another script but I decided to handle it here  - not sure if good habbit but another script would be too simple
         public bool Trap_active = false; 
@@ -131,6 +131,7 @@ namespace Player_Movemnet{
         private Vector3 _Move;
         private Attack.Player_attack  _handle_attacks;
         private Player_statistics _player_statistics;
+        private Player_info _player_info;
         private Player_inventory_info.Player_inventory _player_inventory;
         private bool _text_added = false;
         private string _back_up_interact_text;
@@ -148,7 +149,8 @@ namespace Player_Movemnet{
         
         // to the same for text
         // number of dropped items doesn't change
-        private List<Collider> _trigger_colliders = new List<Collider>();
+        [SerializeField] private List<Collider> _trigger_colliders = new List<Collider>();
+        [SerializeField] private Collider _collider_to_interact;
 
         private void Start(){
             _controller = GetComponent<CharacterController>();
@@ -156,7 +158,8 @@ namespace Player_Movemnet{
             _main_camera = Camera.main.transform;
             _Time_between_landing_next_jump = _Time_between_jumps;
             _handle_attacks = GetComponent<Attack.Player_attack>();
-            _player_statistics =  GetComponent<Player_info>().player_stats;
+            _player_info = GetComponent<Player_info>();
+            _player_statistics =  _player_info.player_stats;
             _player_inventory = GetComponent<Player_inventory_info.Player_inventory>();
             _input_handler = GetComponent<Input_handler>();
             _back_up_interact_text = _interact_pop_up.GetComponentInChildren<Text>().text;
@@ -182,12 +185,13 @@ namespace Player_Movemnet{
         }
         void Update(){
             _input_handler.Check_flags();
-            if(locked_on_enemy){
+            if(_player_info.locked_on_enemy){
                 Handle_state_while_lock_on_enemy();
             }
-            _active_action = GetComponent<Player_info>().active_animation;
+            _active_action = _player_info.active_animation;
             Gravity();
             Ground_check();
+            Handle_jump_on_top_of_enemy();
             Ceiling_check();
             if(!_active_action){
                 Equip_items();
@@ -196,7 +200,7 @@ namespace Player_Movemnet{
                     Jump();
                     Crouch();
                     Move_player();
-                    if(!locked_on_enemy)
+                    if(!_player_info.locked_on_enemy)
                         Rotate_player();
                     Attack();
                     Interact();
@@ -217,7 +221,7 @@ namespace Player_Movemnet{
                 _player_inventory.Check_right_weapon();
         }
         private void OnTriggerEnter(Collider other){
-            _trigger_colliders.Add(other);
+            // _trigger_colliders.Add(other);
             if(other.CompareTag("Trap")){
             //other.gameObject.GetComponentInChildren<Rigidbody>().AddForce(Vector3.up * 100f);
                 Debug.Log("Trap activated");
@@ -231,46 +235,85 @@ namespace Player_Movemnet{
                 _Door_side = 1;
                 //Debug.Log("Door push setting");
             }
-            else if(other.GetComponent<Item_dropped>()){
+            else{
+                //Debug.Log(" random trigger enter");
+            }
+        }
+        private void OnTriggerStay(Collider other){
+            //Debug.Log(other);
+            if(other.GetComponent<Item_dropped>() ||other.gameObject.tag == "Chest"|| other.gameObject.tag == "Door" ){
+                Vector3 interactable_object_dir = other.transform.position - gameObject.transform.position;
+                interactable_object_dir.y = 0;
+                interactable_object_dir.Normalize();
+                float angle = Vector3.Angle(gameObject.transform.forward, interactable_object_dir);
+                if(angle < 45 && angle > -45){
+                    if(!_trigger_colliders.Contains(other))
+                        _trigger_colliders.Add(other);
+                    //dropped items are first because their radious is smaller so they need to be detected before other interactable objects with bigger radious
+                   
+                }
+                else{
+                    if(_trigger_colliders.Contains(other))
+                        _trigger_colliders.Remove(other);
+                    _in_area_to_interact_chest = false;
+                    _in_area_to_interact_door = false;
+                    _in_area_to_interact_dropped_items = false;
+                    //Debug.Log("Item out of reach");
+                    Reset_turn_off_interact_pop_up();
+                }
+            }
+            float distance = Mathf.Infinity;
+            foreach(var interact_collider in _trigger_colliders){
+                if(Vector3.Distance(gameObject.transform.position,interact_collider.gameObject.transform.position) < distance){
+                    distance = Vector3.Distance(gameObject.transform.position,interact_collider.gameObject.transform.position);
+                    _collider_to_interact = interact_collider;
+                    Reset_turn_off_interact_pop_up();
+                }
+            }
+            if(_collider_to_interact == null)
+                return ;
+            if(_collider_to_interact.GetComponent<Item_dropped>()){
                 //Debug.Log("Dropped item in area");
                 _in_area_to_interact_dropped_items = true;
                 _interact_pop_up.SetActive(true);
+                
                 if(!_text_added){
-                    _interact_pop_up.GetComponentInChildren<Text>().text += other.GetComponent<Item_dropped>().interactable_text;
+                    _interact_pop_up.GetComponentInChildren<Text>().text += _collider_to_interact.GetComponent<Item_dropped>().interactable_text;
                     _text_added = true;
                 }               
             }
-            else if(other.gameObject.tag == "Chest"){
-                //Debug.Log("Chest in area");
+            else if(_collider_to_interact.gameObject.tag == "Chest"){
                 _in_area_to_interact_chest = true;
                 _interact_pop_up.SetActive(true);
                 if(!_text_added){
-                    _interact_pop_up.GetComponentInChildren<Text>().text += other.GetComponent<Interactable_objects>().interactable_text;
+                    _interact_pop_up.GetComponentInChildren<Text>().text += _collider_to_interact.GetComponent<Interactable_objects>().interactable_text;
                     _text_added = true;
                 }
             }
-            else if(other.gameObject.tag == "Door"){
+            
+            else if(_collider_to_interact.gameObject.tag == "Door"){
                 //Debug.Log("Opening Door");
                 // Door_touched = true;
                 _in_area_to_interact_door = true;
                 _interact_pop_up.SetActive(true);
                 if(!_text_added){
-                    _interact_pop_up.GetComponentInChildren<Text>().text += other.GetComponent<Interactable_objects>().interactable_text;
+                    _interact_pop_up.GetComponentInChildren<Text>().text += _collider_to_interact.GetComponent<Interactable_objects>().interactable_text;
                     _text_added = true;
                 }
             }
-            else{
-                //Debug.Log(" random trigger enter");
-            }
+            
         }
         private void OnTriggerExit(Collider other){
-            _trigger_colliders.RemoveAt(0);
+            //_trigger_colliders.RemoveAt(0);
             if(other.CompareTag("Trap")){
                 Debug.Log("Trap deactivated");
                 Trap_active = false;
             }
             if(other.GetComponent<Item_dropped>() || other.gameObject.tag == "Chest" || other.gameObject.tag == "Door"){
-                
+                if(_trigger_colliders.Contains(other))
+                    _trigger_colliders.Remove(other);
+                if(_trigger_colliders.Count == 0)
+                    _collider_to_interact = null;
                 _in_area_to_interact_chest = false;
                 _in_area_to_interact_door = false;
                 _in_area_to_interact_dropped_items = false;
@@ -281,28 +324,34 @@ namespace Player_Movemnet{
         private void Interact(){
             if(_input_handler.interact_flag && _trigger_colliders.Count > 0){
                 if(_in_area_to_interact_dropped_items){
-                    _canvas.GetComponent<Inventories>().Add_item_to_player_inv_check_for_same_object(_trigger_colliders[_trigger_colliders.Count-1].GetComponent<Item_dropped>().item_dropped,_trigger_colliders[_trigger_colliders.Count-1].GetComponent<Item_dropped>().amount_of_dropped_items);
+                    _canvas.GetComponent<Inventories>().Add_item_to_player_inv_check_for_same_object(_collider_to_interact.GetComponent<Item_dropped>().item_dropped,_collider_to_interact.GetComponent<Item_dropped>().amount_of_dropped_items);
                     
                     if( _canvas.GetComponent<Inventories>().added_all_items){
-                        Destroy(_trigger_colliders[_trigger_colliders.Count-1].gameObject);
-                        _trigger_colliders.RemoveAt(_trigger_colliders.Count-1);
+                        Destroy(_collider_to_interact.gameObject);
+                        if(_trigger_colliders.Contains(_collider_to_interact))
+                            _trigger_colliders.Remove(_collider_to_interact);
+                        if(_trigger_colliders.Count == 0)
+                            _collider_to_interact = null;
                         _in_area_to_interact_dropped_items = false;
+                        Reset_turn_off_interact_pop_up();
                     }
                     else{
-                        _trigger_colliders[_trigger_colliders.Count-1].GetComponent<Item_dropped>().amount_of_dropped_items = dropped_item_new_amount;
+                        _collider_to_interact.GetComponent<Item_dropped>().amount_of_dropped_items = dropped_item_new_amount;
                     }        
                 }
                 else if(_in_area_to_interact_chest){
-                    _object_to_interact = _trigger_colliders[_trigger_colliders.Count-1].gameObject;   
+                    _object_to_interact =_collider_to_interact.gameObject;   
                     _object_to_interact.GetComponent<AudioSource>().Play();
-                    StartCoroutine(Coloring_object());
+                    //StartCoroutine(Coloring_object());
+                    Function_timer.Create(() => Set_chest_color(Color.red),2);
+                    Function_timer.Create(() => Set_chest_color(Color.white),8);
                     _object_inventory.SetActive(true);
                     _canvas.GetComponent<Inventories>().object_inv_to_show = _object_to_interact.GetComponent<Interactable_objects>();
                     _canvas.GetComponent<Inventories>().Assign_weapons_amount_to_slots();
                     _player_inventory.Handle_inventory();
                 }
                 else if(_in_area_to_interact_door){
-                    _trigger_colliders[0].GetComponent<Rigidbody>().AddForce(_Door_side*_root_for_shot_raycast.forward * _Touch_force * _Player_speed,ForceMode.Acceleration);
+                    _collider_to_interact.GetComponent<Rigidbody>().AddForce(_Door_side*_root_for_shot_raycast.forward * _Touch_force * _Player_speed,ForceMode.Acceleration);
                 }
             }
                 // old version with raycasts
@@ -380,6 +429,9 @@ namespace Player_Movemnet{
             }
             */
         }
+        private void Set_chest_color(Color color){
+            _object_to_interact.GetComponent<Renderer>().material.color = color;
+        }
         private void Reset_turn_off_interact_pop_up(){
             _interact_pop_up.SetActive(false);
             _text_added = false;
@@ -421,12 +473,39 @@ namespace Player_Movemnet{
                 }
         }
         private void Move_player(){
+            _input_vector = _input_handler.walk_input;
+            if(_player_info.locked_on_enemy && _animator.GetBool("Active_animation") == false){
+                //Debug.Log(_animator.GetBool("Active_animation") + "combat movement");
+                _animator.SetBool("Combat_movement",true);
+                if(_input_vector == Vector2.zero){
+                    _animator.CrossFade("Base Layer.Lock on movement.Lock on Idle",0,0);
+                }
+                if(_input_vector.x > 0 && _input_vector.y == 0)
+                    _animator.CrossFade("Base Layer.Lock on movement.Unarmed-Strafe-Right",0,0);
+                else if(_input_vector.x < 0 && _input_vector.y == 0)
+                    _animator.CrossFade("Base Layer.Lock on movement.Unarmed-Strafe-Left",0,0);
+                else if(_input_vector.y > 0 && _input_vector.x == 0)
+                    _animator.CrossFade("Base Layer.Lock on movement.Unarmed-Strafe-Forward",0,0);
+                else if(_input_vector.y > 0 && _input_vector.x > 0)
+                    _animator.CrossFade("Base Layer.Lock on movement.Unarmed-Strafe-Forward-Right",0,0);
+                else if(_input_vector.y > 0 && _input_vector.x < 0)
+                    _animator.CrossFade("Base Layer.Lock on movement.Unarmed-Strafe-Forward-Left",0,0);
+                else if(_input_vector.y < 0 && _input_vector.x == 0)
+                    _animator.CrossFade("Base Layer.Lock on movement.Unarmed-Strafe-Backward",0,0);
+                else if(_input_vector.y < 0 && _input_vector.x > 0)
+                    _animator.CrossFade("Base Layer.Lock on movement.Unarmed-Strafe-Backward-Right",0,0);
+                else if(_input_vector.y < 0 && _input_vector.x < 0)
+                    _animator.CrossFade("Base Layer.Lock on movement.Unarmed-Strafe-Backward-Left",0,0);
+            }
+            else{
+                _animator.SetBool("Combat_movement",false);
+           
             //   if(player_grounded){
                     //_controller.velocity to work properly requires only one _controller.move - tried to combine gravity,jump and mve into one but 
                     //Debug.Log("speed: " + _controller.velocity); 
                    // _Player_current_horizontal_speed = new Vector3 (_controller.velocity.x,0.0f,_controller.velocity.z).magnitude;    
                     _Player_current_horizontal_speed = new Vector3(_character_speed.x,0f,_character_speed.z).magnitude;
-                    _input_vector = _input_handler.walk_input;
+                   
                     if(player_crouching){
                         _Player_target_speed = _crouch_speed;
                     }
@@ -458,6 +537,7 @@ namespace Player_Movemnet{
                     _Move.y = 0f; 
                     _controller.Move(_Move * Time.deltaTime * _Player_speed);
             //  }
+            }
         }
         private void Gravity(){
             _Player_velocity.y += _gravity_force * Time.deltaTime;
@@ -497,12 +577,12 @@ namespace Player_Movemnet{
             if(_input_handler.crouch_flag&& player_grounded){
                 if(player_crouching){
                     player_crouching = false;
-                    _animator.CrossFadeInFixedTime("Idle",0.25f,0);
+                    _animator.CrossFadeInFixedTime("Base Layer.Idle",0.25f,0);
                     //Debug.Log("end crouching");
                 }
                 else{
                     player_crouching = true;
-                    _animator.CrossFadeInFixedTime("Crouching",0.25f,0);
+                    _animator.CrossFadeInFixedTime("Base Layer.Crouching",0.25f,0);
                     //Debug.Log("start crouching");
                 }  
             }
@@ -511,16 +591,24 @@ namespace Player_Movemnet{
                 _controller.center = (new Vector3(0,0.5f,0));
             }
             else{
-                _controller.height = 1.68f;
+                _controller.height = 1.78f;
                 _controller.center = (new Vector3(0,0.9f,0));
             }
         }        
         private void Ground_check(){
             // player_grounded = _controller.isGrounded; // buggy as fuck
-            Vector3 Sphere_position = new Vector3(transform.position.x,transform.position.y - _Grounded_help ,transform.position.z );
+            Vector3 Sphere_position = new Vector3(transform.position.x,transform.position.y - _Grounded_help,transform.position.z );
             player_grounded = Physics.CheckSphere(Sphere_position,_Grounded_check_radious,_ground_layer,QueryTriggerInteraction.Ignore);
             //Debug.Log("Grounded: " + player_grounded);
         }
+        private void Handle_jump_on_top_of_enemy(){
+            Vector3 Sphere_position = new Vector3(transform.position.x,transform.position.y + 2 * _Grounded_help,transform.position.z);
+            if(Physics.CheckSphere(Sphere_position,_Grounded_check_radious,128,QueryTriggerInteraction.Ignore)){
+                //Debug.Log("Push player from the top of the enemy");
+                //Vector3 move = new Vector3()
+                _controller.Move( Vector3.back * Time.deltaTime * 4f);
+            }
+        }   
         private void Ceiling_check(){
             Vector3 Sphere_position = new Vector3(transform.position.x,transform.position.y - _Ceiling_help ,transform.position.z );
             _Player_hit_ceiling = Physics.CheckSphere(Sphere_position,_Grounded_check_radious,_ground_layer,QueryTriggerInteraction.Ignore);
@@ -533,7 +621,7 @@ namespace Player_Movemnet{
             }
         }
         private void Lock_on_enemy(){
-            if(_input_handler.lock_on_flag && !locked_on_enemy && enemies_lock_on.Count > 0){
+            if(_input_handler.lock_on_flag && !_player_info.locked_on_enemy && enemies_lock_on.Count > 0){
                 float distance_to_closest_enemy = Mathf.Infinity;
                 foreach( var enemy in enemies_lock_on){
                     float viewable_anlge = Vector3.Angle(enemy.transform.position - transform.position,_root_for_shot_raycast.forward);
@@ -558,15 +646,15 @@ namespace Player_Movemnet{
                 // }
                 if(_closest_enemy != null){
                     _target_group.AddMember(_closest_enemy.transform,1,2);
-                    locked_on_enemy = true;
+                    _player_info.locked_on_enemy = true;
                     _lock_on_camera.SetActive(true);
                 }
             }
-            else if(_input_handler.lock_on_flag && locked_on_enemy)
+            else if(_input_handler.lock_on_flag && _player_info.locked_on_enemy)
                 Release_lock_on_enemy();
         }
         public void Release_lock_on_enemy(){
-            locked_on_enemy = false;
+            _player_info.locked_on_enemy = false;
             _free_look_camera.SetActive(true);
             _target_group.RemoveMember(_closest_enemy.transform);
             _closest_enemy = null;
@@ -578,6 +666,7 @@ namespace Player_Movemnet{
         }
         private void Handle_state_while_lock_on_enemy(){
             Handle_dashes();
+           // Debug.Log(_animator.GetBool("Active_animation") + "Dashes movement");
             if(_input_handler.switch_flag && enemies_lock_on.Count > 1){
                 if(enemies_lock_on.Count == _enemies_counter+1){
                     _enemies_counter = -1;
@@ -626,10 +715,17 @@ namespace Player_Movemnet{
         private void Handle_dashes(){
             if(_input_handler.dash_flag && _player_statistics.Current_stamina > _dash_stamina_cost){
                 //Debug.Log(_Move * _dash_speed);
-                if(_input_handler.walk_input.x < 0)
-                    _animator.CrossFade("Dash_left",0f,0);
-                else if(_input_handler.walk_input.x > 0)
-                    _animator.CrossFade("Dash_right",0f,0);
+                if(_input_handler.walk_input.x < 0){
+                    _animator.SetBool("Active_animation",true);
+                    _animator.CrossFade("Base Layer.Dash_left",0f,0);
+                }
+                else if(_input_handler.walk_input.x > 0){
+                    _animator.SetBool("Active_animation",true);
+                    _animator.CrossFade("Base Layer.Dash_right",0f,0);
+                }
+                    
+                else
+                    return;
                 _player_statistics.Take_stamina(_dash_stamina_cost);
             }
         }
@@ -682,6 +778,8 @@ namespace Player_Movemnet{
             _input_handler.drop_items_inv_flag = false;
             _input_handler.use_item_inv_flag = false;
             _input_handler.confirmed_action_inv_flag = false;
+            _input_handler.left_weapon_inv_flag = false;
+            _input_handler.right_weapn_inv_flag = false;
         }
     }
 }

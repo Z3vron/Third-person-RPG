@@ -4,6 +4,7 @@ using UnityEngine;
 //[CreateAssetMenu(menuName = "Character Statistics")]
 public class Character_statistics : ScriptableObject{
 
+    [Tooltip("takes armour_effectiveness % less damage")]
     public float armour_effectiveness = 0;
     public float Max_health;
     public float Current_health;
@@ -14,6 +15,7 @@ public class Character_statistics : ScriptableObject{
     public float Current_stamina;
     public bool Taken_dmg = false;
     public bool Taken_stamina = false;
+    public bool isDead = false;
     public int level = 0;
 
     
@@ -47,7 +49,12 @@ public class Character_statistics : ScriptableObject{
     }
     public void Take_damage(float damage){
         if(Current_health > 0)
-            Current_health -= (damage -armour_effectiveness);
+            Current_health -= ( damage * (100 -armour_effectiveness)/100);
+        Taken_dmg = true;
+    }
+    public void Take_damage_bypass_armour(float damage){
+        if(Current_health > 0)
+            Current_health -= damage;
         Taken_dmg = true;
     }
     public void Take_stamina(float stamina){

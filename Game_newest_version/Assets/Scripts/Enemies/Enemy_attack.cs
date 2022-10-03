@@ -14,4 +14,8 @@ public class Enemy_attack : Enemy_action{
     public float maximum_distance_to_attack = 3;
     public float damage = 20;
 
+    [Header("External requirements to use this attack")]
+    public bool require_left_weapon;
+    public bool require_right_weapon;
+
 }

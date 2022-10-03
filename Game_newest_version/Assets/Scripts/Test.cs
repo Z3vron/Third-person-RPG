@@ -22,25 +22,29 @@ using UnityEngine.EventSystems;
     
 // }
 public class Test : MonoBehaviour{
+    public GameObject gameobject_to_spawn;
+    public Transform spawn_point;
     Rigidbody rigidbody ;
     public GameObject player;
     private void Awake() {
-        rigidbody = GetComponent<Rigidbody>();
-    }private void Start() {
+        //rigidbody = GetComponent<Rigidbody>();
+    }
+    private void Start() {
+        GameObject weapon = Instantiate(gameobject_to_spawn,spawn_point) as GameObject;
         // Debug.Log(rigidbody.velocity);
         // rigidbody.velocity = new Vector3(0,0,0);
-    }
+     }
     private void Update() {
         // rigidbody.velocity = new Vector3(0,0,0);
         // rigidbody.angularVelocity = new Vector3(0,0,0);
         //  Debug.Log(rigidbody.velocity);
     }
    private void FixedUpdate() {
-    if(Vector3.Distance(transform.position,player.transform.position) > 10)
-        rigidbody.velocity = transform.forward * 8;
+    // if(Vector3.Distance(transform.position,player.transform.position) > 10)
+    //     rigidbody.velocity = transform.forward * 8;
     
-    else
-        rigidbody.velocity = Vector3.zero;
+    // else
+    //     rigidbody.velocity = Vector3.zero;
    }
     
 }

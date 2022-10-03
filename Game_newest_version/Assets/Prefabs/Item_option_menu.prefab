@@ -99,7 +99,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 16
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -1042,7 +1042,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -2.7200928, y: 100.00003}
-  m_SizeDelta: {x: 160, y: 30}
+  m_SizeDelta: {x: 200, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7272496229626339328
 CanvasRenderer:
@@ -1132,7 +1132,17 @@ MonoBehaviour:
   m_Value: -1
   m_Options:
     m_Options:
+    - m_Text: Equip to left hand (1)
+      m_Image: {fileID: 0}
+    - m_Text: Equip to right hand (2)
+      m_Image: {fileID: 0}
+    - m_Text: Repair item
+      m_Image: {fileID: 0}
     - m_Text: Use item (E)
+      m_Image: {fileID: 0}
+    - m_Text: Use on left weapon(1)
+      m_Image: {fileID: 0}
+    - m_Text: Use on right weapon(2)
       m_Image: {fileID: 0}
     - m_Text: Transfer items (T)
       m_Image: {fileID: 0}
@@ -1141,8 +1151,6 @@ MonoBehaviour:
     - m_Text: Split one item
       m_Image: {fileID: 0}
     - m_Text: Split items in half
-      m_Image: {fileID: 0}
-    - m_Text: Repair item
       m_Image: {fileID: 0}
     - m_Text: Exit
       m_Image: {fileID: 0}

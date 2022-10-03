@@ -29,6 +29,7 @@ public class Enemy_manager : MonoBehaviour
     public GameObject player;
     [SerializeField] private Canvas _world_canvas;
     [SerializeField] private Enemy_attack[] _enemy_attacks;
+    [SerializeField] private Enemy_weapon_slot_manager _enemy_weapon_slot_manager;
     public Enemy_attack current_attack;
 
     private float _health_regen_timer;
@@ -38,9 +39,15 @@ public class Enemy_manager : MonoBehaviour
     public NavMeshAgent nav_mesh_agent;
     public Animator animator;
 
+    private float _poison_timer =0;
+    private float _poison_time=0;
+    private float _poison_damage = 0;
+     [SerializeField] private bool _isPoisoned = false;
+
     private void Awake() {
         nav_mesh_agent = GetComponent<NavMeshAgent>();
         animator = GetComponentInChildren<Animator>();
+        _enemy_weapon_slot_manager = GetComponent<Enemy_weapon_slot_manager>();
     }
     private void Start() {
         //enemy_stats.Set_defaults_stats(300,100,0.1f,0.01f,20,2,0,0);
@@ -51,28 +58,43 @@ public class Enemy_manager : MonoBehaviour
         instance_enemy_stats.armour_effectiveness = enemy_Armour.Chest_armour + enemy_Armour.Helmet_armour + enemy_Armour.Legs_armour;
     }
     //Put in the scriptable object?? - Characters_statistics.cs
-    void Update(){       
+    void Update(){
+        if(instance_enemy_stats.isDead)
+            return;       
         Handle_HUD_enemies_lock_on_list();
         Handle_stamina_health_regen();
         Handle_death();
-        Handle_current_action();
         Handle_recovery_time();
-    }
-    private void Handle_HUD_enemies_lock_on_list(){
-        _instance_enemy_HUD.transform.GetComponent<RectTransform>().position =  new Vector3( gameObject.transform.position.x,gameObject.transform.position.y + GetComponent<BoxCollider>().size.y + GetComponent<BoxCollider>().center.y/2,gameObject.transform.position.z);  
-        _instance_enemy_HUD.transform.localRotation = Quaternion.RotateTowards(_instance_enemy_HUD.transform.rotation,_camera_to_rotate_to.transform.rotation,180);
-        if(player != null){
-            if(Vector3.Distance(transform.position,player.transform.position) > 10){
-                _instance_enemy_HUD.SetActive(false);
-                if(player.GetComponent<Player_Movemnet.Movement>().enemies_lock_on.Contains(gameObject))
-                    player.GetComponent<Player_Movemnet.Movement>().enemies_lock_on.Remove(gameObject);
-            }  
-            else{
-                _instance_enemy_HUD.SetActive(true);
-                if(!player.GetComponent<Player_Movemnet.Movement>().enemies_lock_on.Contains(gameObject))
-                    player.GetComponent<Player_Movemnet.Movement>().enemies_lock_on.Add(gameObject);
+
+        if(_isPoisoned){
+            _poison_timer += Time.deltaTime;
+            instance_enemy_stats.Take_damage_bypass_armour(_poison_damage * Time.deltaTime);
+            if(_poison_timer > _poison_time){
+                _isPoisoned = false;
+                _instance_enemy_HUD.GetComponent<Enemy_HUD>().End_poisoned();
+                _poison_timer = 0;
+                _poison_damage = 0;
             }
         }
+    }
+    private void Handle_HUD_enemies_lock_on_list(){
+        if(_instance_enemy_HUD != null){
+            _instance_enemy_HUD.transform.GetComponent<RectTransform>().position =  new Vector3( gameObject.transform.position.x,gameObject.transform.position.y + GetComponent<CapsuleCollider>().height + 0.3f,gameObject.transform.position.z);  
+            _instance_enemy_HUD.transform.localRotation = Quaternion.RotateTowards(_instance_enemy_HUD.transform.rotation,_camera_to_rotate_to.transform.rotation,180);
+            if(player != null){
+                if(Vector3.Distance(transform.position,player.transform.position) > 10){
+                    _instance_enemy_HUD.SetActive(false);
+                    if(player.GetComponent<Player_Movemnet.Movement>().enemies_lock_on.Contains(gameObject))
+                        player.GetComponent<Player_Movemnet.Movement>().enemies_lock_on.Remove(gameObject);
+                }  
+                else{
+                    _instance_enemy_HUD.SetActive(true);
+                    if(!player.GetComponent<Player_Movemnet.Movement>().enemies_lock_on.Contains(gameObject))
+                        player.GetComponent<Player_Movemnet.Movement>().enemies_lock_on.Add(gameObject);
+                }
+            }
+        }
+       
     }
     private void Handle_stamina_health_regen(){
         if(instance_enemy_stats.Taken_dmg){
@@ -96,14 +118,16 @@ public class Enemy_manager : MonoBehaviour
     }
     private void Handle_death(){
          if(instance_enemy_stats.Current_health <= 0){
+            animator.CrossFade("Death",0f,0);
+            instance_enemy_stats.isDead = true;
             player.GetComponent<Player_info>().player_stats.current_exp += instance_enemy_stats.exp_reward;
             if(player.GetComponent<Player_Movemnet.Movement>().enemies_lock_on.Contains(gameObject))
                 player.GetComponent<Player_Movemnet.Movement>().enemies_lock_on.Remove(gameObject);
-            if(player.GetComponent<Player_Movemnet.Movement>().enemies_lock_on.Count == 0 && player.GetComponent<Player_Movemnet.Movement>().locked_on_enemy)
+            if(player.GetComponent<Player_Movemnet.Movement>().enemies_lock_on.Count == 0 && player.GetComponent<Player_info>().locked_on_enemy)
                 player.GetComponent<Player_Movemnet.Movement>().Release_lock_on_enemy();
-            Destroy(gameObject);
+            Destroy(gameObject,2.167f);
             Destroy(_instance_enemy_HUD);
-            Destroy(instance_enemy_stats);
+            Destroy(instance_enemy_stats,2.167f);
         }
     }
     private void Handle_recovery_time(){
@@ -114,81 +138,12 @@ public class Enemy_manager : MonoBehaviour
             performing_action = false;
         }
     }
-    private void Handle_current_action(){
-        // if(_targeted_character == null){
-        //     Check_for_target();
-        // }
-        // else if(Vector3.Distance(transform.position,_targeted_character.transform.position) > _distance_to_attack){
-        //     Move_to_target();
-        // }
-        // else if(_nav_mesh_agent.remainingDistance <= _distance_to_attack){
-        //     Attack_target();
-        // }
-    }
-     private void Check_for_target(){
-        //_animator.SetFloat("Vertical",0);
-        // Collider[] hit_colliders = Physics.OverlapSphere(gameObject.transform.position,detection_radius,_characters_layer_mask);
-        // foreach( var character_collider in hit_colliders){
-        //     Vector3 target_direction = character_collider.transform.position - gameObject.transform.position;
-        //     float viewable_angle = Vector3.Angle(target_direction,transform.forward);
-        //     if(viewable_angle > _minimum_detection_angle && viewable_angle < _maximum_detection_angle && _player.GetComponent<Player_Movemnet.Movement>().Is_enemy_to_lock_on_visible(gameObject)){ // Is_enemy_to_lock_on_visible uses insidee tranform, the original script is attached to player so transform is player object not enemy object from which i call function
-        //         if(character_collider.CompareTag("Enemy") && character_collider.gameObject != gameObject){
-        //             //Debug.Log("Found another enemy");
-        //             //_targeted_character = character_collider.gameObject;
-        //         }
-        //         else if(character_collider.CompareTag("Player")){
-        //             //Debug.Log("Found player");
-        //             _targeted_character = character_collider.gameObject;
-        //         }
-        //     }
-        // }
-    }
-    private void Move_to_target(){
-        // if(_performing_action)
-        //     return ;
-        // if(Vector3.Distance(transform.position,_player.transform.position) > 25){
-        //     _targeted_character = null;
-        //     _nav_mesh_agent.isStopped = true;
-        //     _animator.SetFloat("Vertical",0);//,0.1f,Time.fixedDeltaTime);//with damping animation is still going 
-        // }
-        // else{
-        //    // Debug.Log("Moving to target");
-        //     _nav_mesh_agent.SetDestination(_targeted_character.transform.position);
-        //     if(_nav_mesh_agent.isStopped){
-        //         _nav_mesh_agent.isStopped = false;
-        //     }
-        //     _animator.SetFloat("Vertical",1,0.1f,Time.fixedDeltaTime);
-        // }
-        // else if(_nav_mesh_agent.remainingDistance <= _distance_to_attack){
-        //     //nav_mesh_agent.nextPosition = transform.position;
-        //     _animator.SetFloat("Vertical",0,0.1f,Time.fixedDeltaTime);
-        //     _nav_mesh_agent.velocity = Vector3.zero;
-        //     _nav_mesh_agent.isStopped = true;
-        //     //Debug.Log("Start  attacking");
-        //     transform.LookAt(_player.transform);//could use Quaternion.lerp / Quaternion.Slerp - could control rotation speed
-        //     //Debug.Log(Vector3.Distance(transform.position,_targeted_character.transform.position));
-        // }
-        
-    }
-    private void Attack_target(){
-        // //stop nav mesh agent
-        // _animator.SetFloat("Vertical",0,0.1f,Time.fixedDeltaTime);
-        // _nav_mesh_agent.velocity = Vector3.zero;
-        // _nav_mesh_agent.isStopped = true;
-        // //Debug.Log("Start  attacking");
-        // transform.LookAt(_player.transform);//could use Quaternion.lerp / Quaternion.Slerp - allow to control  enemy rotation speed
-        // if(_performing_action)
-        //     return ;
-        // if(_current_attack == null){
-        //     Get_new_attack();
-        // }
-        // else{
-        //     _performing_action = true;
-        //     //recovery_timer includes time for the attack animation so each attack recovery timer should be bigger or just change where i put this
-        //     _current_recovery_time = _current_attack.recovery_time;
-        //     _animator.SetBool(_current_attack.animation_name,true);
-        //     _current_attack = null;
-        // }
+    public void Poisoning(float poison_time, float poison_damage){
+        //Debug.Log("enemy poisoned");
+        _isPoisoned = true;
+        _poison_time = poison_time;
+        _poison_damage = poison_damage;
+        _instance_enemy_HUD.GetComponent<Enemy_HUD>().Start_poisoned(_poison_time);
     }
     public void Get_new_attack(){
         Vector3 target_direction = targeted_character.transform.position - transform.position;
@@ -208,8 +163,23 @@ public class Enemy_manager : MonoBehaviour
                 if(current_attack != null)
                     return ;
                 temp_val += enemy_attack.attack_chance_score;
-                if(temp_val > random_val)
-                    current_attack = enemy_attack;
+                if(temp_val > random_val){
+                    // checks for the attacks requirements about weapons
+                    if(enemy_attack.require_left_weapon){
+                        if(_enemy_weapon_slot_manager.left_hand_weapon != null)
+                            current_attack = enemy_attack;
+                    }
+                    if(enemy_attack.require_right_weapon){
+                        if(_enemy_weapon_slot_manager.right_hand_weapon != null)
+                           current_attack = enemy_attack; 
+                    }
+                    if(enemy_attack.require_left_weapon && enemy_attack.require_right_weapon){
+                        if(_enemy_weapon_slot_manager.left_hand_weapon != null && _enemy_weapon_slot_manager.right_hand_weapon != null)
+                            current_attack = enemy_attack;  
+                    }
+                    
+                }
+                    
             }
         }
     }

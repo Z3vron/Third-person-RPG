@@ -23,10 +23,5 @@ public class Enemy_animations_events_handler : MonoBehaviour{
     public void Right_weapon_collider_disable(){
         enemy_weapon_slot_manager.Disable_collider_on_right_weapon();
     }
-    public void End_of_light_right_attack_animation(){
-        _animator.SetBool("Light_attack_right",false);
-    }
-    public void End_of_light_left_attack_animation(){
-        _animator.SetBool("Light_attack_left",false);
-    }
+   
 }

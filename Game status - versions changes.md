@@ -2,7 +2,7 @@ I started learning Unity Game Engine by creating my first game which of course i
 This is my game - there are lots of bugs and issues with it but i am slowly repeairing them and adding some new features. Game doesn't look to good visualy but i never 
 intended to make visually pleasing game - I am not an artist but i like coding so i focus on writing mechanics for the game.
 
-Update next
+Update 03.10.2022
 - Decided to use some free assets from unity store
 - change player model
 - Added combat/locked on enemy separate movement

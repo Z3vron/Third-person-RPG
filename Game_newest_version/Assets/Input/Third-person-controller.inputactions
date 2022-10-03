@@ -141,7 +141,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Switch",
+                    "name": "Switch_player",
                     "type": "Button",
                     "id": "18e63eec-22af-455f-95ac-1c864676ad6d",
                     "expectedControlType": "Button",
@@ -552,7 +552,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
-                    "action": "Switch",
+                    "action": "Switch_player",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -640,6 +640,33 @@
                     "name": "Use",
                     "type": "Button",
                     "id": "39236557-879f-465d-9dfe-adbcc7e4cb15",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Left weapon",
+                    "type": "Button",
+                    "id": "a75ae43d-a55e-4cd5-a7fd-a94f2eed42b5",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Right weapon",
+                    "type": "Button",
+                    "id": "d1375c7f-aded-4098-9d0f-c378b792786e",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Switch_inv",
+                    "type": "Button",
+                    "id": "1eb14fb5-829c-40b3-b487-f1108060590f",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -743,6 +770,39 @@
                     "processors": "",
                     "groups": "",
                     "action": "Use",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d78259d5-61d7-498e-8348-ac33a514e431",
+                    "path": "<Keyboard>/1",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Left weapon",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1f2b973c-8c6d-4a37-b334-fe8ea063d035",
+                    "path": "<Keyboard>/2",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Right weapon",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8a454aee-1190-411a-a640-daacadf99aae",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Switch_inv",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

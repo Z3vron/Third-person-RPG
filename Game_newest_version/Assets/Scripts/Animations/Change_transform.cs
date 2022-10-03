@@ -6,7 +6,6 @@ public class Change_transform : MonoBehaviour
 {
     public Transform character_direction;
     public Transform animation_transform;
-    public bool isInteracting = false;
     private Vector3 _move;
     private CharacterController _cotroller;
 
@@ -14,8 +13,7 @@ public class Change_transform : MonoBehaviour
         _cotroller = GetComponent<CharacterController>();
     }
     private void Update() {
-        isInteracting = GetComponent<Player_info>().active_animation;
-        if(isInteracting){
+        if(GetComponentInChildren<Animator>().GetBool("Movement_driven_by_animation")){
             _move = new Vector3(animation_transform.localPosition.x,0,animation_transform.localPosition.z);
             _move = _move.z * character_direction.forward + _move.x * character_direction.right;;
            // Debug.Log("Moving player: " + _move.x + _move.y + _move.z);

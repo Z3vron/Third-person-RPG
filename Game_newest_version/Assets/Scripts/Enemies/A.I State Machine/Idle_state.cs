@@ -14,7 +14,7 @@ public class Idle_state : State{
             if(viewable_angle > enemy_manager.minimum_detection_angle && viewable_angle < enemy_manager.maximum_detection_angle && enemy_manager.player != null && enemy_manager.player.GetComponent<Player_Movemnet.Movement>().Is_enemy_to_lock_on_visible(gameObject)){ // Is_enemy_to_lock_on_visible uses insidee tranform, the original script is attached to player so transform is player object not enemy object from which i call function
                 if(character_collider.CompareTag("Enemy") && character_collider.gameObject != gameObject){
                     //Debug.Log("Found another enemy");
-                    //_targeted_character = character_collider.gameObject;
+                    //enemy_manager.targeted_character = character_collider.gameObject;
                 }
                 else if(character_collider.CompareTag("Player")){
                     //Debug.Log("Found player");

@@ -11,8 +11,6 @@ public class Combat_stance_state : State{
     public override State Run_current_state(Enemy_manager enemy_manager){
         if(enemy_manager.targeted_character == null)
             return idle_state;
-        // if(enemy_manager.player.GetComponent<Player_info>().player_dead)
-        //     return idle_state;
         //could chagne look at to code so that enemy would circle around player
 
         Vector3 target_dir = enemy_manager.targeted_character.transform.position - enemy_manager.transform.position;

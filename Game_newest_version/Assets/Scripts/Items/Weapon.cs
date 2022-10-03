@@ -10,18 +10,20 @@ namespace Weapon_info{
         public float durability;
         public float material_toughness;
         public bool unarmed;
+        public int weapon_lvl;
+        [Header("Poison efect")]
+        public float poison_damage;
+        public float poison_duration;
+        public bool isPoisoned = false;
+
         [Header("Damages values")]
         public float Light_attack_damage;
         public float Strong_attack_damage;
         public float combo_dmg_bonus;
 
-
         [Header("Stamina costs")]
-
         public float light_attack_stamina_cost;
-
         public float strong_attack_stamina_cost;
-
         public float combo_attack_stamina_cost;
        
         public void Remove_durability(float durability_value_to_remove){

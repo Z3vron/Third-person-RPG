@@ -2,13 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player_info : MonoBehaviour
-{
-    public bool player_dead = false;
+public class Player_info : MonoBehaviour{
     public bool active_animation = false;
     public bool player_invulnerability;
     public bool player_grounded;
     public bool player_crouching;
+    public bool locked_on_enemy = false;
     public Player_statistics player_stats;
     [SerializeField] private UI_elements.UI_bars _player_UI_info;
     [SerializeField] private float _health_regen_delay = 5;
@@ -69,7 +68,7 @@ public class Player_info : MonoBehaviour
         if(player_stats.Current_health <=0){
             //play death animation
            Destroy(gameObject,1.5f);
-           player_dead = true;
+           player_stats.isDead = true;
         }
     }
    

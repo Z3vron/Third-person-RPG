@@ -39,7 +39,7 @@ public class Input_handler : MonoBehaviour
         private InputAction _combo_attack_action;
         private InputAction _open_inventory_action;
         private InputAction _lock_on_action;
-        private InputAction _switch_action;
+        private InputAction _switch_action_player;
         private InputAction _dash_action;
         private InputActionPhase attack_strong_last_phase;
         
@@ -53,6 +53,8 @@ public class Input_handler : MonoBehaviour
         public bool use_item_inv_flag;
         public bool inventory_close_inv_flag;
         public bool confirmed_action_inv_flag;
+        public bool left_weapon_inv_flag;
+        public bool right_weapn_inv_flag;
         public Vector2 mouse_position;
 
         private InputAction _close_inventory_action;
@@ -62,6 +64,9 @@ public class Input_handler : MonoBehaviour
         private InputAction _drop_items_inv_action;
         private InputAction _use_item_inv_action;
         private InputAction _confirm_action_inv_action;
+        private InputAction _left_weapon_inv_action;
+        private InputAction _right_weapon_inv_action;
+        private InputAction _switch_action_inv;
         private InputAction _mouse_pos;
     #endregion
     private PlayerInput _player_input;
@@ -82,7 +87,7 @@ public class Input_handler : MonoBehaviour
         _open_inventory_action = _player_input.actions["Inventory"];
         _help_action = _player_input.actions["Help"];
         _lock_on_action = _player_input.actions["Lock_on"];
-        _switch_action = _player_input.actions["Switch"];
+        _switch_action_player = _player_input.actions["Switch_player"];
         _dash_action = _player_input.actions["Dash"];
 
         //Inventory action map
@@ -93,6 +98,9 @@ public class Input_handler : MonoBehaviour
         _drop_items_inv_action = _player_input.actions["Drop_items"];
         _use_item_inv_action = _player_input.actions["Use"];
         _confirm_action_inv_action = _player_input.actions["Confirm"];
+        _left_weapon_inv_action = _player_input.actions["Left weapon"];
+        _right_weapon_inv_action = _player_input.actions["Right weapon"];
+        _switch_action_inv = _player_input.actions["Switch_inv"];
         _mouse_pos = _player_input.actions["Point"];
         
     }
@@ -100,13 +108,13 @@ public class Input_handler : MonoBehaviour
         //Player action map
         if(_sprint_action.ReadValue<float>() ==1)    sprint_flag = true;{}
         if(_crouch_action.triggered)                 crouch_flag = true;{}
-        if(_jump_action.ReadValue<float>() ==1)      jump_flag = true;{}
+        if(_jump_action.triggered)                   jump_flag = true;{}
         if(_open_inventory_action.triggered)         inventory_flag = true;{}
         if(_weapon_left_action.triggered)            left_weapon_flag = true;{}
         if(_weapon_right_action.triggered)           right_weapon_flag = true;{}
         if(_interact_action.triggered)               interact_flag = true;{}
         if(_lock_on_action.triggered)                lock_on_flag = true;{}
-        if(_switch_action.triggered)                 switch_flag = true;{}
+        if(_switch_action_player.triggered)                 switch_flag = true;{}
         if(_dash_action.triggered)                   dash_flag = true;{}
         if(_attack_1_action.triggered)               attack_light_flag = true;{}
         if(_attack_2_action.phase == InputActionPhase.Started){
@@ -139,7 +147,10 @@ public class Input_handler : MonoBehaviour
         if(_transfer_items_inv_action.triggered)     transfer_items_inv_flag = true;{}
         if(_drop_items_inv_action.triggered)         drop_items_inv_flag = true;{}
         if(_use_item_inv_action.triggered)           use_item_inv_flag = true;{}
-        if(_confirm_action_inv_action.triggered) confirmed_action_inv_flag = true;{}
+        if(_confirm_action_inv_action.triggered)     confirmed_action_inv_flag = true;{}
+        if(_left_weapon_inv_action.triggered)        left_weapon_inv_flag = true;{}
+        if(_right_weapon_inv_action.triggered)       right_weapn_inv_flag = true;{}
+        if(_switch_action_inv.triggered)                 switch_flag = true;{}
         mouse_position = _mouse_pos.ReadValue<Vector2>();
                
     }

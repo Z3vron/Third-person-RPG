@@ -32,7 +32,10 @@ namespace Player_inventory_info{
         private Weapon_slot_manager.Weapon_manager weapon_slot_manager;
         private float _cinemachine_camera_x_sensitivity;
         private float _cinemachine_camera_y_sensitivity;
-
+        private float _poison_timer_left = 0;
+        private float _poison_timer_right = 0;
+        private float _poison_time_left;
+        private float _poison_time_right;
         private void Awake() {
             weapon_slot_manager = GetComponent<Weapon_slot_manager.Weapon_manager>();
             _animator = GetComponentInChildren<Animator>();
@@ -72,6 +75,24 @@ namespace Player_inventory_info{
                 backup_weapon_right = current_weapon_for_right_hand;
                 current_weapon_for_right_hand = unarmed;
                 weapon_slot_manager.Load_weapon_to_slot(current_weapon_for_right_hand,true);
+            }
+            if(current_weapon_for_right_hand.isPoisoned){
+                _poison_timer_right += Time.deltaTime;
+                if(_poison_timer_right >= _poison_time_right){
+                    current_weapon_for_right_hand.isPoisoned = false;
+                    current_weapon_for_right_hand.poison_damage = 0;
+                    current_weapon_for_right_hand.poison_duration = 0;
+                    _poison_timer_right = 0;
+                }
+            }
+            if(current_weapon_for_left_hand.isPoisoned){
+                _poison_timer_left += Time.deltaTime;
+                if(_poison_timer_left >= _poison_time_left){
+                    current_weapon_for_left_hand.isPoisoned = false;
+                    current_weapon_for_left_hand.poison_damage = 0;
+                    current_weapon_for_left_hand.poison_duration = 0;
+                    _poison_timer_left = 0;
+                }
             }
         }
         public void Check_left_weapon(){
@@ -207,6 +228,7 @@ namespace Player_inventory_info{
                             // Debug.Log("removing weapon - no copy left in slot");
                             if(slot_in_playyer_inv)
                                 inventory_weapons_slots.RemoveAt(weapon_slot_inv.slot_number);
+                                
                             else
                                 _inventories.object_inv_to_show.Remove_item_from_object(weapon_slot_inv.slot_number);
                             _inventories.Move_slots_to_left_inv(weapon_slot_inv,amount_of_items_slots);
@@ -259,6 +281,25 @@ namespace Player_inventory_info{
                     Debug.Log("Weapon has 0 durability");
                 }
             } 
+        }
+        public void Poison_weapon(Poison_potion poison_potion,bool right_weapon){
+            if(right_weapon){
+                if( current_weapon_for_right_hand.isPoisoned)
+                    _poison_timer_right = 0;
+                current_weapon_for_right_hand.isPoisoned = true;
+                current_weapon_for_right_hand.poison_damage = poison_potion.poison_damage;
+                current_weapon_for_right_hand.poison_duration = poison_potion.poison_duration;
+                _poison_time_right = poison_potion.efect_duration;
+                
+            }
+            else{
+                if( current_weapon_for_left_hand.isPoisoned)
+                    _poison_timer_left = 0;
+                current_weapon_for_left_hand.isPoisoned = true;
+                current_weapon_for_left_hand.poison_damage = poison_potion.poison_damage;
+                current_weapon_for_left_hand.poison_duration = poison_potion.poison_duration;
+                _poison_time_left = poison_potion.efect_duration;
+            }
         }
         public void Handle_inventory(){
             if(inventory_open){

@@ -36,7 +36,6 @@ public class Inventories : MonoBehaviour{
     private int _slot_number_item_info;
     private float _time_to_show_item_info_elapsed = 0.0f;
     private bool _start_time = false;
-    private bool _weapon_on_mouse;
     private bool _cursor_player_inv;
   
     private Slot _slot_selected;
@@ -84,11 +83,19 @@ public class Inventories : MonoBehaviour{
             if(hit.gameObject.TryGetComponent(out Drop_slot item_slot)){
                 //started at player inv
                 if(_cursor_player_inv){
-                    if(item_slot.slot.isRight && !item_slot.slot.in_inventory && !item_slot.slot.in_obj_inv && _slot_selected.item is Weapon_info.Weapon ){
-                        Change_right_weapon_from_inv(_slot_selected);     
+                    if(!item_slot.slot.in_inventory && !item_slot.slot.in_obj_inv && _slot_selected.item is Weapon_info.Weapon ){
+                        if(item_slot.slot.isRight)
+                            _player_inventory.Change_weapon_for_right_hand(_slot_selected,_cursor_player_inv);
+                        else if(!item_slot.slot.isRight)
+                            _player_inventory.Change_weapon_for_left_hand(_slot_selected,_cursor_player_inv);   
                     }
-                    else if(!item_slot.slot.isRight && !item_slot.slot.in_inventory && !item_slot.slot.in_obj_inv && _slot_selected.item is Weapon_info.Weapon ){
-                        Change_left_weapon_from_inv(_slot_selected);
+                    else if(!item_slot.slot.in_inventory && !item_slot.slot.in_obj_inv && _slot_selected.item is Poison_potion){
+                        if(item_slot.slot.isRight && (!_player_inventory.current_weapon_for_right_hand.unarmed || !_player_inventory.backup_weapon_right.unarmed)){
+                           Poison_weapon_inv(true);
+                        }
+                        else if(!item_slot.slot.isRight && (!_player_inventory.current_weapon_for_left_hand.unarmed || !_player_inventory.backup_weapon_left.unarmed)){
+                           Poison_weapon_inv(false);
+                        }
                     }
                     else if (item_slot.slot.in_inventory && item_slot.slot != _slot_selected ){
                         //must be a better way to do this
@@ -112,10 +119,18 @@ public class Inventories : MonoBehaviour{
                 //started at object inv
                 else if(!_cursor_player_inv){
                     if(item_slot.slot.isRight && !item_slot.slot.in_inventory && !item_slot.slot.in_obj_inv  && _item_selected is Weapon_info.Weapon ){
-                        Change_right_weapon_from_inv(_slot_selected);  
+                        _player_inventory.Change_weapon_for_right_hand(_slot_selected,_cursor_player_inv);
                     }
                     else if(!item_slot.slot.isRight && !item_slot.slot.in_inventory && !item_slot.slot.in_obj_inv && _item_selected is Weapon_info.Weapon){
-                        Change_left_weapon_from_inv(_slot_selected);
+                       _player_inventory.Change_weapon_for_left_hand(_slot_selected,_cursor_player_inv);  
+                    }
+                    else if(!item_slot.slot.in_inventory && !item_slot.slot.in_obj_inv && _slot_selected.item is Poison_potion){
+                        if(item_slot.slot.isRight && (!_player_inventory.current_weapon_for_right_hand.unarmed || !_player_inventory.backup_weapon_right.unarmed)){
+                           Poison_weapon_inv(true);
+                        }
+                        else if(!item_slot.slot.isRight && (!_player_inventory.current_weapon_for_left_hand.unarmed || !_player_inventory.backup_weapon_left.unarmed)){
+                           Poison_weapon_inv(false);
+                        }
                     }
                     else if(item_slot.slot.in_inventory){
                         if(_slot_selected.item is Materials || _slot_selected.item is Potions || _slot_selected.item is Weapon_info.Weapon || item_slot.slot.item is Materials || item_slot.slot.item is Potions || item_slot.slot.item is Weapon_info.Weapon)
@@ -215,38 +230,36 @@ public class Inventories : MonoBehaviour{
             //with objects(scriptableobjects) created with creating systyem on the run line below returns false for the same objects because they are copy of the original scriptable objects but they are not the same scriptable object
             //Debug.Log(target_slot.item + " " + start_slot.item + (target_slot.item == start_slot.item));
             //stack items in inventory
-            if(start_slot.item.max_stack_amount > 1 && target_slot.stack_amount < target_slot.max_stack_amount && target_slot.stack_amount < start_slot.item.max_stack_amount && start_slot.stack_amount < start_slot.item.max_stack_amount  ){
-                if(target_slot.item.item_id == start_slot.item.item_id){
-                    //Debug.Log("stack items player inv");
-                    if((target_slot.stack_amount + start_slot.stack_amount) <= target_slot.max_stack_amount ){
-                        if((target_slot.stack_amount + start_slot.stack_amount) <= target_slot.item.max_stack_amount){
-                            target_slot.stack_amount += start_slot.stack_amount;
-                            start_slot.stack_amount = 0; 
-                            if(player_inv){
-                                _player_inventory.Remove_item_from_player_inv(start_slot);
-                                Move_slots_to_left_inv(start_slot,_player_inventory.amount_of_items_slots);
-                            }
-                            else{
-                                object_inv_to_show.Remove_item_from_object(start_slot.slot_number);
-                                Move_slots_to_left_inv(start_slot,object_inv_to_show.amount_of_item_slots);
-                            }
+            if( target_slot.item.item_id == start_slot.item.item_id && start_slot.item.max_stack_amount > 1 && target_slot.stack_amount < target_slot.max_stack_amount && target_slot.stack_amount < start_slot.item.max_stack_amount && start_slot.stack_amount < start_slot.item.max_stack_amount  ){
+                //Debug.Log("stack items player inv");
+                if((target_slot.stack_amount + start_slot.stack_amount) <= target_slot.max_stack_amount ){
+                    if((target_slot.stack_amount + start_slot.stack_amount) <= target_slot.item.max_stack_amount){
+                        target_slot.stack_amount += start_slot.stack_amount;
+                        start_slot.stack_amount = 0; 
+                        if(player_inv){
+                            _player_inventory.Remove_item_from_player_inv(start_slot);
+                            Move_slots_to_left_inv(start_slot,_player_inventory.amount_of_items_slots);
                         }
                         else{
-                            start_slot.stack_amount -= (target_slot.item.max_stack_amount - target_slot.stack_amount); 
-                            target_slot.stack_amount = target_slot.item.max_stack_amount;
+                            object_inv_to_show.Remove_item_from_object(start_slot.slot_number);
+                            Move_slots_to_left_inv(start_slot,object_inv_to_show.amount_of_item_slots);
                         }
                     }
                     else{
-                        if(target_slot.max_stack_amount <= target_slot.item.max_stack_amount){
-                            start_slot.stack_amount -= (target_slot.max_stack_amount - target_slot.stack_amount);
-                            target_slot.stack_amount = target_slot.max_stack_amount; 
-                        }
-                        else{
-                            start_slot.stack_amount -= (target_slot.item.max_stack_amount - target_slot.stack_amount); 
-                            target_slot.stack_amount = target_slot.item.max_stack_amount;
-                        }
+                        start_slot.stack_amount -= (target_slot.item.max_stack_amount - target_slot.stack_amount); 
+                        target_slot.stack_amount = target_slot.item.max_stack_amount;
                     }
-                }   
+                }
+                else{
+                    if(target_slot.max_stack_amount <= target_slot.item.max_stack_amount){
+                        start_slot.stack_amount -= (target_slot.max_stack_amount - target_slot.stack_amount);
+                        target_slot.stack_amount = target_slot.max_stack_amount; 
+                    }
+                    else{
+                        start_slot.stack_amount -= (target_slot.item.max_stack_amount - target_slot.stack_amount); 
+                        target_slot.stack_amount = target_slot.item.max_stack_amount;
+                    }
+                }
             }
             //chagne two items in inventory
             else{
@@ -306,7 +319,6 @@ public class Inventories : MonoBehaviour{
     }
     public void Move_item_inv(){
         if(_occupied_slots > _slot_selected.slot_number-1){
-            _weapon_on_mouse = true;
             _moving_icon.GetComponentInChildren<Image>().sprite = _slot_selected.item.Item_icon;
             _moving_icon.GetComponentInChildren<Image>().enabled = true;
             _moving_icon.GetComponent<RectTransform>().position= new Vector3( _input_handler.mouse_position.x,_input_handler.mouse_position.y,0);
@@ -321,11 +333,7 @@ public class Inventories : MonoBehaviour{
         }
     }
     public void Unequip_weapon_slot(bool isRight){
-        //if(_player_inventory.inventory_weapons_slots.Count < _player_inventory.amount_of_items_slots){
-            // _player_inventory_slots.inventory_weapons_slots[_player_inventory.inventory_weapons_slots.Count].stack_amount = 1;
-
-            _player_inventory.Remove_weapon_from_hand_slot(isRight);
-        //}
+        _player_inventory.Remove_weapon_from_hand_slot(isRight);
     }
     public void Assign_weapons_amount_to_slots(){
         if(object_inv_to_show !=null){
@@ -385,27 +393,8 @@ public class Inventories : MonoBehaviour{
     }
     private void Update() {  
         _input_handler.Check_flags();
-        if(_input_handler.use_item_inv_flag){
-            Use_item_from_inv();
-        }
-        if(_input_handler.transfer_items_inv_flag){
-            Transfer_items_to_other_inv();
-        }
-        if(_input_handler.drop_items_inv_flag){
-            Drop_item_from_inventory();
-        }
         //Debug.Log("update click  " + _input_handler.mouse_right_pressed_inv_flag );
-        if(_input_handler.inventory_close_inv_flag){
-            if(_instance_item_info != null)
-                Destroy(_instance_item_info);
-            if(_instance_item_option_menu != null)
-                Destroy(_instance_item_option_menu);
-            if(_instance_item_creation_menu != null)
-                Destroy(_instance_item_creation_menu);
-            if(_instance_item_creation_amount != null)
-                Destroy(_instance_item_creation_amount);
-            _pressed_outside_dropdown = true;
-        }
+        
         //option menu on only right click not left
         if(_input_handler.mouse_right_pressed_inv_flag)
             _last_pressed_right = true;
@@ -439,6 +428,8 @@ public class Inventories : MonoBehaviour{
         //     _help2 = false;
         // }
        // Update_inventory_player_data();
+        Handle_exiting_inventory();
+        Handle_shortcuts();
         Set_object_inv_items_amount();
         Update_inventory_object_UI();
         Update_inventory_player_UI();
@@ -453,8 +444,70 @@ public class Inventories : MonoBehaviour{
             }
         }  
     }
+    private void Handle_exiting_inventory(){
+        if(_input_handler.inventory_close_inv_flag){
+            if(_instance_item_info != null)
+                Destroy(_instance_item_info);
+            if(_instance_item_option_menu != null)
+                Destroy(_instance_item_option_menu);
+            if(_instance_item_creation_menu != null)
+                Destroy(_instance_item_creation_menu);
+            if(_instance_item_creation_amount != null)
+                Destroy(_instance_item_creation_amount);
+            _pressed_outside_dropdown = true;
+        }
+    }
+    private void Handle_shortcuts(){
+        if(_input_handler.use_item_inv_flag && _mouse_on_item){
+            Use_item_from_inv();
+            Reset_item_info_pop_up();
+        }
+        if(_input_handler.transfer_items_inv_flag && _mouse_on_item){
+            Transfer_items_to_other_inv();
+            Reset_item_info_pop_up();
+        }
+        if(_input_handler.drop_items_inv_flag && _mouse_on_item){
+            Drop_item_from_inventory();
+            Reset_item_info_pop_up();
+        }
+        
+        if(_mouse_on_item && _input_handler.left_weapon_inv_flag){
+            if(_item_selected is Poison_potion && (!_player_inventory.current_weapon_for_left_hand.unarmed || !_player_inventory.backup_weapon_left.unarmed)){
+                Poison_weapon_inv(false);
+                Reset_item_info_pop_up();
+            }
+            if(_item_selected is Weapon_info.Weapon ){
+                _player_inventory.Change_weapon_for_left_hand(_slot_selected,_cursor_player_inv);
+                Reset_item_info_pop_up();  
+            }
+        }
+        if(_mouse_on_item && _input_handler.right_weapn_inv_flag){
+            if(_item_selected is Poison_potion && (!_player_inventory.current_weapon_for_right_hand.unarmed || !_player_inventory.backup_weapon_right.unarmed)){
+                Poison_weapon_inv(true);
+                Reset_item_info_pop_up();
+            }
+            if(_item_selected is Weapon_info.Weapon ){
+                _player_inventory.Change_weapon_for_right_hand(_slot_selected,_cursor_player_inv);
+                Reset_item_info_pop_up();
+            }
+        }
+       
+        if(_player_inventory.inventory_open && _input_handler.switch_flag){
+            if(_player_inventory_menu.activeSelf) 
+                Show_crafting_menu();
+            else
+                Show_player_inventory();
+        }
+    }
+    private void Reset_item_info_pop_up(){
+        if(_instance_item_info != null){
+            Destroy(_instance_item_info);
+            _item_selected = _slot_selected.item;
+            Start_timer(_slot_selected.slot_number);
+        }
+    }
     private void Transfer_items_to_other_inv(){
-        if(_mouse_on_item && _obj_inv_slots.gameObject.activeSelf){
+        if(_obj_inv_slots.gameObject.activeSelf){
             if(_cursor_player_inv && _occupied_slots > _slot_number_item_info  ){
                 //Debug.Log("transfer items from player inv to object inv");
                 List<Slot> _inv_slots_backup = _inv_slots;
@@ -467,8 +520,6 @@ public class Inventories : MonoBehaviour{
                 else{
                     _inv_slots[_slot_number_item_info].stack_amount = remaining_item_amount;
                 }
-                Reset_timer();
-                _mouse_on_item = true;
             }
             else if (!_cursor_player_inv && _occupied_slots > _slot_number_item_info){
                 //Debug.Log("transfer items from obj inv to player inv");
@@ -481,22 +532,21 @@ public class Inventories : MonoBehaviour{
                 else{
                     _inv_slots[_slot_number_item_info].stack_amount = remaining_item_amount;
                 }
-                Reset_timer();
-                _mouse_on_item = true;
             }
         }
     }
-     public void Change_right_weapon_from_inv(Slot slot){
-        if(_weapon_on_mouse){
-            _player_inventory.Change_weapon_for_right_hand(slot,_cursor_player_inv);
-            _weapon_on_mouse = false;
-        }
-    }
-    public void Change_left_weapon_from_inv(Slot slot){
-        //Debug.Log("on left weapon slot - override events? drop not working neither on poniter enter during drag in other");
-        if(_weapon_on_mouse){
-            _player_inventory.Change_weapon_for_left_hand(slot,_cursor_player_inv);
-            _weapon_on_mouse = false;
+    public void Poison_weapon_inv(bool isRight){
+        Poison_potion poison_potion = (Poison_potion)_slot_selected.item;
+        _player_inventory.Poison_weapon(poison_potion,isRight);
+        _inv_slots[_slot_selected.slot_number].stack_amount -= 1;
+        if(_inv_slots[_slot_selected.slot_number].stack_amount == 0){
+            if(_instance_item_info != null)
+                Destroy(_instance_item_info);
+            if(_cursor_player_inv)
+                _player_inventory.Remove_item_from_player_inv(_slot_selected);
+            else
+                object_inv_to_show.Remove_item_from_object(_slot_selected.slot_number);
+            Move_slots_to_left_inv(_inv_slots[_slot_selected.slot_number],6);
         }
     }
     public void Choose_which_inventory(bool player_inventory){
@@ -573,6 +623,11 @@ public class Inventories : MonoBehaviour{
                     Dagger dagger = (Dagger)weapon;
                     _instance_item_info.GetComponentInChildren<Text>().text +="\n Attack speed : " + dagger.attack_speed_multiplayer;
                 }
+                else if(weapon is Rapier){
+                    _instance_item_info.GetComponent<RectTransform>().sizeDelta = new Vector2(250,150);
+                    Rapier rapier = (Rapier)weapon;
+                    _instance_item_info.GetComponentInChildren<Text>().text +="\n Attack speed : " + rapier.attack_speed_multiplayer + "\n Critical dmg bonus: \t" + rapier.critical_damage_bonus;
+                }
             }
             else if(_item_selected is Whetstones){
                 Whetstones whetstone = (Whetstones)_item_selected;
@@ -588,6 +643,11 @@ public class Inventories : MonoBehaviour{
                 Health_potion health_potion = (Health_potion) _item_selected;
                 _instance_item_info.GetComponent<RectTransform>().sizeDelta = new Vector2(250,75);
                 _instance_item_info.GetComponentInChildren<Text>().text = _item_selected.Item_name +"\n Healing amount: \t" + health_potion.heal_amount + "\n Healing duration: \t" + health_potion.efect_duration ; 
+            }
+            else if(_item_selected is Poison_potion){
+                Poison_potion poison_potion = (Poison_potion) _item_selected;
+                _instance_item_info.GetComponent<RectTransform>().sizeDelta = new Vector2(250,100);
+                _instance_item_info.GetComponentInChildren<Text>().text = _item_selected.Item_name +"\n Poison damage: \t" + poison_potion.poison_damage + "\n Duration on enemy: \t" + poison_potion.poison_duration + "\n Duration on weapon: \t" + poison_potion.efect_duration; 
             }
             else if(_item_selected is Berries_healing){
                 Berries_healing berry_healing = (Berries_healing) _item_selected;
@@ -641,8 +701,15 @@ public class Inventories : MonoBehaviour{
                 _dropdown_options_title = _instance_item_option_menu.GetComponentInChildren<TMPro.TMP_Text>().gameObject;
                 if(!(_item_selected is Health_potion))
                     Remove_option_in_the_item_option_menu("Use item (E)");
-                if(!(_item_selected is Weapon_info.Weapon))
+                if(!(_item_selected is Poison_potion)){
+                    Remove_option_in_the_item_option_menu("Use on left weapon(1)");
+                    Remove_option_in_the_item_option_menu("Use on right weapon(2)");     
+                }
+                if(!(_item_selected is Weapon_info.Weapon)){
                     Remove_option_in_the_item_option_menu("Repair item");
+                    Remove_option_in_the_item_option_menu("Equip to left hand (1)");
+                    Remove_option_in_the_item_option_menu("Equip to right hand (2)");
+                }
                 Items_dropdown_options.onValueChanged.AddListener(delegate{
                     Item_operations_dropdown(Items_dropdown_options,slot);
                 });
@@ -663,11 +730,25 @@ public class Inventories : MonoBehaviour{
         //Debug.Log("value: " + sender.value);
         int index = sender.value;
         if(sender.options[index].text == "Use item (E)"){
-            _mouse_on_item = true;
             Use_item_from_inv(); 
         }
+        if(sender.options[index].text == "Use on left weapon(1)"){
+            if(!_player_inventory.current_weapon_for_left_hand.unarmed || !_player_inventory.backup_weapon_left.unarmed){
+                Poison_weapon_inv(false);
+            }
+        }
+        if(sender.options[index].text == "Use on right weapon(2)"){
+           if(!_player_inventory.current_weapon_for_right_hand.unarmed || !_player_inventory.backup_weapon_right.unarmed){
+                Poison_weapon_inv(true);
+            }
+        }
+        if(sender.options[index].text == "Equip to left hand (1)"){
+            _player_inventory.Change_weapon_for_left_hand(_slot_selected,_cursor_player_inv);  
+        }
+        if(sender.options[index].text == "Equip to right hand (2)"){
+          _player_inventory.Change_weapon_for_right_hand(_slot_selected,_cursor_player_inv);
+        }
         if(sender.options[index].text == "Transfer items (T)"){
-            _mouse_on_item = true;
             Transfer_items_to_other_inv();
         }
         if(sender.options[index].text == "Drop items (O)"){
@@ -718,23 +799,19 @@ public class Inventories : MonoBehaviour{
         _pressed_outside_dropdown = true;
     }
     public void Use_item_from_inv(){
-        if(_mouse_on_item){
-            if(_cursor_player_inv && _occupied_slots > _slot_number_item_info ){
-                if(_inv_slots[_slot_number_item_info].item is Health_potion){
-                    Health_potion health_potion = (Health_potion) _player_inventory.inventory_potions_slots[_slot_number_item_info];
-                    _player_inventory.gameObject.GetComponent<Player_info>().Start_healing_player_process(health_potion.efect_duration,health_potion.heal_amount);
-                    _inv_slots[_slot_number_item_info].stack_amount -= 1;
-                    if(_inv_slots[_slot_number_item_info].stack_amount == 0){
-                        _player_inventory.Remove_item_from_player_inv(_inv_slots[_slot_number_item_info]);
-                        Move_slots_to_left_inv(_inv_slots[_slot_number_item_info],_player_inventory.amount_of_items_slots);
-                    }
+        if(_cursor_player_inv && _occupied_slots > _slot_number_item_info ){
+            if(_inv_slots[_slot_number_item_info].item is Health_potion){
+                Health_potion health_potion = (Health_potion) _player_inventory.inventory_potions_slots[_slot_number_item_info];
+                _player_inventory.gameObject.GetComponent<Player_info>().Start_healing_player_process(health_potion.efect_duration,health_potion.heal_amount);
+                _inv_slots[_slot_number_item_info].stack_amount -= 1;
+                if(_inv_slots[_slot_number_item_info].stack_amount == 0){
+                    _player_inventory.Remove_item_from_player_inv(_inv_slots[_slot_number_item_info]);
+                    Move_slots_to_left_inv(_inv_slots[_slot_number_item_info],_player_inventory.amount_of_items_slots);
                 }
             }
         }
     }
     public void Drop_item_from_inventory(){
-        if(!_mouse_on_item)
-            return;
         Rigidbody _instance_item_dropped;
         _instance_item_dropped = Instantiate(_item_dropped_prefab,_root_for_drop_items.position,_root_for_drop_items.rotation) as Rigidbody;
         _instance_item_dropped.AddForce(_root_for_drop_items.forward * _dropp_items_force);
@@ -780,12 +857,15 @@ public class Inventories : MonoBehaviour{
             Debug.Log("Item in one copy - cant split");
     }
     public void Repair_item(int slot){
-        if(_cursor_player_inv && Check_for_items_to_reapir() && _item_selected is Weapon_info.Weapon){
-            _player_inventory.inventory_weapons_slots[slot].Add_durability(1);
+        if(_item_selected is Weapon_info.Weapon){
+            Weapon_info.Weapon weapon = (Weapon_info.Weapon) _item_selected;
+            if(_cursor_player_inv && Check_for_items_to_reapir(weapon.weapon_lvl/5 +1)){
+                _player_inventory.inventory_weapons_slots[slot].Add_durability(25);
+            }
         }
     }
-    public bool Check_for_items_to_reapir(){
-        return Inv_whetstone_level(3);
+    public bool Check_for_items_to_reapir(int whetstone_lvl){
+        return Is_whetstone_lvl_in_inv(whetstone_lvl);
         // foreach(Item_info.Item item in _player_inventory.inventory_items_slots){
         //     if(item is Whetstones){
         //         Whetstones whetstone = (Whetstones) item;
@@ -798,7 +878,7 @@ public class Inventories : MonoBehaviour{
         // Debug.Log("Not enough resources to reapir weapon");
         // return false;
     }
-    private bool Inv_whetstone_level(int whetstone_grid_level ){
+    private bool Is_whetstone_lvl_in_inv(int whetstone_grid_level ){
         for(int i=0;i<_player_inventory.inventory_items_slots.Count;i++){
             if(_player_inventory.inventory_items_slots[i] is Whetstones){
                 Whetstones whetstone = (Whetstones) _player_inventory.inventory_items_slots[i];
@@ -818,7 +898,7 @@ public class Inventories : MonoBehaviour{
                 }
             }
         }
-        Debug.Log("Not enough resources to reapir weapon");
+        Debug.Log("You don't have required whetstone to reapired weapon");
         return false;
     }      
     public void Check_if_mouse_click_on_dropdown_title(){
@@ -1004,7 +1084,7 @@ public class Inventories : MonoBehaviour{
         
     
         for(int i=0;i<_occupied_slots;i++){
-            if(_inv_slots[i].item == item && _inv_slots[i].stack_amount < _inv_slots[i].max_stack_amount && _inv_slots[i].stack_amount < _inv_slots[i].item.max_stack_amount ){
+            if(_inv_slots[i].item.item_id == item.item_id && _inv_slots[i].stack_amount < _inv_slots[i].max_stack_amount && _inv_slots[i].stack_amount < _inv_slots[i].item.max_stack_amount ){
                 //stack items
                 if(_inv_slots[i].stack_amount + stack_amount <= _inv_slots[i].max_stack_amount && _inv_slots[i].stack_amount + stack_amount <= _inv_slots[i].item.max_stack_amount){
                     _inv_slots[i].stack_amount += stack_amount;
@@ -1179,7 +1259,6 @@ public class Inventories : MonoBehaviour{
             Destroy(_instance_item_info);
         if(_instance_item_option_menu != null)
             Destroy(_instance_item_option_menu);
-       
     }
     public void Show_player_inventory(){
         _crafting_menu.SetActive(false);

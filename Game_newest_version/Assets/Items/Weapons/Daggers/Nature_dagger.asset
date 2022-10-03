@@ -16,11 +16,15 @@ MonoBehaviour:
   Item_name: Nature dagger
   max_stack_amount: 3
   Item_weight: 0
-  item_id: 3
+  item_id: 2.02
   Weapon_model: {fileID: 7228585429627651759, guid: 53715bb0f733ce04b9ed7f6cf3060262, type: 3}
   durability: 100
   material_toughness: 0.2
   unarmed: 0
+  weapon_lvl: 0
+  poison_damage: 0
+  poison_duration: 0
+  isPoisoned: 0
   Light_attack_damage: 20
   Strong_attack_damage: 60
   combo_dmg_bonus: 20

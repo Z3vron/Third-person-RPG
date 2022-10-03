@@ -22,12 +22,12 @@ namespace Attack{
         private int _last_light_attack = 0;
         private Player_statistics _player_stats;
         private Player_inventory_info.Player_inventory _player_inventory;
-        private Animator _animator;
+        public Animator animator;
         // !! Before Instantiate cant get to the data but after it i can just use get component as example below, cant assing objects to the overall prefab but to the instantiate in ine scene yes.
         // change flags that scripts get from prefabs to script on pfebbas to get values by themselves - think about it - probably change quite few things - especially arming player  with weapons - pivots left and right lots of 
         // unnecessary code and values etc
         private void Start() {
-            _animator = gameObject.GetComponentInChildren<Animator>();
+            animator = gameObject.GetComponentInChildren<Animator>();
             _player_stats = GetComponent<Player_info>().player_stats;
             _player_inventory = GetComponent<Player_inventory_info.Player_inventory>();
         }
@@ -55,7 +55,7 @@ namespace Attack{
                             Debug.Log("fist combo attack animation here ");
                         }
                         else{
-                            _animator.CrossFade("Light_attack_combo",0f,0);
+                            animator.CrossFadeInFixedTime("Override.Light_attack_combo",0f,1);
                         }       
                         // Debug.Log("Damage given to enemy without armour: " + damage_given_left + damage_given_right);
                     }
@@ -124,27 +124,36 @@ namespace Attack{
             Instance_projectile = Instantiate(_projectile_prefab_model,_root_for_shooting_projectile.position,_root_for_shooting_projectile.rotation) as Rigidbody;
             Instance_projectile.AddForce(_root_for_shooting_projectile.forward * _projectile_speed);        
         }
+        //could change two functions below to use third one so that there would be less code overall
         public void Start_left_light_attack(){
             //_player_inventory.current_weapon_for_left_hand.GetType()
             if(_player_inventory.current_weapon_for_left_hand is Dagger){
                 Dagger dagger = (Dagger)_player_inventory.current_weapon_for_left_hand;
-                _animator.SetFloat("Attack_speed_multiplayer",dagger.attack_speed_multiplayer);
+                animator.SetFloat("Attack_speed_multiplayer",dagger.attack_speed_multiplayer);
+            }
+            else if(_player_inventory.current_weapon_for_left_hand is Rapier){
+                Rapier rapier = (Rapier)_player_inventory.current_weapon_for_left_hand;
+                animator.SetFloat("Attack_speed_multiplayer",rapier.attack_speed_multiplayer);
             }
             else{
-                _animator.SetFloat("Attack_speed_multiplayer",1);
+                animator.SetFloat("Attack_speed_multiplayer",1);
             }
-            _animator.CrossFade("Light_attack_left",0f,0);
+            animator.CrossFadeInFixedTime("Override.Light_attack_left",0f,1);
             _player_stats.Take_stamina(_player_inventory.current_weapon_for_left_hand.light_attack_stamina_cost);
         }
         public void Start_right_light_attack(){
             if(_player_inventory.current_weapon_for_right_hand is Dagger){
                 Dagger dagger = (Dagger)_player_inventory.current_weapon_for_right_hand;
-                _animator.SetFloat("Attack_speed_multiplayer",dagger.attack_speed_multiplayer);
+                animator.SetFloat("Attack_speed_multiplayer",dagger.attack_speed_multiplayer);
+            }
+            else if(_player_inventory.current_weapon_for_right_hand is Rapier){
+                Rapier rapier = (Rapier)_player_inventory.current_weapon_for_right_hand;
+                animator.SetFloat("Attack_speed_multiplayer",rapier.attack_speed_multiplayer);
             }
             else{
-                _animator.SetFloat("Attack_speed_multiplayer",1);
+                animator.SetFloat("Attack_speed_multiplayer",1);
             }
-            _animator.CrossFade("Light_attack_right",0f,0);//,-1,3,0.9f);
+            animator.CrossFadeInFixedTime("Override.Light_attack_right",0f,1);
             _player_stats.Take_stamina(_player_inventory.current_weapon_for_right_hand.light_attack_stamina_cost);
         }
     }

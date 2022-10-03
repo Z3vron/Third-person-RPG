@@ -26,24 +26,22 @@ public class Enemy_weapon_slot_manager : MonoBehaviour{
     //this is really bad idea but it works - need to look into it, and change few things als oin player etc same issue about order of executing scripts 
     //- i try to get into component in the deactivated object because script that activates it is called in this script so first
     // this script is executing till the end and olny then other scripts called from this one  
-    private void Update() {
-        if(_left_hand_slot.current_Weapon_model_instantiated.GetComponent<Activate_pivots.Activate_pivots>().Left_Pivot.GetComponent<Hand_slot_activator>().activated){
+    private void Update(){
+        if(left_hand_weapon != null && _left_hand_slot.current_Weapon_model_instantiated.GetComponent<Activate_pivots.Activate_pivots>().Left_Pivot.GetComponent<Hand_slot_activator>().activated){
             Assign_weapon_collider(false);
             _left_hand_slot.current_Weapon_model_instantiated.GetComponent<Activate_pivots.Activate_pivots>().Left_Pivot.GetComponent<Hand_slot_activator>().activated = false;
         }
-        if(_right_hand_slot.current_Weapon_model_instantiated.GetComponent<Activate_pivots.Activate_pivots>().Right_Pivot.GetComponent<Hand_slot_activator>().activated){
+        if(right_hand_weapon != null &&_right_hand_slot.current_Weapon_model_instantiated.GetComponent<Activate_pivots.Activate_pivots>().Right_Pivot.GetComponent<Hand_slot_activator>().activated){
             Assign_weapon_collider(true);
             _right_hand_slot.current_Weapon_model_instantiated.GetComponent<Activate_pivots.Activate_pivots>().Right_Pivot.GetComponent<Hand_slot_activator>().activated = false;
         } 
     }
     private void Load_weapon_to_slot(Weapon_info.Weapon weapon, bool isRight){
         if(isRight){
-            ///_right_hand_slot.current_weapon = weapon;
             _right_hand_slot.Equip_weapon(weapon);
-            //Assign_weapon_collider(isRight);
+            Assign_weapon_collider(isRight);
         }
         else{
-            //_left_hand_slot.current_weapon = weapon;
             _left_hand_slot.Equip_weapon(weapon);
             Assign_weapon_collider(isRight);
         }

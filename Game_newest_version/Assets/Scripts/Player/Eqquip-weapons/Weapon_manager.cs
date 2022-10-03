@@ -49,10 +49,15 @@ namespace Weapon_slot_manager{
             else{
                 assign_left_weapon_collider();
             }
-            if(_right_slot.current_weapon.unarmed == false){    
-                if(_right_slot.current_Weapon_model_instantiated.GetComponent<Activate_pivots.Activate_pivots>().Right_Pivot.GetComponent<Hand_slot_activator>().activated){
+            if(_right_slot.current_weapon.unarmed == false){
+                if(_right_slot.current_Weapon_model_instantiated.GetComponent<Activate_pivots.Activate_pivots>() != null){
+                    if(_right_slot.current_Weapon_model_instantiated.GetComponent<Activate_pivots.Activate_pivots>().Right_Pivot.GetComponent<Hand_slot_activator>().activated){
+                        assign_right_weapon_collider();
+                        _right_slot.current_Weapon_model_instantiated.GetComponent<Activate_pivots.Activate_pivots>().Right_Pivot.GetComponent<Hand_slot_activator>().activated = false;
+                    }
+                }    
+                else{
                     assign_right_weapon_collider();
-                    _right_slot.current_Weapon_model_instantiated.GetComponent<Activate_pivots.Activate_pivots>().Right_Pivot.GetComponent<Hand_slot_activator>().activated = false;
                 }
             }
             else{
