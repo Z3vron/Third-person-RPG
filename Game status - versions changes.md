@@ -2,6 +2,26 @@ I started learning Unity Game Engine by creating my first game which of course i
 This is my game - there are lots of bugs and issues with it but i am slowly repeairing them and adding some new features. Game doesn't look to good visualy but i never 
 intended to make visually pleasing game - I am not an artist but i like coding so i focus on writing mechanics for the game.
 
+Update next
+- Decided to use some free assets from unity store
+- change player model
+- Added combat/locked on enemy separate movement
+- Added few new weapons/ models from free assets
+- Added poison potions - can poison any sword and deal extra damage(armour ignored) to enemy over time - enemy poisoned has got small icon with filler around indicator
+- Added shortcuts to change between player inv and crafting inv, equip weapons and poison them
+- Added class that calls given function after given amount of time, it creates new object for that time(performance - could make list of classes(containers for info) inside gamemanager (all timers would work around one update function - right now each timer has got separate MonoBehaviour script - seperate update function on separate object))
+- Added checking angle to interactable objects so that player could interact with them if they are in front of him
+- Changed enemy model/enemy animations handler/ and few values
+- Added from store enemy animations (in progress)
+- Added rapier class - need to work on critical damage chance etc - randomize stuff overall unknown to me right now
+- Created override animator layer for the attacks - in the future to do animations only for some parts of body(avatar mask)
+- Fixed bug that allowed jump endlessly by keeping jump button pressed
+- Fixed bug that drained stamina when pressed dash button but no direction was given
+- Pop-up window containing item info will automaticly refresh itself after user press one of shortcuts on the given item
+- Think on Gamemaster - what put inside etc
+- Could use spherecast to detect interactable objects - right now i use on trigger enter on player - reapaired some bugs with it - could be done better
+- Searched unity store and downloaded and imported some simple animations
+
 
 Update 06.09.2022
 - Changed animations transitions from nodes(in future there would be to much arrows and chaos and bools/triggers) to transitions through code(Crossfade)
@@ -63,4 +83,4 @@ Things i want to do/add:
 - need more animations
 - play with the terrain tool
 - pro-builder or something like that sounds not bad
--overall optimazation
+-overall optimization
