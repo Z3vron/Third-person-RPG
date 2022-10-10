@@ -3,6 +3,11 @@ This is my game - there are lots of bugs and issues with it but i am slowly repe
 intended to make visually pleasing game - I am not an artist but i like coding so i focus on writing mechanics for the game.
 I added some models and animations from the store (ofcourse free assets because i am student) so that game will look more visually pleasing
 
+Changed on github and not locally:
+- input handler
+- player slots
+- reset input flags in movement
+
 Next update
 - Use profiler for both performance and garbage
 - Think on Gc - could use struct rather than classes because struct doesn't create as mach garbage especially when i need container for simple type of data,for simple data eg. no arrayes,lists etc structs should be better, need to check profiler for the Garbage collector allocation, need to check If scriptable objects create garbage - where they are alocated
