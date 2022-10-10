@@ -759,6 +759,10 @@ namespace Player_Movemnet{
             _input_handler.jump_flag = false;
             _input_handler.left_weapon_flag = false;
             _input_handler.right_weapon_flag = false;
+            _input_handler.first_potion_flag = false;
+            _input_handler.second_potion_flag = false;
+            _input_handler.third_potion_flag = false;
+            _input_handler.fourth_potion_flag = false;
             _input_handler.interact_flag = false;
             _input_handler.attack_light_flag = false;
             _input_handler.attack_strong_performed_flag = false;
