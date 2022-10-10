@@ -14,6 +14,10 @@ public class Input_handler : MonoBehaviour
         public bool inventory_flag;
         public bool left_weapon_flag;
         public bool right_weapon_flag;
+        public bool first_potion_flag;
+        public bool second_potion_flag;
+        public bool third_potion_flag;
+        public bool fourth_potion_flag;
         public bool interact_flag;
         public bool attack_light_flag;
         public bool attack_strong_started_flag;
@@ -36,6 +40,10 @@ public class Input_handler : MonoBehaviour
         private InputAction _crouch_action;
         private InputAction _weapon_left_action;
         private InputAction _weapon_right_action;
+        private InputAction _first_potion_action;
+        private InputAction _second_potion_action;
+        private InputAction _third_potion_action;
+        private InputAction _fourth_potion_action;
         private InputAction _combo_attack_action;
         private InputAction _open_inventory_action;
         private InputAction _lock_on_action;
@@ -83,6 +91,10 @@ public class Input_handler : MonoBehaviour
         _crouch_action  = _player_input.actions["Crouch"];
         _weapon_left_action = _player_input.actions["Weapon_left"];
         _weapon_right_action = _player_input.actions["Weapon_right"];
+        _first_potion_action = _player_input.actions["First_potion"];
+        _second_potion_action = _player_input.actions["Second_potion"];
+        _third_potion_action = _player_input.actions["Third_potion"];
+        _fourth_potion_action = _player_input.actions["Fourth_potion"];
         _combo_attack_action = _player_input.actions["Combo_attack"];
         _open_inventory_action = _player_input.actions["Inventory"];
         _help_action = _player_input.actions["Help"];
@@ -112,6 +124,10 @@ public class Input_handler : MonoBehaviour
         if(_open_inventory_action.triggered)         inventory_flag = true;{}
         if(_weapon_left_action.triggered)            left_weapon_flag = true;{}
         if(_weapon_right_action.triggered)           right_weapon_flag = true;{}
+        if(_first_potion_action.triggered)           first_potion_flag = true;{}
+        if(_second_potion_action.triggered)           second_potion_flag = true;{}
+        if(_third_potion_action.triggered)           third_potion_flag = true;{}
+        if(_fourth_potion_action.triggered)           fourth_potion_flag = true;{}
         if(_interact_action.triggered)               interact_flag = true;{}
         if(_lock_on_action.triggered)                lock_on_flag = true;{}
         if(_switch_action_player.triggered)                 switch_flag = true;{}
