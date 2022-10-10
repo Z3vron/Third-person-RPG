@@ -16,6 +16,7 @@ public class Player_slots : MonoBehaviour{
                 _quick_slots_right_weapon_icon.enabled = true;
             }
             else{
+                _quick_slots_right_weapon_icon.sprite = null;
                 _quick_slots_right_weapon_icon.enabled = false;
             } 
         }
@@ -25,14 +26,19 @@ public class Player_slots : MonoBehaviour{
                 _quick_slots_left_weapon_icon.enabled = true;    
             }
             else{
+                _quick_slots_left_weapon_icon.sprite = null;
                 _quick_slots_left_weapon_icon.enabled = false;
             }
         }
     }
     //slot_number is number 1-4 counting from the left side
     public void Update_quick_slot_potions_icon(Potions potion, int slot_number){
-        if(potion.Item_icon == null)
+        if(potion.Item_icon == null){
+            _quick_slots_potions_icons[slot_number-1].sprite = null;
+            _quick_slots_potions_icons[slot_number-1].enabled = false;
             return;
+        }
+            
         _quick_slots_potions_icons[slot_number-1].sprite = potion.Item_icon;
         _quick_slots_potions_icons[slot_number-1].enabled = true;
     }
