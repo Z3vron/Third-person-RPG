@@ -5,27 +5,35 @@ using UnityEngine.UI;
 
 public class Player_slots : MonoBehaviour{
 
-    public Image left_weapon_icon;
-    public Image right_weapon_icon;
-
-    public void Update_weapon_icon(Weapon_info.Weapon weapon, bool isRight){
+    [SerializeField] private  Image _quick_slots_left_weapon_icon;
+    [SerializeField] private  Image _quick_slots_right_weapon_icon;
+    private List<Image> _quick_slots_potions_icons;
+    
+    public void Update_quick_slot_weapon_icon(Weapon_info.Weapon weapon, bool isRight){
         if(isRight){
             if(weapon.Item_icon != null){
-                right_weapon_icon.sprite = weapon.Item_icon;
-                right_weapon_icon.enabled = true;
+                _quick_slots_right_weapon_icon.sprite = weapon.Item_icon;
+                _quick_slots_right_weapon_icon.enabled = true;
             }
             else{
-                right_weapon_icon.enabled = false;
+                _quick_slots_right_weapon_icon.enabled = false;
             } 
         }
         else{
             if(weapon.Item_icon != null){
-                left_weapon_icon.sprite = weapon.Item_icon;
-                left_weapon_icon.enabled = true;    
+                _quick_slots_left_weapon_icon.sprite = weapon.Item_icon;
+                _quick_slots_left_weapon_icon.enabled = true;    
             }
             else{
-                left_weapon_icon.enabled = false;
+                _quick_slots_left_weapon_icon.enabled = false;
             }
         }
+    }
+    //slot_number is number 1-4 counting from the left side
+    public void Update_quick_slot_potions_icon(Potions potion, int slot_number){
+        if(potion.Item_icon == null)
+            return;
+        _quick_slots_potions_icons[slot_number-1].sprite = potion.Item_icon;
+        _quick_slots_potions_icons[slot_number-1].enabled = true;
     }
 }
