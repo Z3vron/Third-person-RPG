@@ -140,6 +140,7 @@ namespace Player_Movemnet{
         
         // on trigger enter depended on button pressed
         private bool _in_area_to_interact_chest = false;
+         private bool _in_area_to_interact_bush = false;
         private bool _in_area_to_interact_door = false;
         private bool _in_area_to_interact_dropped_items = false;
 
@@ -241,7 +242,7 @@ namespace Player_Movemnet{
         }
         private void OnTriggerStay(Collider other){
             //Debug.Log(other);
-            if(other.GetComponent<Item_dropped>() ||other.gameObject.tag == "Chest"|| other.gameObject.tag == "Door" ){
+            if(other.GetComponent<Item_dropped>() ||other.gameObject.tag == "Chest"|| other.gameObject.tag == "Door" || other.gameObject.tag == "Bush"){
                 Vector3 interactable_object_dir = other.transform.position - gameObject.transform.position;
                 interactable_object_dir.y = 0;
                 interactable_object_dir.Normalize();
@@ -258,6 +259,7 @@ namespace Player_Movemnet{
                     _in_area_to_interact_chest = false;
                     _in_area_to_interact_door = false;
                     _in_area_to_interact_dropped_items = false;
+                    _in_area_to_interact_bush = false;
                     //Debug.Log("Item out of reach");
                     Reset_turn_off_interact_pop_up();
                 }
@@ -290,7 +292,14 @@ namespace Player_Movemnet{
                     _text_added = true;
                 }
             }
-            
+            else if(_collider_to_interact.gameObject.tag == "Bush"){
+                _in_area_to_interact_bush = true;
+                _interact_pop_up.SetActive(true);
+                if(!_text_added){
+                    _interact_pop_up.GetComponentInChildren<Text>().text += _collider_to_interact.GetComponent<Bush_contents>().interactable_text;
+                    _text_added = true;
+                }
+            }
             else if(_collider_to_interact.gameObject.tag == "Door"){
                 //Debug.Log("Opening Door");
                 // Door_touched = true;
@@ -349,6 +358,17 @@ namespace Player_Movemnet{
                     _canvas.GetComponent<Inventories>().object_inv_to_show = _object_to_interact.GetComponent<Interactable_objects>();
                     _canvas.GetComponent<Inventories>().Assign_weapons_amount_to_slots();
                     _player_inventory.Handle_inventory();
+                }
+                else if(_in_area_to_interact_bush){
+                    _animator.CrossFade("Gathering",0);
+                   _canvas.GetComponent<Inventories>().Add_item_to_player_inv_check_for_same_object(_collider_to_interact.GetComponent<Bush_contents>().berry_in_bush,_collider_to_interact.GetComponent<Bush_contents>().amount_of_berry); 
+                    if(_canvas.GetComponent<Inventories>().added_all_items){
+                        _collider_to_interact.GetComponent<Bush_contents>().amount_of_berry = 0;
+                    }
+                    else{
+                        _collider_to_interact.GetComponent<Bush_contents>().amount_of_berry = dropped_item_new_amount;
+                    }
+                    
                 }
                 else if(_in_area_to_interact_door){
                     _collider_to_interact.GetComponent<Rigidbody>().AddForce(_Door_side*_root_for_shot_raycast.forward * _Touch_force * _Player_speed,ForceMode.Acceleration);
@@ -759,6 +779,10 @@ namespace Player_Movemnet{
             _input_handler.jump_flag = false;
             _input_handler.left_weapon_flag = false;
             _input_handler.right_weapon_flag = false;
+            _input_handler.first_potion_flag = false;
+            _input_handler.second_potion_flag = false;
+            _input_handler.third_potion_flag = false;
+            _input_handler.fourth_potion_flag = false;
             _input_handler.interact_flag = false;
             _input_handler.attack_light_flag = false;
             _input_handler.attack_strong_performed_flag = false;

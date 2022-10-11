@@ -561,6 +561,7 @@ MonoBehaviour:
   _world_canvas: {fileID: 0}
   _enemy_attacks:
   - {fileID: 11400000, guid: c2cad5c6a045fee46a996e17271c777c, type: 2}
+  - {fileID: 11400000, guid: d00e65eea2e1e2747901dd533517f9f6, type: 2}
   _enemy_weapon_slot_manager: {fileID: 0}
   current_attack: {fileID: 0}
   current_recovery_time: 0

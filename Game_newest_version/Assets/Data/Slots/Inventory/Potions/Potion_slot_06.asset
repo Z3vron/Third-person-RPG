@@ -9,12 +9,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 47a51cdba7a9d5b409da681be30b1651, type: 3}
+  m_Script: {fileID: 11500000, guid: 531689b906bdb7a41b2cd97552dfabae, type: 3}
   m_Name: Potion_slot_06
   m_EditorClassIdentifier: 
   slot_number: 5
   stack_amount: 0
-  max_stack_amount: 5
+  max_stack_amount: 6
   in_inventory: 1
   isRight: 0
   in_obj_inv: 0

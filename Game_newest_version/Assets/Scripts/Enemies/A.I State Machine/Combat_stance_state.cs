@@ -9,6 +9,8 @@ public class Combat_stance_state : State{
     [SerializeField] private bool _target_in_field_of_view = false;
     [SerializeField] private float _border_angle_to_start_rotate = 75;
     public override State Run_current_state(Enemy_manager enemy_manager){
+        if(enemy_manager.instance_enemy_stats.isDead)
+            return this;
         if(enemy_manager.targeted_character == null)
             return idle_state;
         //could chagne look at to code so that enemy would circle around player

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Heavy_attack_right
   m_EditorClassIdentifier: 
   animation_name: Heavy_attack_right
-  attack_chance_score: 6
+  attack_chance_score: 3
   recovery_time: 4
   minimum_attack_angle: -35
   maximum_attack_angle: 35

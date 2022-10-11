@@ -27,13 +27,13 @@ namespace Weapon_slot_manager{
             //load to right hand
             if(hand){
                 _right_slot.Equip_weapon(weapon);
-                _player_quick_access_slots.Update_weapon_icon(weapon,true);
+                _player_quick_access_slots.Update_quick_slot_weapon_icon(weapon,true);
                // Debug.Log("Right");
             }
             //Load to left hand
             else{
                 _left_slot.Equip_weapon(weapon);
-                _player_quick_access_slots.Update_weapon_icon(weapon,false);  
+                _player_quick_access_slots.Update_quick_slot_weapon_icon(weapon,false);  
                // Debug.Log("Left");            
             }
         }

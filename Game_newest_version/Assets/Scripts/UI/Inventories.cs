@@ -455,43 +455,51 @@ public class Inventories : MonoBehaviour{
             if(_instance_item_creation_amount != null)
                 Destroy(_instance_item_creation_amount);
             _pressed_outside_dropdown = true;
+            _mouse_on_item = false;
         }
     }
     private void Handle_shortcuts(){
-        if(_input_handler.use_item_inv_flag && _mouse_on_item){
-            Use_item_from_inv();
-            Reset_item_info_pop_up();
-        }
-        if(_input_handler.transfer_items_inv_flag && _mouse_on_item){
-            Transfer_items_to_other_inv();
-            Reset_item_info_pop_up();
-        }
-        if(_input_handler.drop_items_inv_flag && _mouse_on_item){
-            Drop_item_from_inventory();
-            Reset_item_info_pop_up();
-        }
-        
-        if(_mouse_on_item && _input_handler.left_weapon_inv_flag){
-            if(_item_selected is Poison_potion && (!_player_inventory.current_weapon_for_left_hand.unarmed || !_player_inventory.backup_weapon_left.unarmed)){
-                Poison_weapon_inv(false);
+        if(_mouse_on_item){
+            if(_input_handler.use_item_inv_flag){
+                Use_item_from_inv();
                 Reset_item_info_pop_up();
             }
-            if(_item_selected is Weapon_info.Weapon ){
-                _player_inventory.Change_weapon_for_left_hand(_slot_selected,_cursor_player_inv);
-                Reset_item_info_pop_up();  
-            }
-        }
-        if(_mouse_on_item && _input_handler.right_weapn_inv_flag){
-            if(_item_selected is Poison_potion && (!_player_inventory.current_weapon_for_right_hand.unarmed || !_player_inventory.backup_weapon_right.unarmed)){
-                Poison_weapon_inv(true);
+            if(_input_handler.transfer_items_inv_flag){
+                Transfer_items_to_other_inv();
                 Reset_item_info_pop_up();
             }
-            if(_item_selected is Weapon_info.Weapon ){
-                _player_inventory.Change_weapon_for_right_hand(_slot_selected,_cursor_player_inv);
+            if(_input_handler.drop_items_inv_flag){
+                Drop_item_from_inventory();
                 Reset_item_info_pop_up();
             }
+            
+            if(_input_handler.left_weapon_inv_flag){
+                if(_item_selected is Poison_potion && (!_player_inventory.current_weapon_for_left_hand.unarmed || !_player_inventory.backup_weapon_left.unarmed)){
+                    Poison_weapon_inv(false);
+                    Reset_item_info_pop_up();
+                }
+                if(_item_selected is Weapon_info.Weapon ){
+                    _player_inventory.Change_weapon_for_left_hand(_slot_selected,_cursor_player_inv);
+                    Reset_item_info_pop_up();  
+                }
+            }
+            if(_input_handler.right_weapn_inv_flag){
+                if(_item_selected is Poison_potion && (!_player_inventory.current_weapon_for_right_hand.unarmed || !_player_inventory.backup_weapon_right.unarmed)){
+                    Poison_weapon_inv(true);
+                    Reset_item_info_pop_up();
+                }
+                if(_item_selected is Weapon_info.Weapon ){
+                    _player_inventory.Change_weapon_for_right_hand(_slot_selected,_cursor_player_inv);
+                    Reset_item_info_pop_up();
+                }
+            }
+            if(_input_handler.first_potion_inv_flag){
+                Debug.Log("test");
+                if(_item_selected is Health_potion){
+                    _player_inventory.Change_potion_in_slot(_slot_selected,1);
+                }
+            }
         }
-       
         if(_player_inventory.inventory_open && _input_handler.switch_flag){
             if(_player_inventory_menu.activeSelf) 
                 Show_crafting_menu();

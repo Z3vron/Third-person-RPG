@@ -6,6 +6,10 @@ public class Chase_state : State{
     public Combat_stance_state combat_stance_state;
     public Idle_state idle_state;
     public override State Run_current_state(Enemy_manager enemy_manager){
+        if(enemy_manager.instance_enemy_stats.isDead){
+            enemy_manager.nav_mesh_agent.isStopped = true;
+            return this;
+        }
         if(enemy_manager.targeted_character == null)
             return idle_state;
         if(Vector3.Distance(enemy_manager.transform.position,enemy_manager.targeted_character.transform.position) > 25){

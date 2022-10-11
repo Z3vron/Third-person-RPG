@@ -19,6 +19,7 @@ namespace Player_inventory_info{
         public Weapon_info.Weapon unarmed;
         public Armor_info.Armour player_armour;
         public List<Weapon_info.Weapon> inventory_weapons_slots = new List<Weapon_info.Weapon>();
+        public List<Slot> quick_slots_potions = new List<Slot>();
         public List<Potions> inventory_potions_slots = new List<Potions>();
         public List<Materials> inventory_materials_slots = new List<Materials>();
         public List<Item_info.Item> inventory_items_slots = new List<Item_info.Item>();
@@ -281,6 +282,12 @@ namespace Player_inventory_info{
                     Debug.Log("Weapon has 0 durability");
                 }
             } 
+        }
+        public void Change_potion_in_slot(Slot potion_slot_inv,int slot_number){
+            if(quick_slots_potions[slot_number-1].item == null){
+                quick_slots_potions[slot_number-1].item = potion_slot_inv.item;
+                quick_slots_potions[slot_number-1].stack_amount = potion_slot_inv.stack_amount;
+            }
         }
         public void Poison_weapon(Poison_potion poison_potion,bool right_weapon){
             if(right_weapon){

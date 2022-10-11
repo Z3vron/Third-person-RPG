@@ -157,6 +157,42 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "First_potion",
+                    "type": "Button",
+                    "id": "6ae6a12b-fc7e-4514-9143-03fc401566ff",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Second_potion",
+                    "type": "Button",
+                    "id": "685000b1-62b2-4808-b3f4-8dd8ffa32b88",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Third_potion",
+                    "type": "Button",
+                    "id": "068bd4c9-1f9c-490b-b8b0-2921c466bb24",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Fourth_potion",
+                    "type": "Button",
+                    "id": "9fae3a92-c828-4447-bebd-2befaac19ab1",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -566,6 +602,50 @@
                     "action": "Dash",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "24a92884-736e-45be-a48d-781f757e5f05",
+                    "path": "<Keyboard>/3",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "First_potion",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ff0caed5-dd9a-4e9b-b045-0f47d1a2bf42",
+                    "path": "<Keyboard>/4",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Second_potion",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "27c2d835-1ee9-4760-a7a7-aa0467df3dfb",
+                    "path": "<Keyboard>/5",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Third_potion",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b3f4ed22-1c84-4232-95a9-8ee13ee6faea",
+                    "path": "<Keyboard>/6",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Fourth_potion",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },
@@ -667,6 +747,42 @@
                     "name": "Switch_inv",
                     "type": "Button",
                     "id": "1eb14fb5-829c-40b3-b487-f1108060590f",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "First_potion_inv",
+                    "type": "Button",
+                    "id": "6dba0beb-c578-407b-b922-c16b40769681",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Second_potion_inv",
+                    "type": "Button",
+                    "id": "1a3a189e-6d98-400b-8a62-d748a2f499f9",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Third_potion_inv",
+                    "type": "Button",
+                    "id": "c73b1614-a632-4142-9bce-2b6a73174df5",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Fourth_potion_inv",
+                    "type": "Button",
+                    "id": "4ff8366f-c203-496d-906c-a6e92b53adae",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -803,6 +919,50 @@
                     "processors": "",
                     "groups": "Keyboard&Mouse",
                     "action": "Switch_inv",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "641e4cf4-c1b4-4206-8c61-eabe496a4013",
+                    "path": "<Keyboard>/3",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "First_potion_inv",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "94b4d7a3-a3a7-4ef6-a8b2-5f99c4f0150d",
+                    "path": "<Keyboard>/4",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Second_potion_inv",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6cc976e1-dc5e-47d9-896e-0f7e0305959b",
+                    "path": "<Keyboard>/5",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Third_potion_inv",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a9cdfa41-bdb2-4884-9adb-9db9a3ff2297",
+                    "path": "<Keyboard>/6",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Fourth_potion_inv",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

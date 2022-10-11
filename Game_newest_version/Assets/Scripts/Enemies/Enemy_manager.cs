@@ -120,6 +120,8 @@ public class Enemy_manager : MonoBehaviour
          if(instance_enemy_stats.Current_health <= 0){
             animator.CrossFade("Death",0f,0);
             instance_enemy_stats.isDead = true;
+            nav_mesh_agent.isStopped = true;
+            
             player.GetComponent<Player_info>().player_stats.current_exp += instance_enemy_stats.exp_reward;
             if(player.GetComponent<Player_Movemnet.Movement>().enemies_lock_on.Contains(gameObject))
                 player.GetComponent<Player_Movemnet.Movement>().enemies_lock_on.Remove(gameObject);
