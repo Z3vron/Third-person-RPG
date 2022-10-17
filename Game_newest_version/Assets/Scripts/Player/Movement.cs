@@ -66,8 +66,7 @@ namespace Player_Movemnet{
     {
         //figure out wayy to use pointers and addresses
         public int dropped_item_new_amount;
-        
-       
+        public  List<GameObject> enemies_lock_on = new List<GameObject>();
 
         public bool player_grounded = false;
         public bool player_crouching = false;
@@ -76,17 +75,24 @@ namespace Player_Movemnet{
         // public bool Door_touched = false; // variable used to control door in another script but I decided to handle it here  - not sure if good habbit but another script would be too simple
         public bool Trap_active = false; 
         //Should do Tooltip to every variable
-        [Tooltip("Speed of character in m/s for walking")]
-        [SerializeField] private float _walk_speed = 3.0f;
+        
         #region Stamina costs
         [SerializeField] private float  _sprinting_stamina_cost = 1.5f;
         [SerializeField] private float  _jump_stamina_cost = 3.0f;
         [SerializeField] private float _dash_stamina_cost = 15;
         #endregion
+        #region Movement speed multiplayers
+        [Tooltip("Speed of character in m/s while walking")]
+        [SerializeField] private float _walk_speed = 3.0f;
+        [Tooltip("Speed of character in m/s while sprinting")]
         [SerializeField] private float _sprint_speed = 9.0f;
+        [Tooltip("Speed of character in m/s while crouching")]
         [SerializeField] private float _crouch_speed = 1.0f;
+        [Tooltip("Speed of character in m/s while changing between speed multiplayers")]
         [SerializeField] private float _player_speed_change_rate = 10.0f;
+        [Tooltip("Speed of character in m/s while rotating towards direction camera is facing")]
         [SerializeField] private float _player_rotation_speed = 7.0f;
+        #endregion
         [SerializeField] private float _jump_height = 1.5f;
         [SerializeField] private float _gravity_force = -12f;
         [SerializeField] private float _Time_between_jumps = 0.6f;
@@ -140,13 +146,10 @@ namespace Player_Movemnet{
         
         // on trigger enter depended on button pressed
         private bool _in_area_to_interact_chest = false;
-         private bool _in_area_to_interact_bush = false;
+        private bool _in_area_to_interact_bush = false;
         private bool _in_area_to_interact_door = false;
         private bool _in_area_to_interact_dropped_items = false;
-
         private GameObject _closest_enemy;
-        public  List<GameObject> enemies_lock_on = new List<GameObject>();
-        
         
         // to the same for text
         // number of dropped items doesn't change
