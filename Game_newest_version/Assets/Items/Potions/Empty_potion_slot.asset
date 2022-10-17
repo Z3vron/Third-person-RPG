@@ -9,13 +9,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 531689b906bdb7a41b2cd97552dfabae, type: 3}
-  m_Name: Third_potion_slot
+  m_Script: {fileID: 11500000, guid: 76a89f3f6d701044ebc0b1579e8b92ba, type: 3}
+  m_Name: Empty_potion_slot
   m_EditorClassIdentifier: 
-  slot_number: 2
-  stack_amount: 0
-  max_stack_amount: 4
-  in_inventory: 0
-  isRight: 0
-  in_obj_inv: 0
-  item: {fileID: 0}
+  Item_icon: {fileID: 21300000, guid: 959b91e8f3085c0478e6de42b7006492, type: 3}
+  Item_name: 
+  max_stack_amount: 0
+  Item_weight: 0
+  item_id: 40.0002
+  efect_duration: 0

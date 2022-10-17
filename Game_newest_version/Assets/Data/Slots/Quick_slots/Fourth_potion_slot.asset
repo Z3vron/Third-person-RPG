@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 531689b906bdb7a41b2cd97552dfabae, type: 3}
   m_Name: Fourth_potion_slot
   m_EditorClassIdentifier: 
-  slot_number: 0
+  slot_number: 3
   stack_amount: 0
   max_stack_amount: 4
   in_inventory: 0

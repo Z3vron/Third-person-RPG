@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Item_icon: {fileID: 21300000, guid: bd55711bcab2f4d4183a97d4b93ec822, type: 3}
   Item_name: Health potion
-  max_stack_amount: 3
+  max_stack_amount: 8
   Item_weight: 1.5
   item_id: 41
   efect_duration: 1

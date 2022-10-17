@@ -10,13 +10,15 @@ Think about
 - Debug.log creates lots of garbage ok while working on the game but before building game delete/comment all debug.log lines
 - Think on reusing objects
 - Use get-set (for example get returns value and sets change it if condition was met)
+- Move checking input flags from movement script to input handler - earlier there was a problem with it but i dont remember what was it 
 
 Next update:
 - player strong attack interrupt enemy attack( added animations for both player and enemy)
 - issue with humanoid animations on generic rig - changing type gives errores
 - complete adding animations for first enemy( still missing some nice attack animations)
-- 
-
+- Berries are now gathered from bushes
+- Added quick potions slots(similar to weapon slots) - equiping, removing from slots and using in all methods(shortcut,drag,item menu option)
+- Changed playing sound from the player - still needs to learn about sound in unity because i dont know nothing about it
 
 Update 03.10.2022
 - Decided to use some free assets from unity store

@@ -9,6 +9,8 @@ public class Player_info : MonoBehaviour{
     public bool player_crouching;
     public bool locked_on_enemy = false;
     public Player_statistics player_stats;
+    public AudioClip eat_food;
+    public AudioClip drink_potion;
     [SerializeField] private UI_elements.UI_bars _player_UI_info;
     [SerializeField] private float _health_regen_delay = 5;
     [SerializeField] private float _stamina_regen_delay = 3;
@@ -71,9 +73,10 @@ public class Player_info : MonoBehaviour{
            player_stats.isDead = true;
         }
     }
-   
+    public void Play_audio_from_player(AudioClip audioclip,float delay){
+        Function_timer.Create(() =>  _audio_source.PlayOneShot(audioclip),delay);
+    }
     public void Start_healing_player_process(float duration, float amount_per_second){
-        _audio_source.PlayDelayed(0.5f);
         _healing_process = true;
         _healing_amount_per_sec = amount_per_second;
         _healing_duration_in_sec = duration;

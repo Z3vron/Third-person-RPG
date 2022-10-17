@@ -220,6 +220,14 @@ namespace Player_Movemnet{
                 _player_inventory.Check_left_weapon();
             if(_input_handler.right_weapon_flag)
                 _player_inventory.Check_right_weapon();
+            if(_input_handler.first_potion_flag)
+                _player_inventory.Use_potion_from_quick_slot(0);
+            if(_input_handler.second_potion_flag)
+                _player_inventory.Use_potion_from_quick_slot(1);
+            if(_input_handler.third_potion_flag)
+                _player_inventory.Use_potion_from_quick_slot(2);
+            if(_input_handler.fourth_potion_flag)
+                _player_inventory.Use_potion_from_quick_slot(2);
         }
         private void OnTriggerEnter(Collider other){
             // _trigger_colliders.Add(other);
@@ -256,11 +264,12 @@ namespace Player_Movemnet{
                 else{
                     if(_trigger_colliders.Contains(other))
                         _trigger_colliders.Remove(other);
+                    if(_collider_to_interact == other)
+                        _collider_to_interact = null;
                     _in_area_to_interact_chest = false;
                     _in_area_to_interact_door = false;
                     _in_area_to_interact_dropped_items = false;
                     _in_area_to_interact_bush = false;
-                    //Debug.Log("Item out of reach");
                     Reset_turn_off_interact_pop_up();
                 }
             }
@@ -293,6 +302,8 @@ namespace Player_Movemnet{
                 }
             }
             else if(_collider_to_interact.gameObject.tag == "Bush"){
+                if(_collider_to_interact.GetComponent<Bush_contents>().amount_of_berry == 0)
+                    return ;
                 _in_area_to_interact_bush = true;
                 _interact_pop_up.SetActive(true);
                 if(!_text_added){
@@ -318,7 +329,7 @@ namespace Player_Movemnet{
                 Debug.Log("Trap deactivated");
                 Trap_active = false;
             }
-            if(other.GetComponent<Item_dropped>() || other.gameObject.tag == "Chest" || other.gameObject.tag == "Door"){
+            if(other.GetComponent<Item_dropped>() || other.gameObject.tag == "Chest" || other.gameObject.tag == "Door" || other.gameObject.tag == "Bush"){
                 if(_trigger_colliders.Contains(other))
                     _trigger_colliders.Remove(other);
                 if(_trigger_colliders.Count == 0)
@@ -368,7 +379,6 @@ namespace Player_Movemnet{
                     else{
                         _collider_to_interact.GetComponent<Bush_contents>().amount_of_berry = dropped_item_new_amount;
                     }
-                    
                 }
                 else if(_in_area_to_interact_door){
                     _collider_to_interact.GetComponent<Rigidbody>().AddForce(_Door_side*_root_for_shot_raycast.forward * _Touch_force * _Player_speed,ForceMode.Acceleration);
@@ -804,6 +814,10 @@ namespace Player_Movemnet{
             _input_handler.confirmed_action_inv_flag = false;
             _input_handler.left_weapon_inv_flag = false;
             _input_handler.right_weapn_inv_flag = false;
+            _input_handler.first_potion_inv_flag = false;
+            _input_handler.second_potion_inv_flag = false;
+            _input_handler.third_potion_inv_flag = false;
+            _input_handler.fourth_potion_inv_flag = false;
         }
     }
 }

@@ -17,6 +17,7 @@ namespace Player_inventory_info{
         public Weapon_info.Weapon current_weapon_for_left_hand;
         public Weapon_info.Weapon backup_weapon_left;
         public Weapon_info.Weapon unarmed;
+        public Potions empty_potion;
         public Armor_info.Armour player_armour;
         public List<Weapon_info.Weapon> inventory_weapons_slots = new List<Weapon_info.Weapon>();
         public List<Slot> quick_slots_potions = new List<Slot>();
@@ -64,6 +65,11 @@ namespace Player_inventory_info{
            backup_weapon_left = unarmed;
            backup_weapon_right = unarmed;
            _input_handler = GetComponent<Input_handler>();
+            for(int i=0;i<4;i++){
+                quick_slots_potions[i].item = null;
+                quick_slots_potions[i].stack_amount = 0;
+                _inventories.player_slots.Update_quick_slot_potions_icon(empty_potion,i);
+           }
         }
         private void Update() {
             if(current_weapon_for_left_hand.durability == 0){
@@ -283,10 +289,109 @@ namespace Player_inventory_info{
                 }
             } 
         }
-        public void Change_potion_in_slot(Slot potion_slot_inv,int slot_number){
-            if(quick_slots_potions[slot_number-1].item == null){
-                quick_slots_potions[slot_number-1].item = potion_slot_inv.item;
-                quick_slots_potions[slot_number-1].stack_amount = potion_slot_inv.stack_amount;
+        public bool Change_potion_in_slot(Slot potion_slot_inv,int quick_slot_number,bool slot_in_playyer_inv){
+            Potions temp_potion;
+            if(quick_slots_potions[quick_slot_number].item == null){
+                quick_slots_potions[quick_slot_number].item = potion_slot_inv.item;
+                if(quick_slots_potions[quick_slot_number].max_stack_amount >= potion_slot_inv.stack_amount){
+                    quick_slots_potions[quick_slot_number].stack_amount = potion_slot_inv.stack_amount;
+                    if(slot_in_playyer_inv)
+                        Remove_item_from_player_inv(potion_slot_inv);
+                    else
+                        _inventories.object_inv_to_show.Remove_item_from_object(potion_slot_inv.slot_number);
+                    _inventories.Move_slots_to_left_inv(potion_slot_inv,amount_of_items_slots);
+                }
+                else{
+                    quick_slots_potions[quick_slot_number].stack_amount = quick_slots_potions[quick_slot_number].max_stack_amount;
+                    potion_slot_inv.stack_amount -= quick_slots_potions[quick_slot_number].max_stack_amount;
+                }
+                return true;
+            }
+            else if(quick_slots_potions[quick_slot_number].item.item_id == potion_slot_inv.item.item_id){
+                if(quick_slots_potions[quick_slot_number].stack_amount + potion_slot_inv.stack_amount <= quick_slots_potions[quick_slot_number].max_stack_amount){
+                    quick_slots_potions[quick_slot_number].stack_amount += potion_slot_inv.stack_amount;
+                     if(slot_in_playyer_inv)
+                        Remove_item_from_player_inv(potion_slot_inv);
+                    else
+                        _inventories.object_inv_to_show.Remove_item_from_object(potion_slot_inv.slot_number);
+                    potion_slot_inv.stack_amount = 0;
+                    potion_slot_inv.item = null;
+                    _inventories.Move_slots_to_left_inv(potion_slot_inv,amount_of_items_slots);
+                }
+                else{
+                    potion_slot_inv.stack_amount -= (quick_slots_potions[quick_slot_number].max_stack_amount - quick_slots_potions[quick_slot_number].stack_amount);
+                    quick_slots_potions[quick_slot_number].stack_amount = quick_slots_potions[quick_slot_number].max_stack_amount;
+                }
+                return false;
+            }
+            else if(quick_slots_potions[quick_slot_number].item != null && inventory_potions_slots.Count < amount_of_items_slots){
+                
+                _inventories.Add_item_to_player_inv_check_for_same_object(quick_slots_potions[quick_slot_number].item,quick_slots_potions[quick_slot_number].stack_amount);
+               //Add_item_to_player_inv_list(quick_slots_potions[slot_number].item);
+                quick_slots_potions[quick_slot_number].item = potion_slot_inv.item;
+                //same as above
+                if(quick_slots_potions[quick_slot_number].max_stack_amount >= potion_slot_inv.stack_amount){
+                    quick_slots_potions[quick_slot_number].stack_amount = potion_slot_inv.stack_amount;
+                    if(slot_in_playyer_inv)
+                        Remove_item_from_player_inv(potion_slot_inv);
+                    else
+                        _inventories.object_inv_to_show.Remove_item_from_object(potion_slot_inv.slot_number);
+                    potion_slot_inv.stack_amount = 0;
+                    potion_slot_inv.item = null;
+                    _inventories.Move_slots_to_left_inv(potion_slot_inv,amount_of_items_slots);
+                }
+                else{
+                    quick_slots_potions[quick_slot_number].stack_amount = quick_slots_potions[quick_slot_number].max_stack_amount;
+                    potion_slot_inv.stack_amount -= quick_slots_potions[quick_slot_number].max_stack_amount;
+                }
+                return true;
+            }
+            else if(quick_slots_potions[quick_slot_number].item != null && inventory_potions_slots.Count == amount_of_items_slots){
+                temp_potion = (Potions)quick_slots_potions[quick_slot_number].item;
+                int temp_stack_amount = quick_slots_potions[quick_slot_number].stack_amount;
+                quick_slots_potions[quick_slot_number].item = potion_slot_inv.item;
+                if(quick_slots_potions[quick_slot_number].max_stack_amount >= potion_slot_inv.stack_amount){
+                    quick_slots_potions[quick_slot_number].stack_amount = potion_slot_inv.stack_amount;
+                    if(slot_in_playyer_inv)
+                        Remove_item_from_player_inv(potion_slot_inv);
+                    else
+                        _inventories.object_inv_to_show.Remove_item_from_object(potion_slot_inv.slot_number);
+                    potion_slot_inv.stack_amount = 0;
+                    potion_slot_inv.item = null;
+                    _inventories.Move_slots_to_left_inv(potion_slot_inv,amount_of_items_slots);
+                    //Add_item_to_player_inv_list(temp_potion);
+                    _inventories.Add_item_to_player_inv_check_for_same_object(temp_potion,temp_stack_amount);
+                    return true;
+                }
+                else{
+                    _inventories.remaining_item_amount = 0;
+                    _inventories.Add_item_to_player_inv_check_for_same_object(temp_potion,temp_stack_amount);
+                    if(_inventories.remaining_item_amount == 0){
+                        quick_slots_potions[quick_slot_number].stack_amount = quick_slots_potions[quick_slot_number].max_stack_amount;
+                        potion_slot_inv.stack_amount -= quick_slots_potions[quick_slot_number].max_stack_amount;
+                        return true;
+                    }
+                    else{
+                        quick_slots_potions[quick_slot_number].stack_amount -= _inventories.remaining_item_amount; 
+                        return false;
+                    }
+                }
+            }
+            else{
+                return false;
+            }
+        }
+        public void Use_potion_from_quick_slot(int slot_number){
+            if(quick_slots_potions[slot_number].item == null)
+                return ;
+            else{
+                quick_slots_potions[slot_number].stack_amount -= 1;
+                Health_potion health_potion = (Health_potion) quick_slots_potions[slot_number].item;
+                GetComponent<Player_info>().Start_healing_player_process(health_potion.efect_duration,health_potion.heal_amount);
+                if(quick_slots_potions[slot_number].stack_amount == 0){
+                    quick_slots_potions[slot_number].item = null;
+                    _inventories.player_slots.Update_quick_slot_potions_icon(empty_potion,slot_number);
+                }
             }
         }
         public void Poison_weapon(Poison_potion poison_potion,bool right_weapon){
@@ -297,7 +402,6 @@ namespace Player_inventory_info{
                 current_weapon_for_right_hand.poison_damage = poison_potion.poison_damage;
                 current_weapon_for_right_hand.poison_duration = poison_potion.poison_duration;
                 _poison_time_right = poison_potion.efect_duration;
-                
             }
             else{
                 if( current_weapon_for_left_hand.isPoisoned)
@@ -356,6 +460,18 @@ namespace Player_inventory_info{
                     weapon_slot_manager.Load_weapon_to_slot(current_weapon_for_left_hand,false);
                 }
                
+            }
+        }
+        public void Remove_potion_from_quick_slot(int slot_number){
+            if(quick_slots_potions[slot_number].item == null)
+                return ;
+            else{
+                _inventories.Add_item_to_player_inv_check_for_same_object(quick_slots_potions[slot_number].item,quick_slots_potions[slot_number].stack_amount);
+                if(_inventories.added_all_items){
+                    quick_slots_potions[slot_number].item = null;
+                    quick_slots_potions[slot_number].stack_amount = 0;
+                    _inventories.player_slots.Update_quick_slot_potions_icon(empty_potion,slot_number);
+                }
             }
         }
         public void Remove_item_from_player_inv(Slot slot){

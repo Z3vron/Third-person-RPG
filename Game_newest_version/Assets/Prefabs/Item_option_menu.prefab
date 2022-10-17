@@ -1140,9 +1140,11 @@ MonoBehaviour:
       m_Image: {fileID: 0}
     - m_Text: Use item (E)
       m_Image: {fileID: 0}
-    - m_Text: Use on left weapon(1)
+    - m_Text: Eat food (E)
       m_Image: {fileID: 0}
-    - m_Text: Use on right weapon(2)
+    - m_Text: Use on left weapon (1)
+      m_Image: {fileID: 0}
+    - m_Text: Use on right weapon (2)
       m_Image: {fileID: 0}
     - m_Text: Transfer items (T)
       m_Image: {fileID: 0}
@@ -1151,6 +1153,14 @@ MonoBehaviour:
     - m_Text: Split one item
       m_Image: {fileID: 0}
     - m_Text: Split items in half
+      m_Image: {fileID: 0}
+    - m_Text: Equip to first slot (3)
+      m_Image: {fileID: 0}
+    - m_Text: Equip to second slot (4)
+      m_Image: {fileID: 0}
+    - m_Text: Equip to third slot (5)
+      m_Image: {fileID: 0}
+    - m_Text: Equip to fourth slot (6)
       m_Image: {fileID: 0}
     - m_Text: Exit
       m_Image: {fileID: 0}

@@ -11,6 +11,7 @@ public class Inventories : MonoBehaviour{
     public Interactable_objects object_inv_to_show;
     public bool added_all_items;
     public int remaining_item_amount;
+    public Player_slots player_slots;
 
 
     [SerializeField]  private  GameObject _moving_icon;
@@ -51,13 +52,14 @@ public class Inventories : MonoBehaviour{
     private GameObject _dropdown_options_title;
     private bool _pressed_outside_dropdown = true;
     private bool _mouse_on_item = false;
+   
     // create list of slots - code will be more clean - extra list but current syntax is just awful - done but still could think about changing system - now i manually add item to player/obj list end to list of slots separate
     // variables used in operations on inventories taking values from object or player inv
     // I store stack amount in slot scriptableobject could change to store in in weapon??? or in the list - still not sure  about that
     private Weapon_info.Weapon _weapon; 
     private Item_info.Item _item_selected;
     int _occupied_slots;
-    List <GameObject>  _inv_slots_images = new List<GameObject>();
+    List <Image>  _inv_slots_images = new List<Image>();
     List <Slot> _inv_slots = new List<Slot>();
     bool _item_derivative;
 
@@ -67,6 +69,7 @@ public class Inventories : MonoBehaviour{
     private void Start() {
         _help = new PointerEventData(null);
         _graphicRaycaster_inv_slots = GetComponent<GraphicRaycaster>();
+        player_slots = GetComponentInChildren<Player_slots>();
     }
     // watchout for choose which inv function - called on pointer enter - changing some values - be carefull with using 3 variables above their values isn't changing  by add weapons functions but they change originall values 
     //do automatic stack of same objects whilk transfering items to the object/player inventory, handle situation when transfer item to capped inv - done mouse gives more control - no stack and transfer do auto stack if possible, if inv full than it transfer as much as possible and rest stay at original inv
@@ -95,6 +98,12 @@ public class Inventories : MonoBehaviour{
                         }
                         else if(!item_slot.slot.isRight && (!_player_inventory.current_weapon_for_left_hand.unarmed || !_player_inventory.backup_weapon_left.unarmed)){
                            Poison_weapon_inv(false);
+                        }
+                    }
+                    else if(!item_slot.slot.in_inventory && !item_slot.slot.in_obj_inv && _item_selected is Health_potion){
+                        if(_player_inventory.Change_potion_in_slot(_slot_selected,item_slot.slot.slot_number,_cursor_player_inv)){
+                            Potions potion = (Potions)_item_selected;
+                            player_slots.Update_quick_slot_potions_icon(potion,item_slot.slot.slot_number);
                         }
                     }
                     else if (item_slot.slot.in_inventory && item_slot.slot != _slot_selected ){
@@ -130,6 +139,12 @@ public class Inventories : MonoBehaviour{
                         }
                         else if(!item_slot.slot.isRight && (!_player_inventory.current_weapon_for_left_hand.unarmed || !_player_inventory.backup_weapon_left.unarmed)){
                            Poison_weapon_inv(false);
+                        }
+                    }
+                    else if(!item_slot.slot.in_inventory && !item_slot.slot.in_obj_inv && _item_selected is Health_potion){
+                        if(_player_inventory.Change_potion_in_slot(_slot_selected,item_slot.slot.slot_number,_cursor_player_inv)){
+                            Potions potion = (Potions)_item_selected;
+                            player_slots.Update_quick_slot_potions_icon(potion,item_slot.slot.slot_number);
                         }
                     }
                     else if(item_slot.slot.in_inventory){
@@ -335,6 +350,9 @@ public class Inventories : MonoBehaviour{
     public void Unequip_weapon_slot(bool isRight){
         _player_inventory.Remove_weapon_from_hand_slot(isRight);
     }
+    public void Unequip_potion_slot(int slot_number){
+        _player_inventory.Remove_potion_from_quick_slot(slot_number);
+    }
     public void Assign_weapons_amount_to_slots(){
         if(object_inv_to_show !=null){
             //Debug.Log("Assing amount");
@@ -372,13 +390,18 @@ public class Inventories : MonoBehaviour{
         //items
         Update_UI_inventory_row(_player_inventory.inventory_items_slots,_player_inventory_slots.inventory_items_images_slots,_player_inventory_slots.inventory_items_slots);
     }
-    private void Update_UI_inventory_row(List<Item_info.Item> list_of_items,List<GameObject> list_of_icons,List<Slot> list_of_slots){
+    private void Update_UI_inventory_row(List<Item_info.Item> list_of_items,List<Image> list_of_icons,List<Slot> list_of_slots){
         for(int i=0;i<list_of_items.Count;i++){
             _player_inventory_slots.Add_inventory_item_icon(list_of_items[i],i);
             _player_inventory_slots.Check_item_amount(i,list_of_icons,list_of_slots);
         }
         for(int i=list_of_items.Count;i<_player_inventory.amount_of_items_slots;i++){
             _player_inventory_slots.Remove_inventory_item_icon(i,list_of_icons);
+        }
+    }
+    private void Update_quick_slots_potions_UI(){
+        for(int i=0;i<4;i++){
+            _player_inventory_slots.Check_item_amount(i,player_slots.quick_slots_potions_icons,_player_inventory.quick_slots_potions);
         }
     }
     public void Update_creation_inventory_UI(){
@@ -434,6 +457,7 @@ public class Inventories : MonoBehaviour{
         Update_inventory_object_UI();
         Update_inventory_player_UI();
         Update_creation_inventory_UI();
+        Update_quick_slots_potions_UI();
        
          if(_start_time){
             _time_to_show_item_info_elapsed += Time.deltaTime;
@@ -461,7 +485,10 @@ public class Inventories : MonoBehaviour{
     private void Handle_shortcuts(){
         if(_mouse_on_item){
             if(_input_handler.use_item_inv_flag){
-                Use_item_from_inv();
+                if(_item_selected is Berries)
+                    Use_item_from_inv();
+                else 
+                    Use_item_from_inv();
                 Reset_item_info_pop_up();
             }
             if(_input_handler.transfer_items_inv_flag){
@@ -494,9 +521,39 @@ public class Inventories : MonoBehaviour{
                 }
             }
             if(_input_handler.first_potion_inv_flag){
-                Debug.Log("test");
                 if(_item_selected is Health_potion){
-                    _player_inventory.Change_potion_in_slot(_slot_selected,1);
+                    if(_player_inventory.Change_potion_in_slot(_slot_selected,0,_cursor_player_inv)){
+                        Potions potion = (Potions)_item_selected;
+                        player_slots.Update_quick_slot_potions_icon(potion,0);
+                        Reset_item_info_pop_up();
+                    }
+                }
+            }
+            if(_input_handler.second_potion_inv_flag){
+                if(_item_selected is Health_potion){
+                    if(_player_inventory.Change_potion_in_slot(_slot_selected,1,_cursor_player_inv)){
+                        Potions potion = (Potions)_item_selected;
+                        player_slots.Update_quick_slot_potions_icon(potion,1);
+                        Reset_item_info_pop_up();
+                    }
+                }
+            }
+            if(_input_handler.third_potion_inv_flag){
+                if(_item_selected is Health_potion){
+                    if(_player_inventory.Change_potion_in_slot(_slot_selected,2,_cursor_player_inv)){
+                        Potions potion = (Potions)_item_selected;
+                        player_slots.Update_quick_slot_potions_icon(potion,2);
+                        Reset_item_info_pop_up();
+                    }
+                }
+            }
+            if(_input_handler.fourth_potion_inv_flag){
+                if(_item_selected is Health_potion){
+                    if(_player_inventory.Change_potion_in_slot(_slot_selected,3,_cursor_player_inv)){
+                        Potions potion = (Potions)_item_selected;
+                        player_slots.Update_quick_slot_potions_icon(potion,3);
+                        Reset_item_info_pop_up();
+                    }
                 }
             }
         }
@@ -534,7 +591,7 @@ public class Inventories : MonoBehaviour{
                 Add_item_to_player_inv_check_for_same_object(_inv_slots[_slot_number_item_info].item,_inv_slots[_slot_number_item_info].stack_amount);
                 Choose_which_inventory_type_slot(_obj_inv_slots.obj_inv_items_slots[_slot_number_item_info]);
                 if(added_all_items){
-                     object_inv_to_show.Remove_item_from_object(_slot_number_item_info);
+                    object_inv_to_show.Remove_item_from_object(_slot_number_item_info);
                     Move_slots_to_left_inv(_inv_slots[_slot_number_item_info],object_inv_to_show.amount_of_item_slots);
                 }
                 else{
@@ -639,17 +696,17 @@ public class Inventories : MonoBehaviour{
             }
             else if(_item_selected is Whetstones){
                 Whetstones whetstone = (Whetstones)_item_selected;
-                _instance_item_info.GetComponent<RectTransform>().sizeDelta = new Vector2(250,75);
+                _instance_item_info.GetComponent<RectTransform>().sizeDelta = new Vector2(250,85);
                 _instance_item_info.GetComponentInChildren<Text>().text = _item_selected.Item_name + "\n Durability: \t" + whetstone.durability + "\n Toughness: \t" + whetstone.grid_toughness;
             }
             else if(_item_selected is Materials){
                 Materials material = (Materials)_item_selected;
-                _instance_item_info.GetComponent<RectTransform>().sizeDelta = new Vector2(250,75);
+                _instance_item_info.GetComponent<RectTransform>().sizeDelta = new Vector2(250,85);
                 _instance_item_info.GetComponentInChildren<Text>().text = _item_selected.Item_name +"\n Quality: \t" + material.quality_class + "\n Size: \t" + material.size; 
             }
             else if(_item_selected is Health_potion){
                 Health_potion health_potion = (Health_potion) _item_selected;
-                _instance_item_info.GetComponent<RectTransform>().sizeDelta = new Vector2(250,75);
+                _instance_item_info.GetComponent<RectTransform>().sizeDelta = new Vector2(250,85);
                 _instance_item_info.GetComponentInChildren<Text>().text = _item_selected.Item_name +"\n Healing amount: \t" + health_potion.heal_amount + "\n Healing duration: \t" + health_potion.efect_duration ; 
             }
             else if(_item_selected is Poison_potion){
@@ -657,10 +714,10 @@ public class Inventories : MonoBehaviour{
                 _instance_item_info.GetComponent<RectTransform>().sizeDelta = new Vector2(250,100);
                 _instance_item_info.GetComponentInChildren<Text>().text = _item_selected.Item_name +"\n Poison damage: \t" + poison_potion.poison_damage + "\n Duration on enemy: \t" + poison_potion.poison_duration + "\n Duration on weapon: \t" + poison_potion.efect_duration; 
             }
-            else if(_item_selected is Berries_healing){
-                Berries_healing berry_healing = (Berries_healing) _item_selected;
-                _instance_item_info.GetComponent<RectTransform>().sizeDelta = new Vector2(250,75);
-                _instance_item_info.GetComponentInChildren<Text>().text = _item_selected.Item_name +"\n Healing amount: \t" + berry_healing.health_restore_amount + "\n Eating time: /s: \t" + berry_healing.eating_time; 
+            else if(_item_selected is Berries){
+                Berries berries = (Berries) _item_selected;
+                _instance_item_info.GetComponent<RectTransform>().sizeDelta = new Vector2(250,85);
+                _instance_item_info.GetComponentInChildren<Text>().text = _item_selected.Item_name +"\n Healing amount: \t" + berries.health_restore_amount + "\n Eating time: /s: \t" + berries.eating_time; 
             }
             //set window size base on item info size etc??
         }    
@@ -707,11 +764,19 @@ public class Inventories : MonoBehaviour{
                 _instance_item_option_menu.GetComponent<RectTransform>().localPosition += new Vector3(0,-45,0);
                 Items_dropdown_options = _instance_item_option_menu.GetComponent<TMPro.TMP_Dropdown>();
                 _dropdown_options_title = _instance_item_option_menu.GetComponentInChildren<TMPro.TMP_Text>().gameObject;
-                if(!(_item_selected is Health_potion))
+                if(!(_item_selected is Health_potion)){
                     Remove_option_in_the_item_option_menu("Use item (E)");
+                    Remove_option_in_the_item_option_menu("Equip to first slot (3)");
+                    Remove_option_in_the_item_option_menu("Equip to second slot (4)");
+                    Remove_option_in_the_item_option_menu("Equip to third slot (5)");
+                    Remove_option_in_the_item_option_menu("Equip to fourth slot (6)");
+                }
+                if(!(_item_selected is Berries)){
+                    Remove_option_in_the_item_option_menu("Eat food (E)");
+                }    
                 if(!(_item_selected is Poison_potion)){
-                    Remove_option_in_the_item_option_menu("Use on left weapon(1)");
-                    Remove_option_in_the_item_option_menu("Use on right weapon(2)");     
+                    Remove_option_in_the_item_option_menu("Use on left weapon (1)");
+                    Remove_option_in_the_item_option_menu("Use on right weapon (2)");     
                 }
                 if(!(_item_selected is Weapon_info.Weapon)){
                     Remove_option_in_the_item_option_menu("Repair item");
@@ -740,12 +805,15 @@ public class Inventories : MonoBehaviour{
         if(sender.options[index].text == "Use item (E)"){
             Use_item_from_inv(); 
         }
-        if(sender.options[index].text == "Use on left weapon(1)"){
+        if(sender.options[index].text == "Eat food (E)"){
+            Use_item_from_inv();
+        }
+        if(sender.options[index].text == "Use on left weapon (1)"){
             if(!_player_inventory.current_weapon_for_left_hand.unarmed || !_player_inventory.backup_weapon_left.unarmed){
                 Poison_weapon_inv(false);
             }
         }
-        if(sender.options[index].text == "Use on right weapon(2)"){
+        if(sender.options[index].text == "Use on right weapon (2)"){
            if(!_player_inventory.current_weapon_for_right_hand.unarmed || !_player_inventory.backup_weapon_right.unarmed){
                 Poison_weapon_inv(true);
             }
@@ -755,6 +823,34 @@ public class Inventories : MonoBehaviour{
         }
         if(sender.options[index].text == "Equip to right hand (2)"){
           _player_inventory.Change_weapon_for_right_hand(_slot_selected,_cursor_player_inv);
+        }
+        if(sender.options[index].text == "Equip to first slot (3)"){
+            if(_player_inventory.Change_potion_in_slot(_slot_selected,0,_cursor_player_inv)){
+                Potions potion = (Potions)_item_selected;
+                player_slots.Update_quick_slot_potions_icon(potion,0);
+                Reset_item_info_pop_up();
+            }
+        }
+        if(sender.options[index].text == "Equip to second slot (4)"){
+            if(_player_inventory.Change_potion_in_slot(_slot_selected,1,_cursor_player_inv)){
+                Potions potion = (Potions)_item_selected;
+                player_slots.Update_quick_slot_potions_icon(potion,1);
+                Reset_item_info_pop_up();
+            }
+        }
+        if(sender.options[index].text == "Equip to third slot (5)"){
+            if(_player_inventory.Change_potion_in_slot(_slot_selected,2,_cursor_player_inv)){
+                Potions potion = (Potions)_item_selected;
+                player_slots.Update_quick_slot_potions_icon(potion,2);
+                Reset_item_info_pop_up();
+            }
+        }
+        if(sender.options[index].text == "Equip to fourth slot (6)"){
+            if(_player_inventory.Change_potion_in_slot(_slot_selected,3,_cursor_player_inv)){
+                Potions potion = (Potions)_item_selected;
+                player_slots.Update_quick_slot_potions_icon(potion,3);
+                Reset_item_info_pop_up();
+            }
         }
         if(sender.options[index].text == "Transfer items (T)"){
             Transfer_items_to_other_inv();
@@ -807,13 +903,36 @@ public class Inventories : MonoBehaviour{
         _pressed_outside_dropdown = true;
     }
     public void Use_item_from_inv(){
-        if(_cursor_player_inv && _occupied_slots > _slot_number_item_info ){
-            if(_inv_slots[_slot_number_item_info].item is Health_potion){
-                Health_potion health_potion = (Health_potion) _player_inventory.inventory_potions_slots[_slot_number_item_info];
-                _player_inventory.gameObject.GetComponent<Player_info>().Start_healing_player_process(health_potion.efect_duration,health_potion.heal_amount);
+        if(_occupied_slots > _slot_number_item_info ){
+            if(_inv_slots[_slot_number_item_info].item is Health_potion || _inv_slots[_slot_number_item_info].item is Berries){
+                if(_inv_slots[_slot_number_item_info].item is Health_potion){
+                    Health_potion health_potion;
+                    if(_cursor_player_inv){
+                        health_potion  = (Health_potion) _player_inventory.inventory_potions_slots[_slot_number_item_info];
+                    }
+                    else{
+                        health_potion = (Health_potion) object_inv_to_show.items_in_object[_slot_number_item_info];
+                    }
+                    _player_inventory.gameObject.GetComponent<Player_info>().Start_healing_player_process(health_potion.efect_duration,health_potion.heal_amount);
+                    _player_inventory.gameObject.GetComponent<Player_info>().Play_audio_from_player(_player_inventory.gameObject.GetComponent<Player_info>().drink_potion,1);
+                }
+                else if(_inv_slots[_slot_number_item_info].item is Berries){
+                    Berries berry;
+                    if(_cursor_player_inv){
+                        berry  = (Berries) _player_inventory.inventory_items_slots[_slot_number_item_info];
+                    }
+                    else{
+                        berry = (Berries) object_inv_to_show.items_in_object[_slot_number_item_info];
+                    }
+                    _player_inventory.gameObject.GetComponent<Player_info>().Start_healing_player_process(berry.eating_time,berry.health_restore_amount);
+                    _player_inventory.gameObject.GetComponent<Player_info>().Play_audio_from_player(_player_inventory.gameObject.GetComponent<Player_info>().eat_food,1);
+                }
                 _inv_slots[_slot_number_item_info].stack_amount -= 1;
                 if(_inv_slots[_slot_number_item_info].stack_amount == 0){
-                    _player_inventory.Remove_item_from_player_inv(_inv_slots[_slot_number_item_info]);
+                    if(_cursor_player_inv)
+                        _player_inventory.Remove_item_from_player_inv(_inv_slots[_slot_number_item_info]);
+                    else
+                        object_inv_to_show.Remove_item_from_object(_slot_number_item_info);
                     Move_slots_to_left_inv(_inv_slots[_slot_number_item_info],_player_inventory.amount_of_items_slots);
                 }
             }

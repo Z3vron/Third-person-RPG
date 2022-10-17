@@ -6,43 +6,43 @@ using UnityEngine.UI;
 public class Inventory_slots : MonoBehaviour{
 
     [Header("Weapons")]
-    public GameObject Weapon_1;
-    public GameObject Weapon_2;
-    public GameObject Weapon_3;
-    public GameObject Weapon_4;
-    public GameObject Weapon_5;
-    public GameObject Weapon_6;
-    public List<GameObject> inventory_weapons_images_slots = new List<GameObject>();
+    public Image Weapon_1;
+    public Image Weapon_2;
+    public Image Weapon_3;
+    public Image Weapon_4;
+    public Image Weapon_5;
+    public Image Weapon_6;
+    public List<Image> inventory_weapons_images_slots = new List<Image>();
     public List<Slot> inventory_weapons_slots = new List<Slot>();
 
     [Header("Materials")]
-    public GameObject Material_1;
-    public GameObject Material_2;
-    public GameObject Material_3;
-    public GameObject Material_4;
-    public GameObject Material_5;
-    public GameObject Material_6;
-    public List<GameObject> inventory_materials_images_slots = new List<GameObject>();
+    public Image Material_1;
+    public Image Material_2;
+    public Image Material_3;
+    public Image Material_4;
+    public Image Material_5;
+    public Image Material_6;
+    public List<Image> inventory_materials_images_slots = new List<Image>();
     public List<Slot> inventory_materials_slots = new List<Slot>();
     
     [Header("Items")]
-    public GameObject Item_1;
-    public GameObject Item_2;
-    public GameObject Item_3;
-    public GameObject Item_4;
-    public GameObject Item_5;
-    public GameObject Item_6;
-    public List<GameObject> inventory_items_images_slots = new List<GameObject>();
+    public Image Item_1;
+    public Image Item_2;
+    public Image Item_3;
+    public Image Item_4;
+    public Image Item_5;
+    public Image Item_6;
+    public List<Image> inventory_items_images_slots = new List<Image>();
     public List<Slot> inventory_items_slots = new List<Slot>();
 
     [Header("Potions")]
-    public GameObject potion_01;
-    public GameObject potion_02;
-    public GameObject potion_03;
-    public GameObject potion_04;
-    public GameObject potion_05;
-    public GameObject potion_06;
-    public List<GameObject> inventory_potions_images_slots = new List<GameObject>();
+    public Image potion_01;
+    public Image potion_02;
+    public Image potion_03;
+    public Image potion_04;
+    public Image potion_05;
+    public Image potion_06;
+    public List<Image> inventory_potions_images_slots = new List<Image>();
     public List<Slot> inventory_potions_slots = new List<Slot>();
 
     private void Start() {
@@ -158,28 +158,12 @@ public class Inventory_slots : MonoBehaviour{
             }
         }
     }
-    public void Remove_inventory_item_icon(int position, List<GameObject> list){
-        list[position].GetComponent<Image>().sprite = null;
-        list[position].GetComponent<Image>().enabled = false;
+    public void Remove_inventory_item_icon(int position, List<Image> list){
+        list[position].sprite = null;
+        list[position].enabled = false;
         list[position].GetComponentInChildren<Text>().enabled = false;
-
-        // if(item_type is Weapon_info.Weapon){
-        //     inventory_weapons_images_slots[position].GetComponent<Image>().sprite = null;
-        //     inventory_weapons_images_slots[position].GetComponent<Image>().enabled = false;
-        //     inventory_weapons_images_slots[position].GetComponentInChildren<Text>().enabled = false;
-        // }
-        // else if(item_type is Materials){
-        //     inventory_materials_images_slots[position].GetComponent<Image>().sprite = null;
-        //     inventory_materials_images_slots[position].GetComponent<Image>().enabled = false;
-        //     inventory_materials_images_slots[position].GetComponentInChildren<Text>().enabled = false;
-        // }
-        // else if (item_type is Item_info.Item){
-        //     inventory_items_images_slots[position].GetComponent<Image>().sprite = null;
-        //     inventory_items_images_slots[position].GetComponent<Image>().enabled = false;
-        //     inventory_items_images_slots[position].GetComponentInChildren<Text>().enabled = false;
-        // }
     }
-    public void Check_item_amount(int position, List<GameObject> icon_list, List<Slot> slot_list){
+    public void Check_item_amount(int position, List<Image> icon_list, List<Slot> slot_list){
         if(slot_list[position].stack_amount > 1){
             icon_list[position].GetComponentInChildren<Text>().text = icon_list[position].transform.parent.GetComponent<Drop_slot>().slot.stack_amount.ToString();
             icon_list[position].GetComponentInChildren<Text>().enabled = true;

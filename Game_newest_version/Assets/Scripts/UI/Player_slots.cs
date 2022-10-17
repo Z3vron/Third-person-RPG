@@ -4,10 +4,10 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class Player_slots : MonoBehaviour{
-
+    public List<Image> quick_slots_potions_icons;
     [SerializeField] private  Image _quick_slots_left_weapon_icon;
     [SerializeField] private  Image _quick_slots_right_weapon_icon;
-    [SerializeField] private List<Image> _quick_slots_potions_icons;
+   
     
     public void Update_quick_slot_weapon_icon(Weapon_info.Weapon weapon, bool isRight){
         if(isRight){
@@ -34,12 +34,11 @@ public class Player_slots : MonoBehaviour{
     //slot_number is number 1-4 counting from the left side
     public void Update_quick_slot_potions_icon(Potions potion, int slot_number){
         if(potion.Item_icon == null){
-            _quick_slots_potions_icons[slot_number-1].sprite = null;
-            _quick_slots_potions_icons[slot_number-1].enabled = false;
+            quick_slots_potions_icons[slot_number].sprite = null;
+            quick_slots_potions_icons[slot_number].enabled = false;
             return;
         }
-            
-        _quick_slots_potions_icons[slot_number-1].sprite = potion.Item_icon;
-        _quick_slots_potions_icons[slot_number-1].enabled = true;
+        quick_slots_potions_icons[slot_number].sprite = potion.Item_icon;
+        quick_slots_potions_icons[slot_number].enabled = true;
     }
 }
