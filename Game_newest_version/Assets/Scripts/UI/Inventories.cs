@@ -52,7 +52,7 @@ public class Inventories : MonoBehaviour{
     private GameObject _dropdown_options_title;
     private bool _pressed_outside_dropdown = true;
     private bool _mouse_on_item = false;
-    private Player_slots _player_slots;
+   
     // create list of slots - code will be more clean - extra list but current syntax is just awful - done but still could think about changing system - now i manually add item to player/obj list end to list of slots separate
     // variables used in operations on inventories taking values from object or player inv
     // I store stack amount in slot scriptableobject could change to store in in weapon??? or in the list - still not sure  about that
@@ -69,7 +69,7 @@ public class Inventories : MonoBehaviour{
     private void Start() {
         _help = new PointerEventData(null);
         _graphicRaycaster_inv_slots = GetComponent<GraphicRaycaster>();
-        _player_slots = GetComponentInChildren<Player_slots>();
+        player_slots = GetComponentInChildren<Player_slots>();
     }
     // watchout for choose which inv function - called on pointer enter - changing some values - be carefull with using 3 variables above their values isn't changing  by add weapons functions but they change originall values 
     //do automatic stack of same objects whilk transfering items to the object/player inventory, handle situation when transfer item to capped inv - done mouse gives more control - no stack and transfer do auto stack if possible, if inv full than it transfer as much as possible and rest stay at original inv
