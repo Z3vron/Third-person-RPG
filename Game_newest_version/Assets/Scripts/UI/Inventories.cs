@@ -14,7 +14,7 @@ public class Inventories : MonoBehaviour{
     public Player_slots player_slots;
 
 
-    [SerializeField]  private  GameObject _moving_icon;
+    [SerializeField] private  GameObject _moving_icon;
     [SerializeField] private Input_handler _input_handler;
     [SerializeField] private Player_inventory_info.Player_inventory _player_inventory;
     [SerializeField] private GameObject _instance_item_info_prefab_model;  
@@ -31,6 +31,7 @@ public class Inventories : MonoBehaviour{
     [SerializeField] private GameObject _player_inventory_menu;
     [SerializeField] private GameObject _inventory_buttons;
     [SerializeField] private GameObject _input_field_prefab;
+    [SerializeField] private GameObject _items_add_rem_window_pop_up;
     
     
     
@@ -38,11 +39,10 @@ public class Inventories : MonoBehaviour{
     private float _time_to_show_item_info_elapsed = 0.0f;
     private bool _start_time = false;
     private bool _cursor_player_inv;
-  
     private Slot _slot_selected;
     private PointerEventData _help;
-    bool _help2 = false;
-    bool _last_pressed_right;
+    private bool _help2 = false;
+    private bool _last_pressed_right;
     private GraphicRaycaster _graphicRaycaster_inv_slots;
     private GameObject _instance_item_info;
     private GameObject _instance_item_option_menu;
@@ -52,16 +52,16 @@ public class Inventories : MonoBehaviour{
     private GameObject _dropdown_options_title;
     private bool _pressed_outside_dropdown = true;
     private bool _mouse_on_item = false;
-   
-    // create list of slots - code will be more clean - extra list but current syntax is just awful - done but still could think about changing system - now i manually add item to player/obj list end to list of slots separate
-    // variables used in operations on inventories taking values from object or player inv
-    // I store stack amount in slot scriptableobject could change to store in in weapon??? or in the list - still not sure  about that
     private Weapon_info.Weapon _weapon; 
     private Item_info.Item _item_selected;
-    int _occupied_slots;
-    List <Image>  _inv_slots_images = new List<Image>();
-    List <Slot> _inv_slots = new List<Slot>();
+    private int _occupied_slots;
+    private List <Image>  _inv_slots_images = new List<Image>();
+    private List <Slot> _inv_slots = new List<Slot>();
     bool _item_derivative;
+
+    //create variables for the texts so that i would not get to them by get compnonent in child it 
+    private TMPro.TextMeshPro _items_add_rem_window_pop_up_text;
+    private Image   _items_add_rem_window_pop_up_icon;
 
     // slots item has higher priority player inv lists update base on correspondig slots actually not i chagned it, so operations are done on lists in inventory and slots items are asign to respondned lists position items - not sure which is better
     // nope went with original :)
@@ -70,6 +70,8 @@ public class Inventories : MonoBehaviour{
         _help = new PointerEventData(null);
         _graphicRaycaster_inv_slots = GetComponent<GraphicRaycaster>();
         player_slots = GetComponentInChildren<Player_slots>();
+        _items_add_rem_window_pop_up_text = _items_add_rem_window_pop_up.GetComponentInChildren<TMPro.TextMeshPro>();
+        _items_add_rem_window_pop_up_icon = _items_add_rem_window_pop_up.GetComponentInChildren<Image>();
     }
     // watchout for choose which inv function - called on pointer enter - changing some values - be carefull with using 3 variables above their values isn't changing  by add weapons functions but they change originall values 
     //do automatic stack of same objects whilk transfering items to the object/player inventory, handle situation when transfer item to capped inv - done mouse gives more control - no stack and transfer do auto stack if possible, if inv full than it transfer as much as possible and rest stay at original inv
@@ -949,6 +951,7 @@ public class Inventories : MonoBehaviour{
         else
             object_inv_to_show.Remove_item_from_object(_slot_selected.slot_number);
         Move_slots_to_left_inv(_slot_selected,_player_inventory.amount_of_items_slots);
+        Show_items_add_rem_from_inv_window_pop_up(false,_item_selected,_slot_selected.stack_amount;);
     }
     public void Split_one_item_from_inv_stack(int slot){
         if(_slot_selected.stack_amount >1){
@@ -1377,6 +1380,18 @@ public class Inventories : MonoBehaviour{
            _player_inventory.GetComponent<Player_Movemnet.Movement>().dropped_item_new_amount = stack_amount;
            remaining_item_amount = stack_amount;
         }
+    }
+    public void Show_items_add_rem_from_inv_window_pop_up(bool items_added, Item_info.Item item, int amount_of_items){
+        if(items_added){
+            _items_add_rem_window_pop_up_text = "Added ";
+        }
+        else{
+            _items_add_rem_window_pop_up_text = "Removed ";
+        }
+        _items_add_rem_window_pop_up_icon.sprite = item.Item_icon;
+        _items_add_rem_window_pop_up_text += item.Item_name + " x" + amount_of_items;
+        _items_add_rem_window_pop_up.SetActive(true);
+        Function_timer.Create(() =>  items_add_rem_window_pop_up.SetActive(false),3.5);
     }
     //buttons to toggle between crafting and player inv
     public void Show_crafting_menu(){
