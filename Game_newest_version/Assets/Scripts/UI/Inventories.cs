@@ -59,8 +59,9 @@ public class Inventories : MonoBehaviour{
     private List <Slot> _inv_slots = new List<Slot>();
     bool _item_derivative;
 
+
     //create variables for the texts so that i would not get to them by get compnonent in child it 
-    private TMPro.TextMeshPro _items_add_rem_window_pop_up_text;
+    private TMPro.TMP_Text _items_add_rem_window_pop_up_text;
     private Image   _items_add_rem_window_pop_up_icon;
 
     // slots item has higher priority player inv lists update base on correspondig slots actually not i chagned it, so operations are done on lists in inventory and slots items are asign to respondned lists position items - not sure which is better
@@ -70,7 +71,7 @@ public class Inventories : MonoBehaviour{
         _help = new PointerEventData(null);
         _graphicRaycaster_inv_slots = GetComponent<GraphicRaycaster>();
         player_slots = GetComponentInChildren<Player_slots>();
-        _items_add_rem_window_pop_up_text = _items_add_rem_window_pop_up.GetComponentInChildren<TMPro.TextMeshPro>();
+        _items_add_rem_window_pop_up_text = _items_add_rem_window_pop_up.GetComponentInChildren<TMPro.TMP_Text>();
         _items_add_rem_window_pop_up_icon = _items_add_rem_window_pop_up.GetComponentInChildren<Image>();
     }
     // watchout for choose which inv function - called on pointer enter - changing some values - be carefull with using 3 variables above their values isn't changing  by add weapons functions but they change originall values 
@@ -583,9 +584,11 @@ public class Inventories : MonoBehaviour{
                 if(added_all_items){
                     _player_inventory.Remove_item_from_player_inv(_slot_selected);
                     Move_slots_to_left_inv(_inv_slots[_slot_number_item_info],object_inv_to_show.amount_of_item_slots);
+                    Show_items_add_rem_from_inv_window_pop_up(false,_inv_slots[_slot_number_item_info].item,_inv_slots[_slot_number_item_info].stack_amount);
                 }
                 else{
                     _inv_slots[_slot_number_item_info].stack_amount = remaining_item_amount;
+                    Show_items_add_rem_from_inv_window_pop_up(false,_inv_slots[_slot_number_item_info].item,remaining_item_amount);
                 }
             }
             else if (!_cursor_player_inv && _occupied_slots > _slot_number_item_info){
@@ -595,9 +598,11 @@ public class Inventories : MonoBehaviour{
                 if(added_all_items){
                     object_inv_to_show.Remove_item_from_object(_slot_number_item_info);
                     Move_slots_to_left_inv(_inv_slots[_slot_number_item_info],object_inv_to_show.amount_of_item_slots);
+                    Show_items_add_rem_from_inv_window_pop_up(true,_inv_slots[_slot_number_item_info].item,_inv_slots[_slot_number_item_info].stack_amount);
                 }
                 else{
                     _inv_slots[_slot_number_item_info].stack_amount = remaining_item_amount;
+                    Show_items_add_rem_from_inv_window_pop_up(true,_inv_slots[_slot_number_item_info].item,remaining_item_amount);
                 }
             }
         }
@@ -606,6 +611,7 @@ public class Inventories : MonoBehaviour{
         Poison_potion poison_potion = (Poison_potion)_slot_selected.item;
         _player_inventory.Poison_weapon(poison_potion,isRight);
         _inv_slots[_slot_selected.slot_number].stack_amount -= 1;
+        Show_items_add_rem_from_inv_window_pop_up(false,_inv_slots[_slot_selected.slot_number].item,1);
         if(_inv_slots[_slot_selected.slot_number].stack_amount == 0){
             if(_instance_item_info != null)
                 Destroy(_instance_item_info);
@@ -911,6 +917,7 @@ public class Inventories : MonoBehaviour{
                     Health_potion health_potion;
                     if(_cursor_player_inv){
                         health_potion  = (Health_potion) _player_inventory.inventory_potions_slots[_slot_number_item_info];
+                        Show_items_add_rem_from_inv_window_pop_up(false,health_potion,1);
                     }
                     else{
                         health_potion = (Health_potion) object_inv_to_show.items_in_object[_slot_number_item_info];
@@ -922,6 +929,7 @@ public class Inventories : MonoBehaviour{
                     Berries berry;
                     if(_cursor_player_inv){
                         berry  = (Berries) _player_inventory.inventory_items_slots[_slot_number_item_info];
+                        Show_items_add_rem_from_inv_window_pop_up(false,berry,1);
                     }
                     else{
                         berry = (Berries) object_inv_to_show.items_in_object[_slot_number_item_info];
@@ -941,17 +949,21 @@ public class Inventories : MonoBehaviour{
         }
     }
     public void Drop_item_from_inventory(){
+        if(!_mouse_on_item)
+            return ;
         Rigidbody _instance_item_dropped;
         _instance_item_dropped = Instantiate(_item_dropped_prefab,_root_for_drop_items.position,_root_for_drop_items.rotation) as Rigidbody;
         _instance_item_dropped.AddForce(_root_for_drop_items.forward * _dropp_items_force);
         _instance_item_dropped.GetComponent<Item_dropped>().item_dropped = _item_selected;
         _instance_item_dropped.GetComponent<Item_dropped>().amount_of_dropped_items =  _slot_selected.stack_amount;
-        if(_cursor_player_inv)
+        if(_cursor_player_inv){
+            Show_items_add_rem_from_inv_window_pop_up(false,_instance_item_dropped.GetComponent<Item_dropped>().item_dropped,_instance_item_dropped.GetComponent<Item_dropped>().amount_of_dropped_items);
             _player_inventory.Remove_item_from_player_inv(_slot_selected);
+        } 
         else
             object_inv_to_show.Remove_item_from_object(_slot_selected.slot_number);
+        //Reset_item_info_pop_up();
         Move_slots_to_left_inv(_slot_selected,_player_inventory.amount_of_items_slots);
-        Show_items_add_rem_from_inv_window_pop_up(false,_item_selected,_slot_selected.stack_amount;);
     }
     public void Split_one_item_from_inv_stack(int slot){
         if(_slot_selected.stack_amount >1){
@@ -1018,6 +1030,7 @@ public class Inventories : MonoBehaviour{
                         _player_inventory.inventory_items_slots[i] = (Item_info.Item) whetstone;
                     else{
                         _player_inventory_slots.inventory_items_slots[i].stack_amount -=1;
+                        Show_items_add_rem_from_inv_window_pop_up(false,_player_inventory_slots.inventory_items_slots[i].item,1);
                         if(_player_inventory_slots.inventory_items_slots[i].stack_amount == 0){
                             _player_inventory.inventory_items_slots.RemoveAt(i);
                             Choose_which_inventory_type_slot(_player_inventory_slots.inventory_items_slots[i]);
@@ -1186,6 +1199,7 @@ public class Inventories : MonoBehaviour{
                         _player_inventory.inventory_items_slots.Remove(item);
                     }
                 }
+                Show_items_add_rem_from_inv_window_pop_up(false,item,1);
             }
             return true;
         }
@@ -1382,16 +1396,24 @@ public class Inventories : MonoBehaviour{
         }
     }
     public void Show_items_add_rem_from_inv_window_pop_up(bool items_added, Item_info.Item item, int amount_of_items){
+        if(_items_add_rem_window_pop_up.activeSelf == true &&  _items_add_rem_window_pop_up_text.text.Contains(item.Item_name)){
+            if(items_added && _items_add_rem_window_pop_up_text.text.Contains("Added ") || !items_added && _items_add_rem_window_pop_up_text.text.Contains("Removed")){
+                string[] temp = _items_add_rem_window_pop_up_text.text.Split(' ');
+                amount_of_items += Int32.Parse(temp[temp.Length-1]);
+            }
+        }
         if(items_added){
-            _items_add_rem_window_pop_up_text = "Added ";
+            _items_add_rem_window_pop_up_text.text = "Added ";
         }
         else{
-            _items_add_rem_window_pop_up_text = "Removed ";
+            _items_add_rem_window_pop_up_text.text = "Removed ";
         }
         _items_add_rem_window_pop_up_icon.sprite = item.Item_icon;
-        _items_add_rem_window_pop_up_text += item.Item_name + " x" + amount_of_items;
+        _items_add_rem_window_pop_up_text.text += item.Item_name + " x " + amount_of_items;
         _items_add_rem_window_pop_up.SetActive(true);
-        Function_timer.Create(() =>  items_add_rem_window_pop_up.SetActive(false),3.5);
+        
+        Function_timer.Stop_timer("inv_item_balance_window_pop_up");
+        Function_timer.Create(() =>  _items_add_rem_window_pop_up.SetActive(false),3.5f,"inv_item_balance_window_pop_up");
     }
     //buttons to toggle between crafting and player inv
     public void Show_crafting_menu(){

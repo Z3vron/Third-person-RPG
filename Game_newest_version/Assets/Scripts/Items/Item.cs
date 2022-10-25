@@ -12,7 +12,7 @@ namespace Item_info{
         public int max_stack_amount; 
         public float Item_weight; 
         [Tooltip("Item id used to recognise if the elements are the same - could be stackable - Weapons 0-20, Armour 20-40, Potions 40-60, Items 60-80,Materials 80-100")]
-        public float item_id;
+        public string item_id;
     }
 }
 

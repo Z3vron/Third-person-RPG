@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-
 public class Movement : MonoBehaviour
 {
     private CharacterControlle_r _Controler;
@@ -23,7 +22,6 @@ public class Movement : MonoBehaviour
         _Controler = GetComponent<CharacterControlle_r>();
        // context = GetComponent<InputAction.CallbackContext>();
     }
-
     // Update is called once per frame
     void Update(){
        
@@ -46,7 +44,6 @@ public class Movement : MonoBehaviour
             jumping = true;
         }
        
-
     }
     
 }
@@ -116,7 +113,7 @@ namespace Player_Movemnet{
         [SerializeField] private GameObject _load_strong_attack_fillbar;
         [SerializeField] private LayerMask _interact_layer;
         [SerializeField] private GameObject _object_inventory;
-        [SerializeField] private Canvas _canvas;
+        [SerializeField] private Inventories _inventories;
         [SerializeField] private   Transform _root_for_shot_raycast;
         [SerializeField] private GameObject _free_look_camera;
         [SerializeField] private GameObject _lock_on_camera;
@@ -153,7 +150,7 @@ namespace Player_Movemnet{
         
         // to the same for text
         // number of dropped items doesn't change
-        [SerializeField] private List<Collider> _trigger_colliders = new List<Collider>();
+        public List<Collider> trigger_colliders = new List<Collider>();
         [SerializeField] private Collider _collider_to_interact;
 
         private void Start(){
@@ -259,14 +256,14 @@ namespace Player_Movemnet{
                 interactable_object_dir.Normalize();
                 float angle = Vector3.Angle(gameObject.transform.forward, interactable_object_dir);
                 if(angle < 45 && angle > -45){
-                    if(!_trigger_colliders.Contains(other))
-                        _trigger_colliders.Add(other);
+                    if(!trigger_colliders.Contains(other))
+                        trigger_colliders.Add(other);
                     //dropped items are first because their radious is smaller so they need to be detected before other interactable objects with bigger radious
                    
                 }
                 else{
-                    if(_trigger_colliders.Contains(other))
-                        _trigger_colliders.Remove(other);
+                    if(trigger_colliders.Contains(other))
+                        trigger_colliders.Remove(other);
                     if(_collider_to_interact == other)
                         _collider_to_interact = null;
                     _in_area_to_interact_chest = false;
@@ -277,7 +274,7 @@ namespace Player_Movemnet{
                 }
             }
             float distance = Mathf.Infinity;
-            foreach(var interact_collider in _trigger_colliders){
+            foreach(var interact_collider in trigger_colliders){
                 if(Vector3.Distance(gameObject.transform.position,interact_collider.gameObject.transform.position) < distance){
                     distance = Vector3.Distance(gameObject.transform.position,interact_collider.gameObject.transform.position);
                     _collider_to_interact = interact_collider;
@@ -333,9 +330,9 @@ namespace Player_Movemnet{
                 Trap_active = false;
             }
             if(other.GetComponent<Item_dropped>() || other.gameObject.tag == "Chest" || other.gameObject.tag == "Door" || other.gameObject.tag == "Bush"){
-                if(_trigger_colliders.Contains(other))
-                    _trigger_colliders.Remove(other);
-                if(_trigger_colliders.Count == 0)
+                if(trigger_colliders.Contains(other))
+                    trigger_colliders.Remove(other);
+                if(trigger_colliders.Count == 0)
                     _collider_to_interact = null;
                 _in_area_to_interact_chest = false;
                 _in_area_to_interact_door = false;
@@ -345,20 +342,22 @@ namespace Player_Movemnet{
             }
         }
         private void Interact(){
-            if(_input_handler.interact_flag && _trigger_colliders.Count > 0){
+            if(_input_handler.interact_flag && trigger_colliders.Count > 0){
                 if(_in_area_to_interact_dropped_items){
-                    _canvas.GetComponent<Inventories>().Add_item_to_player_inv_check_for_same_object(_collider_to_interact.GetComponent<Item_dropped>().item_dropped,_collider_to_interact.GetComponent<Item_dropped>().amount_of_dropped_items);
+                    _inventories.Add_item_to_player_inv_check_for_same_object(_collider_to_interact.GetComponent<Item_dropped>().item_dropped,_collider_to_interact.GetComponent<Item_dropped>().amount_of_dropped_items);
                     
-                    if( _canvas.GetComponent<Inventories>().added_all_items){
+                    if(_inventories.added_all_items){
+                        _inventories.Show_items_add_rem_from_inv_window_pop_up(true,_collider_to_interact.GetComponent<Item_dropped>().item_dropped,_collider_to_interact.GetComponent<Item_dropped>().amount_of_dropped_items);
                         Destroy(_collider_to_interact.gameObject);
-                        if(_trigger_colliders.Contains(_collider_to_interact))
-                            _trigger_colliders.Remove(_collider_to_interact);
-                        if(_trigger_colliders.Count == 0)
+                        if(trigger_colliders.Contains(_collider_to_interact))
+                            trigger_colliders.Remove(_collider_to_interact);
+                        if(trigger_colliders.Count == 0)
                             _collider_to_interact = null;
                         _in_area_to_interact_dropped_items = false;
                         Reset_turn_off_interact_pop_up();
                     }
                     else{
+                        _inventories.Show_items_add_rem_from_inv_window_pop_up(true,_collider_to_interact.GetComponent<Item_dropped>().item_dropped,dropped_item_new_amount);
                         _collider_to_interact.GetComponent<Item_dropped>().amount_of_dropped_items = dropped_item_new_amount;
                     }        
                 }
@@ -369,17 +368,19 @@ namespace Player_Movemnet{
                     Function_timer.Create(() => Set_chest_color(Color.red),2);
                     Function_timer.Create(() => Set_chest_color(Color.white),8);
                     _object_inventory.SetActive(true);
-                    _canvas.GetComponent<Inventories>().object_inv_to_show = _object_to_interact.GetComponent<Interactable_objects>();
-                    _canvas.GetComponent<Inventories>().Assign_weapons_amount_to_slots();
+                    _inventories.object_inv_to_show = _object_to_interact.GetComponent<Interactable_objects>();
+                    _inventories.Assign_weapons_amount_to_slots();
                     _player_inventory.Handle_inventory();
                 }
                 else if(_in_area_to_interact_bush){
                     _animator.CrossFade("Gathering",0);
-                   _canvas.GetComponent<Inventories>().Add_item_to_player_inv_check_for_same_object(_collider_to_interact.GetComponent<Bush_contents>().berry_in_bush,_collider_to_interact.GetComponent<Bush_contents>().amount_of_berry); 
-                    if(_canvas.GetComponent<Inventories>().added_all_items){
+                   _inventories.Add_item_to_player_inv_check_for_same_object(_collider_to_interact.GetComponent<Bush_contents>().berry_in_bush,_collider_to_interact.GetComponent<Bush_contents>().amount_of_berry); 
+                    if(_inventories.added_all_items){
+                        _inventories.Show_items_add_rem_from_inv_window_pop_up(true,_collider_to_interact.GetComponent<Bush_contents>().berry_in_bush,_collider_to_interact.GetComponent<Bush_contents>().amount_of_berry);
                         _collider_to_interact.GetComponent<Bush_contents>().amount_of_berry = 0;
                     }
                     else{
+                        _inventories.Show_items_add_rem_from_inv_window_pop_up(true,_collider_to_interact.GetComponent<Bush_contents>().berry_in_bush,dropped_item_new_amount);
                         _collider_to_interact.GetComponent<Bush_contents>().amount_of_berry = dropped_item_new_amount;
                     }
                 }
@@ -429,11 +430,10 @@ namespace Player_Movemnet{
                         _object_to_interact = _Hit.collider.gameObject;
                         _object_to_interact.GetComponent<AudioSource>().Play();
                         StartCoroutine(Coloring_object());
-
                         _object_inventory.SetActive(true);
                         
-                        _canvas.GetComponent<Inventories>().object_inv_to_show = _object_to_interact.GetComponent<Interactable_objects>();
-                        _canvas.GetComponent<Inventories>().Assign_weapons_amount_to_slots();
+                        _inventories.object_inv_to_show = _object_to_interact.GetComponent<Interactable_objects>();
+                        _inventories.Assign_weapons_amount_to_slots();
                         _player_inventory.Handle_inventory();
             
                         // if(_object_to_interact.GetComponent<Interactable_objects>().weapon_to_pickup != null){
@@ -442,13 +442,11 @@ namespace Player_Movemnet{
                         //     _object_to_interact.GetComponent<Interactable_objects>().weapon_to_pickup = null;
                         // }
                             
-
                     }
                     else if(_Hit.collider.gameObject.tag == "Door"){
                         Debug.Log("Opening Door");
                        // Door_touched = true;
                         _Hit.collider.gameObject.GetComponent<Rigidbody>().AddForce(_Door_side*_root_for_shot_raycast.forward * _Touch_force * _Player_speed,ForceMode.Acceleration);
-
                         
                     }
                     
