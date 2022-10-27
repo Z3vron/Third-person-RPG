@@ -13,14 +13,14 @@ Think about
 - Move checking input flags from movement script to input handler - earlier there was a problem with it but i dont remember what was it 
 - Work on and reduce lines in code about transfering items i have separate function that calls others (i use it in the shortcut and item option) but i also have old code that i use for the tranfer while dragging item with mouse - there are some diffrence i think but I'm not sure - need to thoroughly read code and delete one part
 
-Next update:
+Update 25.10.2022:
 - player strong attack interrupt enemy attack( added animations for both player and enemy)
 - issue with humanoid animations on generic rig - changing type gives errores
 - complete adding animations for first enemy( still missing some nice attack animations)
 - Berries are now gathered from bushes
 - Added quick potions slots(similar to weapon slots) - equiping, removing from slots and using in all methods(shortcut,drag,item menu option)
 - Changed playing sound from the player - still needs to learn about sound in unity because i dont know nothing about it
-- Added window pop up when adding/removing items from the player inventory( one window - so if many diffrent items arae moved at the same time for example while creating item then window won't show it properly)
+- Added window pop up when adding/removing items from the player inventory( one window - so if many diffrent items are moved at the same time for example while creating item then window won't show it properly)
 
 
 Update 03.10.2022
