@@ -78,17 +78,27 @@ namespace Player_Movemnet{
         [SerializeField] private float  _jump_stamina_cost = 3.0f;
         [SerializeField] private float _dash_stamina_cost = 15;
         #endregion
-        #region Movement speed multiplayers
-        [Tooltip("Speed of character in m/s while walking")]
-        [SerializeField] private float _walk_speed = 3.0f;
-        [Tooltip("Speed of character in m/s while sprinting")]
-        [SerializeField] private float _sprint_speed = 9.0f;
-        [Tooltip("Speed of character in m/s while crouching")]
-        [SerializeField] private float _crouch_speed = 1.0f;
-        [Tooltip("Speed of character in m/s while changing between speed multiplayers")]
-        [SerializeField] private float _player_speed_change_rate = 10.0f;
-        [Tooltip("Speed of character in m/s while rotating towards direction camera is facing")]
-        [SerializeField] private float _player_rotation_speed = 7.0f;
+        #region Movement speed values
+            [Tooltip("Speed of character in m/s while walking")]
+            [SerializeField] private float _walk_speed = 3.0f;
+            [Tooltip("Speed of character in m/s while sprinting")]
+            [SerializeField] private float _sprint_speed = 9.0f;
+            [Tooltip("Speed of character in m/s while crouching")]
+            [SerializeField] private float _crouch_speed = 1.0f;
+            [Tooltip("Speed of character in m/s while changing between speed multiplayers")]
+            [SerializeField] private float _player_speed_change_rate = 10.0f;
+            [Tooltip("Speed of character in m/s while rotating towards direction camera is facing")]
+            [SerializeField] private float _player_rotation_speed = 7.0f;
+            [Tooltip("Speed of character while dashing in any direction")]
+            [SerializeField] private float _dash_speed;
+
+            //not sure about 3 variables below i think that i could remove atleast one but there is still a problem with getting actual player speed - i tried few diffrent methods but i am not satisfied with any of them
+            [Tooltip("Present player speed")]
+            [SerializeField] private float _Player_speed;
+            [Tooltip("Targeted player speed")]
+            [SerializeField] private float _Player_target_speed;
+            [Tooltip("Present player horizontal speed")]
+            [SerializeField] private float _Player_current_horizontal_speed;
         #endregion
         [SerializeField] private float _jump_height = 1.5f;
         [SerializeField] private float _gravity_force = -12f;
@@ -99,26 +109,38 @@ namespace Player_Movemnet{
         [SerializeField] private float _Grounded_check_radious  = 0.19f;
         [SerializeField] private float _Grounded_help = -0.09f;
         [SerializeField] private float _Ceiling_help = -1.65f;
-        [SerializeField] private LayerMask _ground_layer;
-        [SerializeField] private float _Player_speed;
-        [SerializeField] private float _dash_speed;
-        [SerializeField] private float _Player_current_horizontal_speed;
-        [SerializeField] private float _Player_target_speed;
+        
+        
+        
+        
         [SerializeField] private RaycastHit _hit;
         [SerializeField] private bool _active_action;
         [SerializeField] private float _Distance_to_interact = 0.9f;
         [SerializeField] private float _Touch_force = 80f;
         [SerializeField] private float _Door_side=0;
-        [SerializeField] private GameObject _interact_pop_up;
-        [SerializeField] private GameObject _load_strong_attack_fillbar;
-        [SerializeField] private LayerMask _interact_layer;
+        #region UI elements references
+            [Tooltip("UI element that shows user to press E to interact with given object(object name is adjusted) shows when in distance to interact")]
+            [SerializeField] private GameObject _interact_pop_up;
+            [Tooltip("UI elemnt that shows status(level) of loading strong attack")]
+            [SerializeField] private GameObject _load_strong_attack_fillbar;
+        #endregion
+        #region Layer masks
+            [SerializeField] private LayerMask _ground_layer;
+            [SerializeField] private LayerMask _interact_layer;
+            [SerializeField] private LayerMask _environment_layer;
+        #endregion
+        
         [SerializeField] private GameObject _object_inventory;
         [SerializeField] private Inventories _inventories;
-        [SerializeField] private   Transform _root_for_shot_raycast;
-        [SerializeField] private GameObject _free_look_camera;
-        [SerializeField] private GameObject _lock_on_camera;
-        [SerializeField] private CinemachineTargetGroup _target_group;
-        [SerializeField] private LayerMask _environment_layer;
+        [SerializeField] private  Transform _root_for_shot_raycast;
+        #region Cameras
+            [Tooltip("Reference to free looking camera - one used while walking on the level")]
+            [SerializeField] private GameObject _free_look_camera;
+            [Tooltip("Reference to lock on camera - one used while attacking enemy(combat stance/mode)")]
+            [SerializeField] private GameObject _lock_on_camera;
+            [Tooltip("Reference to cinemachine target group - used to adjust lock on camera so that both locked on enemy and player would be in view")]
+            [SerializeField] private CinemachineTargetGroup _target_group;
+        #endregion
 
         
         private  GameObject _object_to_interact;
@@ -784,7 +806,7 @@ namespace Player_Movemnet{
             Gizmos.DrawSphere(new Vector3(transform.position.x, transform.position.y - _Ceiling_help, transform.position.z), _Grounded_check_radious);
         }
         private void Set_input_flags_false(){
-            //Player action map
+            #region  Player action map 
             _input_handler.sprint_flag = false;
             _input_handler.crouch_flag = false;
             _input_handler.jump_flag = false;
@@ -804,8 +826,8 @@ namespace Player_Movemnet{
             _input_handler.lock_on_flag = false;
             _input_handler.switch_flag = false;
             _input_handler.dash_flag = false;
-
-            //Inventory action map
+            #endregion
+            #region  Inventory action map
             _input_handler.inventory_close_inv_flag = false;
             _input_handler.mouse_right_pressed_inv_flag = false;
             _input_handler.mouse_left_pressed_inv_flag = false;
@@ -819,6 +841,7 @@ namespace Player_Movemnet{
             _input_handler.second_potion_inv_flag = false;
             _input_handler.third_potion_inv_flag = false;
             _input_handler.fourth_potion_inv_flag = false;
+            #endregion
         }
     }
 }
