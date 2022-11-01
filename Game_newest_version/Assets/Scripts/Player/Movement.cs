@@ -100,24 +100,37 @@ namespace Player_Movemnet{
             [Tooltip("Present player horizontal speed")]
             [SerializeField] private float _Player_current_horizontal_speed;
         #endregion
+        [Tooltip("Height that player will achieve while jumping")]
         [SerializeField] private float _jump_height = 1.5f;
+        [Tooltip("Gravity force that pulls player down")]
         [SerializeField] private float _gravity_force = -12f;
-        [SerializeField] private float _Time_between_jumps = 0.6f;
-        [SerializeField] private float _Time_between_landing_next_jump;     
-        [SerializeField] private float _Target_angle;        
-        [SerializeField] private bool _Player_hit_ceiling = false;        
-        [SerializeField] private float _Grounded_check_radious  = 0.19f;
-        [SerializeField] private float _Grounded_help = -0.09f;
-        [SerializeField] private float _Ceiling_help = -1.65f;
+
+        [Tooltip("Time that needs to pass before player will be able to jump again")]
+        [SerializeField] private float _time_between_jumps = 0.6f;
+        [Tooltip("Timer that counts time elapsed from the last landing ")]
+        [SerializeField] private float _timer_between_landing_next_jump;     
+       
+            
+        [SerializeField] private bool _Player_hit_ceiling = false;       
+        [Tooltip("Determine radius of the sphere that checks if player is grounded")] 
+        [SerializeField] private float _grounded_check_radious  = 0.19f;
+        [Tooltip("Changes transform.y of the sphere that checks if player is grounded")]
+        [SerializeField] private float _grounded_help = -0.09f;
+        [Tooltip("Changes transform.y of the sphere that checks if player hit ceiling")]
+        [SerializeField] private float _ceiling_help = -1.65f;
         
         
         
         
         [SerializeField] private RaycastHit _hit;
+        [Tooltip("Store information if player is doing action(that require animation) so this really stores info if player animator controller currently is playing any animation")]
         [SerializeField] private bool _active_action;
-        [SerializeField] private float _Distance_to_interact = 0.9f;
-        [SerializeField] private float _Touch_force = 80f;
-        [SerializeField] private float _Door_side=0;
+        [Tooltip("Distance to interactable object that within player must be to interact with given object - not using right now changed from raycast to triggers")]
+        [SerializeField] private float _distance_to_interact = 0.9f;
+        [Tooltip("Force with which player is pushing and pulling doors")]
+        [SerializeField] private float _touch_force = 80f;
+        [Tooltip("Variable that holds information about which side of doors player is facing(-1 when player will need to pull doors and 1 when he will need to push them")]
+        [SerializeField] private float _door_side=0;
         #region UI elements references
             [Tooltip("UI element that shows user to press E to interact with given object(object name is adjusted) shows when in distance to interact")]
             [SerializeField] private GameObject _interact_pop_up;
@@ -125,8 +138,11 @@ namespace Player_Movemnet{
             [SerializeField] private GameObject _load_strong_attack_fillbar;
         #endregion
         #region Layer masks
-            [SerializeField] private LayerMask _ground_layer;
+            [Tooltip("Used to detect if player is grounded or if player hit ceiling")]
+            [SerializeField] private LayerMask _ground_ceiling_layer;
+            [Tooltip("Used to decide if object in the front of player in given radius and distance is interactable")]
             [SerializeField] private LayerMask _interact_layer;
+            [Tooltip("Used to detect if there is something(some object) in a way between player and possible enemy to lock on")]
             [SerializeField] private LayerMask _environment_layer;
         #endregion
         
@@ -138,7 +154,7 @@ namespace Player_Movemnet{
             [SerializeField] private GameObject _free_look_camera;
             [Tooltip("Reference to lock on camera - one used while attacking enemy(combat stance/mode)")]
             [SerializeField] private GameObject _lock_on_camera;
-            [Tooltip("Reference to cinemachine target group - used to adjust lock on camera so that both locked on enemy and player would be in view")]
+            [Tooltip("Reference to cinemachine target group - usadjust lock on camera so that both lock on enemy and player will be in view")]
             [SerializeField] private CinemachineTargetGroup _target_group;
         #endregion
 
@@ -179,7 +195,7 @@ namespace Player_Movemnet{
             _controller = GetComponent<CharacterController>();
             _animator = gameObject.GetComponentInChildren<Animator>();
             _main_camera = Camera.main.transform;
-            _Time_between_landing_next_jump = _Time_between_jumps;
+            _timer_between_landing_next_jump = _time_between_jumps;
             _handle_attacks = GetComponent<Attack.Player_attack>();
             _player_info = GetComponent<Player_info>();
             _player_statistics =  _player_info.player_stats;
@@ -260,10 +276,10 @@ namespace Player_Movemnet{
             }
             else if(other.CompareTag("Door_pull")){
                // Debug.Log("Door pull setting");
-                _Door_side = -1;
+                _door_side = -1;
             }
             else if(other.CompareTag("Door_push")){
-                _Door_side = 1;
+                _door_side = 1;
                 //Debug.Log("Door push setting");
             }
             else{
@@ -407,14 +423,14 @@ namespace Player_Movemnet{
                     }
                 }
                 else if(_in_area_to_interact_door){
-                    _collider_to_interact.GetComponent<Rigidbody>().AddForce(_Door_side*_root_for_shot_raycast.forward * _Touch_force * _Player_speed,ForceMode.Acceleration);
+                    _collider_to_interact.GetComponent<Rigidbody>().AddForce(_door_side*_root_for_shot_raycast.forward * _touch_force * _Player_speed,ForceMode.Acceleration);
                 }
             }
                 // old version with raycasts
                 /*
             // use raycast or ontrigger enter
-            if(Physics.Raycast(_root_for_shot_raycast.position, _root_for_shot_raycast.forward, out _Hit, _Distance_to_interact,_interact_layer)){
-                Debug.DrawRay(_root_for_shot_raycast.position, _root_for_shot_raycast.forward,Color.blue,_Distance_to_interact);
+            if(Physics.Raycast(_root_for_shot_raycast.position, _root_for_shot_raycast.forward, out _Hit, _distance_to_interact,_interact_layer)){
+                Debug.DrawRay(_root_for_shot_raycast.position, _root_for_shot_raycast.forward,Color.blue,_distance_to_interact);
                    _interact_pop_up.SetActive(true);
                   
                     if(!_text_added){
@@ -468,7 +484,7 @@ namespace Player_Movemnet{
                     else if(_Hit.collider.gameObject.tag == "Door"){
                         Debug.Log("Opening Door");
                        // Door_touched = true;
-                        _Hit.collider.gameObject.GetComponent<Rigidbody>().AddForce(_Door_side*_root_for_shot_raycast.forward * _Touch_force * _Player_speed,ForceMode.Acceleration);
+                        _Hit.collider.gameObject.GetComponent<Rigidbody>().AddForce(_door_side*_root_for_shot_raycast.forward * _touch_force * _Player_speed,ForceMode.Acceleration);
                         
                     }
                     
@@ -608,10 +624,10 @@ namespace Player_Movemnet{
                 // _controller.Move(_Player_velocity * Time.deltaTime);
             }
             if(player_grounded && !player_crouching){
-                if(_Time_between_landing_next_jump >= 0.0f)
-                    _Time_between_landing_next_jump -= Time.deltaTime;
+                if(_timer_between_landing_next_jump >= 0.0f)
+                    _timer_between_landing_next_jump -= Time.deltaTime;
 
-                if (_input_handler.jump_flag && _Time_between_landing_next_jump <=0.0f && _player_statistics.Current_stamina > _jump_stamina_cost){
+                if (_input_handler.jump_flag && _timer_between_landing_next_jump <=0.0f && _player_statistics.Current_stamina > _jump_stamina_cost){
                     //_Player_velocity.y += Mathf.Sqrt(_jump_height * -2.0f * _gravity_force); // in theory should take care speed to jump higher - very high jumpo at stairs - not sure how it works
                     // _Player_velocity = _Move;
                     _player_statistics.Take_stamina(_jump_stamina_cost * Time.deltaTime);
@@ -623,7 +639,7 @@ namespace Player_Movemnet{
             // _controller.Move(new Vector3(move.x,_Player_velocity.y,move.z) * Time.deltaTime * _Player_speed);
             }
             else{
-                _Time_between_landing_next_jump = _Time_between_jumps;
+                _timer_between_landing_next_jump = _time_between_jumps;
             }
         }
         private void Crouch(){
@@ -650,26 +666,27 @@ namespace Player_Movemnet{
         }        
         private void Ground_check(){
             // player_grounded = _controller.isGrounded; // buggy as fuck
-            Vector3 Sphere_position = new Vector3(transform.position.x,transform.position.y - _Grounded_help,transform.position.z );
-            player_grounded = Physics.CheckSphere(Sphere_position,_Grounded_check_radious,_ground_layer,QueryTriggerInteraction.Ignore);
+            Vector3 Sphere_position = new Vector3(transform.position.x,transform.position.y - _grounded_help,transform.position.z );
+            player_grounded = Physics.CheckSphere(Sphere_position,_grounded_check_radious,_ground_ceiling_layer,QueryTriggerInteraction.Ignore);
             //Debug.Log("Grounded: " + player_grounded);
         }
         private void Handle_jump_on_top_of_enemy(){
-            Vector3 Sphere_position = new Vector3(transform.position.x,transform.position.y + 2 * _Grounded_help,transform.position.z);
-            if(Physics.CheckSphere(Sphere_position,_Grounded_check_radious,128,QueryTriggerInteraction.Ignore)){
+            Vector3 Sphere_position = new Vector3(transform.position.x,transform.position.y + 2 * _grounded_help,transform.position.z);
+            if(Physics.CheckSphere(Sphere_position,_grounded_check_radious,128,QueryTriggerInteraction.Ignore)){
                 //Debug.Log("Push player from the top of the enemy");
                 //Vector3 move = new Vector3()
                 _controller.Move( Vector3.back * Time.deltaTime * 4f);
             }
         }   
         private void Ceiling_check(){
-            Vector3 Sphere_position = new Vector3(transform.position.x,transform.position.y - _Ceiling_help ,transform.position.z );
-            _Player_hit_ceiling = Physics.CheckSphere(Sphere_position,_Grounded_check_radious,_ground_layer,QueryTriggerInteraction.Ignore);
+            Vector3 Sphere_position = new Vector3(transform.position.x,transform.position.y - _ceiling_help ,transform.position.z );
+            _Player_hit_ceiling = Physics.CheckSphere(Sphere_position,_grounded_check_radious,_ground_ceiling_layer,QueryTriggerInteraction.Ignore);
         }
         private void Rotate_player(){
             if(_input_vector != Vector2.zero){
-                _Target_angle = Mathf.Atan2(_input_vector.x,_input_vector.y) * Mathf.Rad2Deg + _main_camera.eulerAngles.y;
-                Quaternion Rotation = Quaternion.Euler(0f,_Target_angle,0f);
+                private float _target_angle;  
+                _target_angle = Mathf.Atan2(_input_vector.x,_input_vector.y) * Mathf.Rad2Deg + _main_camera.eulerAngles.y;
+                Quaternion Rotation = Quaternion.Euler(0f,_target_angle,0f);
                 transform.rotation = Quaternion.Lerp(transform.rotation, Rotation,Time.deltaTime * _player_rotation_speed);
             }
         }
@@ -802,45 +819,45 @@ namespace Player_Movemnet{
             else 
                 Gizmos.color = transparentRed;
                 
-            Gizmos.DrawSphere(new Vector3(transform.position.x, transform.position.y - _Grounded_help, transform.position.z), _Grounded_check_radious);
-            Gizmos.DrawSphere(new Vector3(transform.position.x, transform.position.y - _Ceiling_help, transform.position.z), _Grounded_check_radious);
+            Gizmos.DrawSphere(new Vector3(transform.position.x, transform.position.y - _grounded_help, transform.position.z), _grounded_check_radious);
+            Gizmos.DrawSphere(new Vector3(transform.position.x, transform.position.y - _ceiling_help, transform.position.z), _grounded_check_radious);
         }
         private void Set_input_flags_false(){
             #region  Player action map 
-            _input_handler.sprint_flag = false;
-            _input_handler.crouch_flag = false;
-            _input_handler.jump_flag = false;
-            _input_handler.left_weapon_flag = false;
-            _input_handler.right_weapon_flag = false;
-            _input_handler.first_potion_flag = false;
-            _input_handler.second_potion_flag = false;
-            _input_handler.third_potion_flag = false;
-            _input_handler.fourth_potion_flag = false;
-            _input_handler.interact_flag = false;
-            _input_handler.attack_light_flag = false;
-            _input_handler.attack_strong_performed_flag = false;
-            _input_handler.attack_special_flag = false;
-            _input_handler.attack_combo_flag = false;
-            _input_handler.inventory_flag = false;
-            _input_handler.attack_strong_canceled_flag = false;
-            _input_handler.lock_on_flag = false;
-            _input_handler.switch_flag = false;
-            _input_handler.dash_flag = false;
+                _input_handler.sprint_flag = false;
+                _input_handler.crouch_flag = false;
+                _input_handler.jump_flag = false;
+                _input_handler.left_weapon_flag = false;
+                _input_handler.right_weapon_flag = false;
+                _input_handler.first_potion_flag = false;
+                _input_handler.second_potion_flag = false;
+                _input_handler.third_potion_flag = false;
+                _input_handler.fourth_potion_flag = false;
+                _input_handler.interact_flag = false;
+                _input_handler.attack_light_flag = false;
+                _input_handler.attack_strong_performed_flag = false;
+                _input_handler.attack_special_flag = false;
+                _input_handler.attack_combo_flag = false;
+                _input_handler.inventory_flag = false;
+                _input_handler.attack_strong_canceled_flag = false;
+                _input_handler.lock_on_flag = false;
+                _input_handler.switch_flag = false;
+                _input_handler.dash_flag = false;
             #endregion
             #region  Inventory action map
-            _input_handler.inventory_close_inv_flag = false;
-            _input_handler.mouse_right_pressed_inv_flag = false;
-            _input_handler.mouse_left_pressed_inv_flag = false;
-            _input_handler.transfer_items_inv_flag = false;
-            _input_handler.drop_items_inv_flag = false;
-            _input_handler.use_item_inv_flag = false;
-            _input_handler.confirmed_action_inv_flag = false;
-            _input_handler.left_weapon_inv_flag = false;
-            _input_handler.right_weapn_inv_flag = false;
-            _input_handler.first_potion_inv_flag = false;
-            _input_handler.second_potion_inv_flag = false;
-            _input_handler.third_potion_inv_flag = false;
-            _input_handler.fourth_potion_inv_flag = false;
+                _input_handler.inventory_close_inv_flag = false;
+                _input_handler.mouse_right_pressed_inv_flag = false;
+                _input_handler.mouse_left_pressed_inv_flag = false;
+                _input_handler.transfer_items_inv_flag = false;
+                _input_handler.drop_items_inv_flag = false;
+                _input_handler.use_item_inv_flag = false;
+                _input_handler.confirmed_action_inv_flag = false;
+                _input_handler.left_weapon_inv_flag = false;
+                _input_handler.right_weapn_inv_flag = false;
+                _input_handler.first_potion_inv_flag = false;
+                _input_handler.second_potion_inv_flag = false;
+                _input_handler.third_potion_inv_flag = false;
+                _input_handler.fourth_potion_inv_flag = false;
             #endregion
         }
     }
