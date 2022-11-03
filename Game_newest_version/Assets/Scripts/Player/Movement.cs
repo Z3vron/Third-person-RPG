@@ -74,11 +74,12 @@ namespace Player_Movemnet{
         //Should do Tooltip to every variable
         
         #region Stamina costs
-        [SerializeField] private float  _sprinting_stamina_cost = 1.5f;
-        [SerializeField] private float  _jump_stamina_cost = 3.0f;
-        [SerializeField] private float _dash_stamina_cost = 15;
+            [SerializeField] private float  _sprinting_stamina_cost = 1.5f;
+            [SerializeField] private float  _jump_stamina_cost = 3.0f;
+            [SerializeField] private float _dash_stamina_cost = 15;
         #endregion
         #region Movement speed values
+            [Header("Movement speed values")]
             [Tooltip("Speed of character in m/s while walking")]
             [SerializeField] private float _walk_speed = 3.0f;
             [Tooltip("Speed of character in m/s while sprinting")]
@@ -111,7 +112,7 @@ namespace Player_Movemnet{
         [SerializeField] private float _timer_between_landing_next_jump;     
        
             
-        [SerializeField] private bool _Player_hit_ceiling = false;       
+        [SerializeField] private bool _player_hit_ceiling = false;       
         [Tooltip("Determine radius of the sphere that checks if player is grounded")] 
         [SerializeField] private float _grounded_check_radious  = 0.19f;
         [Tooltip("Changes transform.y of the sphere that checks if player is grounded")]
@@ -162,14 +163,16 @@ namespace Player_Movemnet{
         private  GameObject _object_to_interact;
         private CharacterController _controller;
         private Input_handler _input_handler;
-        private Vector3 _Player_velocity = new Vector3(0,0,0);
+        [Tooltip("Stores player speed - used to move character controller")]
+        private Vector3 _player_velocity = new Vector3(0,0,0);
         private Transform _main_camera;
+        [Tooltip("Stores input values for WASD")]
         private Vector2 _input_vector;
         private Animator _animator;
         private Vector3 _Current_position;
         private Vector3 _Last_position;
         private Vector3 _character_speed;
-        private Vector3 _Move;
+        private Vector3 _Move = new Vector3(0,0,0);
         private Attack.Player_attack  _handle_attacks;
         private Player_statistics _player_statistics;
         private Player_info _player_info;
@@ -569,7 +572,7 @@ namespace Player_Movemnet{
             else{
                 _animator.SetBool("Combat_movement",false);
            
-            //   if(player_grounded){
+                if(player_grounded){
                     //_controller.velocity to work properly requires only one _controller.move - tried to combine gravity,jump and mve into one but 
                     //Debug.Log("speed: " + _controller.velocity); 
                    // _Player_current_horizontal_speed = new Vector3 (_controller.velocity.x,0.0f,_controller.velocity.z).magnitude;    
@@ -600,40 +603,43 @@ namespace Player_Movemnet{
                     else
                         _Player_speed = _Player_target_speed;
                 
-                    
-                    _Move = new Vector3(_input_vector.x,0,_input_vector.y);
-                    _Move  = _main_camera.forward * _Move.z + _main_camera.right * _Move.x;
-                    _Move.y = 0f; 
+                    // if(_jump)
+
+                    // else
+                        _Move = new Vector3(_input_vector.x,_Move.y,_input_vector.y);
+                    _Move  = _main_camera.forward * _Move.z + _main_camera.right * _Move.x + _Move.y*_main_camera.up;
+                    //_Move.y = 0f; 
                     _controller.Move(_Move * Time.deltaTime * _Player_speed);
-            //  }
+                }
             }
         }
         private void Gravity(){
-            _Player_velocity.y += _gravity_force * Time.deltaTime;
-            if (player_grounded && _Player_velocity.y < 0)
-                _Player_velocity.y = 0f;
+            // _player_velocity.y += _gravity_force * Time.deltaTime;
+            // //_player_velocity.x = _player_velocity.z = 0;
+            // if (player_grounded && _player_velocity.y < 0)
+            //     _player_velocity.y = 0f;
         
-            _controller.Move(_Player_velocity * Time.deltaTime);
+            // _controller.Move(_player_velocity * Time.deltaTime);
+            _Move.y  += _gravity_force * Time.deltaTime;
+            if (player_grounded &&  _Move.y < 0)
+                  _Move.y = 0f;
+        
+             _controller.Move( _Move * Time.deltaTime);
         }
         private void Jump(){
-            if(!player_grounded && _Player_hit_ceiling){
-               // Debug.Log("Player hit ceiling" + _controller.velocity );
-                //_controller.move = Vector3.zero;
-                // _Player_velocity.y =_gravity_force*2 * Time.deltaTime;
-                //_Player_velocity.y = - _Player_velocity.y;
-                // _controller.Move(_Player_velocity * Time.deltaTime);
-            }
             if(player_grounded && !player_crouching){
                 if(_timer_between_landing_next_jump >= 0.0f)
                     _timer_between_landing_next_jump -= Time.deltaTime;
 
                 if (_input_handler.jump_flag && _timer_between_landing_next_jump <=0.0f && _player_statistics.Current_stamina > _jump_stamina_cost){
                     //_Player_velocity.y += Mathf.Sqrt(_jump_height * -2.0f * _gravity_force); // in theory should take care speed to jump higher - very high jumpo at stairs - not sure how it works
-                    // _Player_velocity = _Move;
-                    _player_statistics.Take_stamina(_jump_stamina_cost * Time.deltaTime);
-                    //Debug.Log("Taken stamina: " + _jump_stamina_cost * Time.deltaTime);
-                    _Player_velocity.y = Mathf.Sqrt(_jump_height * -2.0f * _gravity_force);
-                    _controller.Move(_Player_velocity * Time.deltaTime);
+                    //_player_velocity = _Move;
+                    _player_statistics.Take_stamina(_jump_stamina_cost);
+
+                    //_player_velocity.y = Mathf.Sqrt(_jump_height * -2.0f * _gravity_force);
+                    //_controller.Move(_player_velocity * Time.deltaTime);
+                    _Move.y = Mathf.Sqrt(_jump_height * -2.0f * _gravity_force);
+                    _controller.Move(_Move * Time.deltaTime);
                 }
             // Debug.Log("X: " + move.x +"Y: " + _Player_velocity.y +"Z: " + move.z );
             // _controller.Move(new Vector3(move.x,_Player_velocity.y,move.z) * Time.deltaTime * _Player_speed);
@@ -680,11 +686,16 @@ namespace Player_Movemnet{
         }   
         private void Ceiling_check(){
             Vector3 Sphere_position = new Vector3(transform.position.x,transform.position.y - _ceiling_help ,transform.position.z );
-            _Player_hit_ceiling = Physics.CheckSphere(Sphere_position,_grounded_check_radious,_ground_ceiling_layer,QueryTriggerInteraction.Ignore);
+            _player_hit_ceiling = Physics.CheckSphere(Sphere_position,_grounded_check_radious,_ground_ceiling_layer,QueryTriggerInteraction.Ignore);
+            if(!player_grounded && _player_hit_ceiling){
+               Debug.Log("Player hit ceiling" + _controller.velocity );
+                if(_player_velocity.y > 0)
+                    _player_velocity.y = -0.4f;
+            }
         }
         private void Rotate_player(){
             if(_input_vector != Vector2.zero){
-                private float _target_angle;  
+                float _target_angle;  
                 _target_angle = Mathf.Atan2(_input_vector.x,_input_vector.y) * Mathf.Rad2Deg + _main_camera.eulerAngles.y;
                 Quaternion Rotation = Quaternion.Euler(0f,_target_angle,0f);
                 transform.rotation = Quaternion.Lerp(transform.rotation, Rotation,Time.deltaTime * _player_rotation_speed);
@@ -786,11 +797,9 @@ namespace Player_Movemnet{
             if(_input_handler.dash_flag && _player_statistics.Current_stamina > _dash_stamina_cost){
                 //Debug.Log(_Move * _dash_speed);
                 if(_input_handler.walk_input.x < 0){
-                    _animator.SetBool("Active_animation",true);
                     _animator.CrossFade("Base Layer.Dash_left",0f,0);
                 }
                 else if(_input_handler.walk_input.x > 0){
-                    _animator.SetBool("Active_animation",true);
                     _animator.CrossFade("Base Layer.Dash_right",0f,0);
                 }
                     
