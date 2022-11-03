@@ -15,6 +15,7 @@ Think about
 
 Next update:
 - Fixed bug when player was stuck at ceiling after hitting it
+- Worked on cleaning code and moving some part of it to the other script so that each script would have one specific porpouse
 
 
 
