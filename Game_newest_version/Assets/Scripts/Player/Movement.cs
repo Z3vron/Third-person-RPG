@@ -74,6 +74,7 @@ namespace Player_Movemnet{
         //Should do Tooltip to every variable
         
         #region Stamina costs
+            [Header("Stamina costs")]
             [SerializeField] private float  _sprinting_stamina_cost = 1.5f;
             [SerializeField] private float  _jump_stamina_cost = 3.0f;
             [SerializeField] private float _dash_stamina_cost = 15;
@@ -132,13 +133,15 @@ namespace Player_Movemnet{
         [SerializeField] private float _touch_force = 80f;
         [Tooltip("Variable that holds information about which side of doors player is facing(-1 when player will need to pull doors and 1 when he will need to push them")]
         [SerializeField] private float _door_side=0;
-        #region UI elements references
+        #region UI elements references""
+            [Header("UI elements references")]
             [Tooltip("UI element that shows user to press E to interact with given object(object name is adjusted) shows when in distance to interact")]
             [SerializeField] private GameObject _interact_pop_up;
             [Tooltip("UI elemnt that shows status(level) of loading strong attack")]
             [SerializeField] private GameObject _load_strong_attack_fillbar;
         #endregion
         #region Layer masks
+            [Header("Layer masks")]
             [Tooltip("Used to detect if player is grounded or if player hit ceiling")]
             [SerializeField] private LayerMask _ground_ceiling_layer;
             [Tooltip("Used to decide if object in the front of player in given radius and distance is interactable")]
@@ -151,6 +154,7 @@ namespace Player_Movemnet{
         [SerializeField] private Inventories _inventories;
         [SerializeField] private  Transform _root_for_shot_raycast;
         #region Cameras
+            [Header("Cameras")]
             [Tooltip("Reference to free looking camera - one used while walking on the level")]
             [SerializeField] private GameObject _free_look_camera;
             [Tooltip("Reference to lock on camera - one used while attacking enemy(combat stance/mode)")]
@@ -207,12 +211,10 @@ namespace Player_Movemnet{
             _back_up_interact_text = _interact_pop_up.GetComponentInChildren<Text>().text;
 
 
-             _Current_position = transform.position;
-             _Last_position = transform.position;
-            //_interact_pop_up = GameObject.FindObjectOfType<Canvas>();
-
-
-            //read on this shit layermask from raycast return number but from variable set in inspector UnityEngine.layermask
+            _Current_position = transform.position;
+            _Last_position = transform.position;
+            
+            //read on this shit, layermask from raycast return number but from variable set in inspector UnityEngine.layermask
             _environment_layer = LayerMask.NameToLayer("Environment");
         }
         //Physics should be done here - chagne TIme.deltaTime for Time.FixeddeltaTime
@@ -324,43 +326,46 @@ namespace Player_Movemnet{
             }
             if(_collider_to_interact == null)
                 return ;
+
+            if(!_interact_pop_up.activeSelf())
+                _interact_pop_up.SetActive(true);
             if(_collider_to_interact.GetComponent<Item_dropped>()){
                 //Debug.Log("Dropped item in area");
                 _in_area_to_interact_dropped_items = true;
-                _interact_pop_up.SetActive(true);
+                _interact_pop_up.GetComponent<Interact_pop_up>().Set_interact_pop_up(_collider_to_interact.GetComponent<Item_dropped>().interactable_text);
                 
-                if(!_text_added){
-                    _interact_pop_up.GetComponentInChildren<Text>().text += _collider_to_interact.GetComponent<Item_dropped>().interactable_text;
-                    _text_added = true;
-                }               
+                // if(!_text_added){
+                //     _interact_pop_up.GetComponentInChildren<Text>().text += _collider_to_interact.GetComponent<Item_dropped>().interactable_text;
+                //     _text_added = true;
+                // }               
             }
             else if(_collider_to_interact.gameObject.tag == "Chest"){
                 _in_area_to_interact_chest = true;
-                _interact_pop_up.SetActive(true);
-                if(!_text_added){
-                    _interact_pop_up.GetComponentInChildren<Text>().text += _collider_to_interact.GetComponent<Interactable_objects>().interactable_text;
-                    _text_added = true;
-                }
+                _interact_pop_up.GetComponent<Interact_pop_up>().Set_interact_pop_up(_collider_to_interact.GetComponent<Interactable_objects>().interactable_text);
+                // if(!_text_added){
+                //     _interact_pop_up.GetComponentInChildren<Text>().text += _collider_to_interact.GetComponent<Interactable_objects>().interactable_text;
+                //     _text_added = true;
+                // }
             }
             else if(_collider_to_interact.gameObject.tag == "Bush"){
                 if(_collider_to_interact.GetComponent<Bush_contents>().amount_of_berry == 0)
                     return ;
                 _in_area_to_interact_bush = true;
-                _interact_pop_up.SetActive(true);
-                if(!_text_added){
-                    _interact_pop_up.GetComponentInChildren<Text>().text += _collider_to_interact.GetComponent<Bush_contents>().interactable_text;
-                    _text_added = true;
-                }
+                _interact_pop_up.GetComponent<Interact_pop_up>().Set_interact_pop_up(_collider_to_interact.GetComponent<Bush_contents>().interactable_text);
+                // if(!_text_added){
+                //     _interact_pop_up.GetComponentInChildren<Text>().text += _collider_to_interact.GetComponent<Bush_contents>().interactable_text;
+                //     _text_added = true;
+                // }
             }
             else if(_collider_to_interact.gameObject.tag == "Door"){
                 //Debug.Log("Opening Door");
                 // Door_touched = true;
                 _in_area_to_interact_door = true;
-                _interact_pop_up.SetActive(true);
-                if(!_text_added){
-                    _interact_pop_up.GetComponentInChildren<Text>().text += _collider_to_interact.GetComponent<Interactable_objects>().interactable_text;
-                    _text_added = true;
-                }
+                _interact_pop_up.GetComponent<Interact_pop_up>().Set_interact_pop_up(_collider_to_interact.GetComponent<Interactable_objects>().interactable_text);
+                // if(!_text_added){
+                //     _interact_pop_up.GetComponentInChildren<Text>().text += _collider_to_interact.GetComponent<Interactable_objects>().interactable_text;
+                //     _text_added = true;
+                // }
             }
             
         }
@@ -505,9 +510,10 @@ namespace Player_Movemnet{
             _object_to_interact.GetComponent<Renderer>().material.color = color;
         }
         private void Reset_turn_off_interact_pop_up(){
-            _interact_pop_up.SetActive(false);
-            _text_added = false;
-            _interact_pop_up.GetComponentInChildren<Text>().text = _back_up_interact_text;
+            _interact_pop_up.GetComponent<Interact_pop_up>().Reset_interact_pop_up();
+            //_interact_pop_up.SetActive(false);
+        //     _text_added = false;
+        //     _interact_pop_up.GetComponentInChildren<Text>().text = _back_up_interact_text;
         }
         private IEnumerator Coloring_object(){
             _object_to_interact.GetComponent<Renderer>().material.color = Color.red;
