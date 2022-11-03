@@ -13,6 +13,11 @@ Think about
 - Move checking input flags from movement script to input handler - earlier there was a problem with it but i dont remember what was it 
 - Work on and reduce lines in code about transfering items i have separate function that calls others (i use it in the shortcut and item option) but i also have old code that i use for the tranfer while dragging item with mouse - there are some diffrence i think but I'm not sure - need to thoroughly read code and delete one part
 
+Next update:
+- Fixed bug when player was stuck at ceiling after hitting it
+
+
+
 Update 25.10.2022:
 - player strong attack interrupt enemy attack( added animations for both player and enemy)
 - issue with humanoid animations on generic rig - changing type gives errores
