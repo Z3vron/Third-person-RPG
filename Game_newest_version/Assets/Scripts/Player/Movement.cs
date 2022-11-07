@@ -61,17 +61,21 @@ namespace Player_Movemnet{
     [RequireComponent(typeof(CharacterController))]
     public class Movement : MonoBehaviour
     {
-        public int counter = 0;
         //figure out wayy to use pointers and addresses
         public int dropped_item_new_amount;
-        public  List<GameObject> enemies_lock_on = new List<GameObject>();
-        public bool player_grounded = false;
-        public bool player_crouching = false;
-        
-      
+       
+        #region Player flags
+            [Header("Player movement flags")]
+            public bool player_grounded = false;
+            public bool player_crouching = false;
+            public bool player_hit_ceiling = false;  
+        #endregion
         // public bool Door_touched = false; // variable used to control door in another script but I decided to handle it here  - not sure if good habbit but another script would be too simple
         public bool Trap_active = false; 
-        
+        [Tooltip("Force with which player is pushing and pulling doors")]
+        [SerializeField] private float _touch_force = 80f;
+        [Tooltip("Variable that holds information about which side of doors player is facing(-1 when player will need to pull doors and 1 when he will need to push them")]
+        [SerializeField] private float _door_side=0;
         #region Stamina costs
             [Header("Stamina costs")]
             [SerializeField] private float  _sprinting_stamina_cost = 1.5f;
@@ -99,43 +103,45 @@ namespace Player_Movemnet{
             [Tooltip("Targeted player speed")]
             [SerializeField] private float _player_target_speed;
         #endregion
-        [Tooltip("Height that player will achieve while jumping")]
-        [SerializeField] private float _jump_height = 1.5f;
-        [Tooltip("Gravity force that pulls player down")]
-        [SerializeField] private float _gravity_force = -12f;
-
-        [Tooltip("Time that needs to pass before player will be able to jump again")]
-        [SerializeField] private float _time_between_jumps = 0.6f;
-        [Tooltip("Timer that counts time elapsed from the last landing ")]
-        [SerializeField] private float _timer_between_landing_next_jump;     
-       
-            
-        [SerializeField] private bool _player_hit_ceiling = false;       
-        [Tooltip("Determine radius of the sphere that checks if player is grounded")] 
-        [SerializeField] private float _grounded_check_radious  = 0.19f;
-        [Tooltip("Changes transform.y of the sphere that checks if player is grounded")]
-        [SerializeField] private float _grounded_help = -0.09f;
-        [Tooltip("Changes transform.y of the sphere that checks if player hit ceiling")]
-        [SerializeField] private float _ceiling_help = -1.65f;
-        
-        
-        
-        
-        [SerializeField] private RaycastHit _hit;
-        [Tooltip("Store information if player is doing action(that require animation) so this really stores info if player animator controller currently is playing any animation")]
-        [SerializeField] private bool _active_action;
-        [Tooltip("Distance to interactable object that within player must be to interact with given object - not using right now changed from raycast to triggers")]
-        [SerializeField] private float _distance_to_interact = 0.9f;
-        [Tooltip("Force with which player is pushing and pulling doors")]
-        [SerializeField] private float _touch_force = 80f;
-        [Tooltip("Variable that holds information about which side of doors player is facing(-1 when player will need to pull doors and 1 when he will need to push them")]
-        [SerializeField] private float _door_side=0;
-        #region UI elements references""
+        #region Jump/Gravity/ ground and ceiling check values
+            [Header("Gravity/Jump ground and ceiling check values")]
+            [Tooltip("Gravity force that pulls player down")]
+            [SerializeField] private float _gravity_force = -12f;
+            [Tooltip("Height that player will achieve while jumping")]
+            [SerializeField] private float _jump_height = 1.5f;
+            [Tooltip("Time that needs to pass before player will be able to jump again")]
+            [SerializeField] private float _time_between_jumps = 0.6f;
+            [Tooltip("Timer that counts time elapsed from the last landing ")]
+            [SerializeField] private float _timer_between_landing_next_jump;     
+            [Tooltip("Determine radius of the sphere that checks if player is grounded")] 
+            [SerializeField] private float _grounded_check_radious  = 0.19f;
+            [Tooltip("Changes transform.y of the sphere that checks if player is grounded")]
+            [SerializeField] private float _grounded_help = -0.09f;
+            [Tooltip("Changes transform.y of the sphere that checks if player hit ceiling")]
+            [SerializeField] private float _ceiling_help = -1.65f;
+        #endregion        
+        #region UI elements references
             [Header("UI elements references")]
             [Tooltip("UI element that shows user to press E to interact with given object(object name is adjusted) shows when in distance to interact")]
             [SerializeField] private Interact_pop_up _interact_pop_up;
             [Tooltip("UI elemnt that shows status(level) of loading strong attack")]
             [SerializeField] private GameObject _load_strong_attack_fillbar;
+            [Tooltip("UI element that shows contents of the object to interact - for now chest only")]
+            [SerializeField] private GameObject _object_inventory;
+        #endregion
+        #region Other scripts and components references
+            [Header("Other scripts references")]
+            [Tooltip("Script that handles operations on inventories")]
+            [SerializeField] private Inventories _inventories;
+            private Input_handler _input_handler;
+            private Attack.Player_attack  _handle_attacks;
+            private Player_statistics _player_statistics;
+            private Player_info _player_info;
+            private Player_inventory_info.Player_inventory _player_inventory;
+
+            private CharacterController _controller;
+            private Animator _animator;
+            private Transform _main_camera;
         #endregion
         #region Layer masks
             [Header("Layer masks")]
@@ -146,10 +152,6 @@ namespace Player_Movemnet{
             [Tooltip("Used to detect if there is something(some object) in a way between player and possible enemy to lock on")]
             [SerializeField] private LayerMask _environment_layer;
         #endregion
-        
-        [SerializeField] private GameObject _object_inventory;
-        [SerializeField] private Inventories _inventories;
-        [SerializeField] private  Transform _root_for_shot_raycast;
         #region Cameras
             [Header("Cameras")]
             [Tooltip("Reference to free looking camera - one used while walking on the level")]
@@ -159,45 +161,42 @@ namespace Player_Movemnet{
             [Tooltip("Reference to cinemachine target group - usadjust lock on camera so that both lock on enemy and player will be in view")]
             [SerializeField] private CinemachineTargetGroup _target_group;
         #endregion
-
-        private  GameObject _object_to_interact;
-        private CharacterController _controller;
-        private Input_handler _input_handler;
-        private Transform _main_camera;
+        
+        [Tooltip("Used to store direction of player - could use gameobject.transform?")]
+        [SerializeField] private  Transform _root_for_shot_raycast;
         [Tooltip("Stores input values(0-1) for walking(movement) input")]
-         private Vector2 _input_vector;
-        private Animator _animator;
-        private Vector3 _Current_position;
-        private Vector3 _Last_position;
-        private Vector3 _character_speed;
+        private Vector2 _input_vector;
         [Tooltip("Stores player speed - used to move character controller")]
         [SerializeField] private Vector3 _Move = new Vector3(0,0,0);
-        private Attack.Player_attack  _handle_attacks;
-        private Player_statistics _player_statistics;
-        private Player_info _player_info;
-        private Player_inventory_info.Player_inventory _player_inventory;
-        private bool _text_added = false;
         private float _strong_attack_time_elapsed = 0.0f;
-        private int _enemies_counter = -1;
-        
-        // on trigger enter depended on button pressed
-        private bool _in_area_to_interact_chest = false;
-        private bool _in_area_to_interact_bush = false;
-        private bool _in_area_to_interact_door = false;
-        private bool _in_area_to_interact_dropped_items = false;
-        private GameObject _closest_enemy;
-        
-        // to the same for text
-        // number of dropped items doesn't change
-        public List<Collider> trigger_colliders = new List<Collider>();
-        [SerializeField] private Collider _collider_to_interact;
-        [SerializeField] private Collider _previous_collider_to_interact;
+        #region Lock on variables
+            public  List<GameObject> enemies_lock_on = new List<GameObject>();
+            private int _enemies_counter = -1;
+            private GameObject _closest_enemy;
+        #endregion
+        #region Interact with objects variables
+            [Header("Interact with objects variables")]
+            private  GameObject _object_to_interact;
+            private bool _text_added = false;
+           // [Tooltip("Distance to interactable object that within player must be to interact with given object - not using right now changed from raycast to triggers")]
+            //[SerializeField] private float _distance_to_interact = 0.9f;
+
+            private bool _in_area_to_interact_chest = false;
+            private bool _in_area_to_interact_bush = false;
+            private bool _in_area_to_interact_door = false;
+            private bool _in_area_to_interact_dropped_items = false;
+
+            public List<Collider> trigger_colliders = new List<Collider>();
+            [Tooltip("Collider with which player will interact")]
+            [SerializeField] private Collider _collider_to_interact;
+            private Collider _previous_collider_to_interact;
+        #endregion
 
         private void Start(){
             _controller = GetComponent<CharacterController>();
-            _animator = gameObject.GetComponentInChildren<Animator>();
+            _animator = GetComponentInChildren<Animator>();
             _main_camera = Camera.main.transform;
-            _timer_between_landing_next_jump = _time_between_jumps;
+
             _handle_attacks = GetComponent<Attack.Player_attack>();
             _player_info = GetComponent<Player_info>();
             _player_statistics =  _player_info.player_stats;
@@ -205,19 +204,12 @@ namespace Player_Movemnet{
             _input_handler = GetComponent<Input_handler>();
 
             _player_speed = 1;
-
-            _Current_position = transform.position;
-            _Last_position = transform.position;
-            
+            _timer_between_landing_next_jump = _time_between_jumps;
             //read on this shit, layermask from raycast return number but from variable set in inspector UnityEngine.layermask
             _environment_layer = LayerMask.NameToLayer("Environment");
         }
         //Physics should be done here - chagne TIme.deltaTime for Time.FixeddeltaTime
         private void FixedUpdate() {
-            _Current_position = transform.position;
-            _character_speed = (_Current_position - _Last_position)/Time.fixedDeltaTime;
-            _Last_position = _Current_position;
-
             //camera shakes really badly
             // if(!_Active_action && !_player_inventory.inventory_open)
             // Move_player();
@@ -227,12 +219,11 @@ namespace Player_Movemnet{
             if(_player_info.locked_on_enemy){
                 Handle_state_while_lock_on_enemy();
             }
-            _active_action = _player_info.active_animation;
             Gravity();
             Ground_check();
             Handle_jump_on_top_of_enemy();
             Ceiling_check();
-            if(!_active_action){
+            if(!_player_info.active_animation){
                 Equip_items();
                 if(!_player_inventory.inventory_open){
                     Lock_on_enemy();
@@ -334,9 +325,8 @@ namespace Player_Movemnet{
                 } 
             }
             if(_interact_pop_up.gameObject.activeSelf && _collider_to_interact != _previous_collider_to_interact){
-                        Debug.Log( counter + "change collider to interact" + _collider_to_interact + " " + _previous_collider_to_interact);
+                       // Debug.Log("change collider to interact" + _collider_to_interact + " " + _previous_collider_to_interact);
                         _interact_pop_up.Reset_interact_pop_up();
-                        counter++;
                     }
             if(_collider_to_interact == null || _collider_to_interact == _previous_collider_to_interact){
                 //Debug.Log("Dont repeat actions");
@@ -691,8 +681,8 @@ namespace Player_Movemnet{
         }   
         private void Ceiling_check(){
             Vector3 Sphere_position = new Vector3(transform.position.x,transform.position.y - _ceiling_help ,transform.position.z );
-            _player_hit_ceiling = Physics.CheckSphere(Sphere_position,_grounded_check_radious,_ground_ceiling_layer,QueryTriggerInteraction.Ignore);
-            if(!player_grounded && _player_hit_ceiling){
+            player_hit_ceiling = Physics.CheckSphere(Sphere_position,_grounded_check_radious,_ground_ceiling_layer,QueryTriggerInteraction.Ignore);
+            if(!player_grounded && player_hit_ceiling){
                Debug.Log("Player hit ceiling" + _controller.velocity );
                 if(_Move.y > 0)
                     _Move.y = -0.4f;
@@ -814,6 +804,7 @@ namespace Player_Movemnet{
             }
         }
         public bool Is_enemy_to_lock_on_visible(GameObject potential_enemy_to_lock_on){
+            private RaycastHit _hit;
             if(Physics.Linecast(transform.position,potential_enemy_to_lock_on.transform.position, out _hit)){
                 //Debug.DrawLine(transform.position,_closest_enemy.transform.position);
                 if(_hit.transform.gameObject.layer == _environment_layer )
