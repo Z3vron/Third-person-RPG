@@ -12,12 +12,19 @@ Think about
 - Use get-set (for example get returns value and sets change it if condition was met)
 - Move checking input flags from movement script to input handler - earlier there was a problem with it but i dont remember what was it 
 - Work on and reduce lines in code about transfering items i have separate function that calls others (i use it in the shortcut and item option) but i also have old code that i use for the tranfer while dragging item with mouse - there are some diffrence i think but I'm not sure - need to thoroughly read code and delete one part
+- Camera shakes on stairs and also there is some tricky movement while going against camera(S) - it is caused while multiplaying movement vector by camera values - current system would be good if camera would be stationary on the same height behind player(at least that is what i am thinking right now)
 
 Next update:
 - Fixed bug when player was stuck at ceiling after hitting it
 - Worked on cleaning code and moving some part of it to the other script so that each script would have one specific porpouse
+- Reworked movement system so that player could not control movement while in the air, now i am using only one character controler move func - this will allow for good player speed measurement - by doing this i also made code more clean and removed unnecessary variables and lines of code, changed animations transisions so that they would be more acurate to the actual player speed, add lerping to design speed
+- Fixed bug when dashes wouldn't correctly start or would be stopped in the middle of animation( fixed issue when active animation was restarted to false to early)
+- Fixed issues with interacting with objects while player was in few objects triggers areas
 
-
+do some kind of container for the player attacks so that they could be randomized
+root motion with controller 
+some things i do t ooften (each frame etc) should be done less time
+movement while lock on enemy
 
 Update 25.10.2022:
 - player strong attack interrupt enemy attack( added animations for both player and enemy)
