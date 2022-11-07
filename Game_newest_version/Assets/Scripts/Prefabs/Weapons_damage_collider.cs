@@ -43,7 +43,7 @@ public class Weapons_damage_collider : MonoBehaviour{
         }
         if(other.CompareTag("Player")){
             if(other.GetComponentInParent<Player_info>().player_invulnerability){
-                Debug.Log("Player is player is invulnerable at that moment");
+                Debug.Log("Player is invulnerable at that moment");
                 return;
             }
             else{

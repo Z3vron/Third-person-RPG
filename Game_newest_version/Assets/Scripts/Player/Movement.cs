@@ -61,17 +61,16 @@ namespace Player_Movemnet{
     [RequireComponent(typeof(CharacterController))]
     public class Movement : MonoBehaviour
     {
+        public int counter = 0;
         //figure out wayy to use pointers and addresses
         public int dropped_item_new_amount;
         public  List<GameObject> enemies_lock_on = new List<GameObject>();
-
         public bool player_grounded = false;
         public bool player_crouching = false;
         
       
         // public bool Door_touched = false; // variable used to control door in another script but I decided to handle it here  - not sure if good habbit but another script would be too simple
         public bool Trap_active = false; 
-        //Should do Tooltip to every variable
         
         #region Stamina costs
             [Header("Stamina costs")]
@@ -88,7 +87,7 @@ namespace Player_Movemnet{
             [Tooltip("Speed of character in m/s while crouching")]
             [SerializeField] private float _crouch_speed = 1.0f;
             [Tooltip("Speed of character in m/s while changing between speed multiplayers")]
-            [SerializeField] private float _player_speed_change_rate = 10.0f;
+            [SerializeField] private float _player_speed_change_rate = 7.0f;
             [Tooltip("Speed of character in m/s while rotating towards direction camera is facing")]
             [SerializeField] private float _player_rotation_speed = 7.0f;
             [Tooltip("Speed of character while dashing in any direction")]
@@ -96,11 +95,9 @@ namespace Player_Movemnet{
 
             //not sure about 3 variables below i think that i could remove atleast one but there is still a problem with getting actual player speed - i tried few diffrent methods but i am not satisfied with any of them
             [Tooltip("Present player speed")]
-            [SerializeField] private float _Player_speed;
+            [SerializeField] private float _player_speed;
             [Tooltip("Targeted player speed")]
-            [SerializeField] private float _Player_target_speed;
-            [Tooltip("Present player horizontal speed")]
-            [SerializeField] private float _Player_current_horizontal_speed;
+            [SerializeField] private float _player_target_speed;
         #endregion
         [Tooltip("Height that player will achieve while jumping")]
         [SerializeField] private float _jump_height = 1.5f;
@@ -136,7 +133,7 @@ namespace Player_Movemnet{
         #region UI elements references""
             [Header("UI elements references")]
             [Tooltip("UI element that shows user to press E to interact with given object(object name is adjusted) shows when in distance to interact")]
-            [SerializeField] private GameObject _interact_pop_up;
+            [SerializeField] private Interact_pop_up _interact_pop_up;
             [Tooltip("UI elemnt that shows status(level) of loading strong attack")]
             [SerializeField] private GameObject _load_strong_attack_fillbar;
         #endregion
@@ -163,26 +160,23 @@ namespace Player_Movemnet{
             [SerializeField] private CinemachineTargetGroup _target_group;
         #endregion
 
-        
         private  GameObject _object_to_interact;
         private CharacterController _controller;
         private Input_handler _input_handler;
-        [Tooltip("Stores player speed - used to move character controller")]
-        private Vector3 _player_velocity = new Vector3(0,0,0);
         private Transform _main_camera;
-        [Tooltip("Stores input values for WASD")]
-        private Vector2 _input_vector;
+        [Tooltip("Stores input values(0-1) for walking(movement) input")]
+         private Vector2 _input_vector;
         private Animator _animator;
         private Vector3 _Current_position;
         private Vector3 _Last_position;
         private Vector3 _character_speed;
-        private Vector3 _Move = new Vector3(0,0,0);
+        [Tooltip("Stores player speed - used to move character controller")]
+        [SerializeField] private Vector3 _Move = new Vector3(0,0,0);
         private Attack.Player_attack  _handle_attacks;
         private Player_statistics _player_statistics;
         private Player_info _player_info;
         private Player_inventory_info.Player_inventory _player_inventory;
         private bool _text_added = false;
-        private string _back_up_interact_text;
         private float _strong_attack_time_elapsed = 0.0f;
         private int _enemies_counter = -1;
         
@@ -197,6 +191,7 @@ namespace Player_Movemnet{
         // number of dropped items doesn't change
         public List<Collider> trigger_colliders = new List<Collider>();
         [SerializeField] private Collider _collider_to_interact;
+        [SerializeField] private Collider _previous_collider_to_interact;
 
         private void Start(){
             _controller = GetComponent<CharacterController>();
@@ -208,8 +203,8 @@ namespace Player_Movemnet{
             _player_statistics =  _player_info.player_stats;
             _player_inventory = GetComponent<Player_inventory_info.Player_inventory>();
             _input_handler = GetComponent<Input_handler>();
-            _back_up_interact_text = _interact_pop_up.GetComponentInChildren<Text>().text;
 
+            _player_speed = 1;
 
             _Current_position = transform.position;
             _Last_position = transform.position;
@@ -219,7 +214,7 @@ namespace Player_Movemnet{
         }
         //Physics should be done here - chagne TIme.deltaTime for Time.FixeddeltaTime
         private void FixedUpdate() {
-             _Current_position = transform.position;
+            _Current_position = transform.position;
             _character_speed = (_Current_position - _Last_position)/Time.fixedDeltaTime;
             _Last_position = _Current_position;
 
@@ -249,7 +244,9 @@ namespace Player_Movemnet{
                     Attack();
                     Interact();
                 }
+                Move_controller();
             }
+            
         }
         private void LateUpdate() {
             Set_input_flags_false();
@@ -299,75 +296,79 @@ namespace Player_Movemnet{
                 interactable_object_dir.Normalize();
                 float angle = Vector3.Angle(gameObject.transform.forward, interactable_object_dir);
                 if(angle < 45 && angle > -45){
-                    if(!trigger_colliders.Contains(other))
+                    //Debug.Log("in");
+                    if(!trigger_colliders.Contains(other)){
+                        if(other.TryGetComponent(out Bush_contents bush_content)){
+                            if(bush_content.amount_of_berry == 0)
+                                return;
+                        }
                         trigger_colliders.Add(other);
-                    //dropped items are first because their radious is smaller so they need to be detected before other interactable objects with bigger radious
-                   
+                    }                   
                 }
                 else{
-                    if(trigger_colliders.Contains(other))
-                        trigger_colliders.Remove(other);
-                    if(_collider_to_interact == other)
+                    if(_collider_to_interact == other){
+                       // Debug.Log("remove");
                         _collider_to_interact = null;
-                    _in_area_to_interact_chest = false;
-                    _in_area_to_interact_door = false;
-                    _in_area_to_interact_dropped_items = false;
-                    _in_area_to_interact_bush = false;
-                    Reset_turn_off_interact_pop_up();
+                        _previous_collider_to_interact = null;
+                    }
+                    if(trigger_colliders.Contains(other)){
+                        trigger_colliders.Remove(other);
+                        _in_area_to_interact_chest = false;
+                        _in_area_to_interact_door = false;
+                        _in_area_to_interact_dropped_items = false;
+                        _in_area_to_interact_bush = false;
+                        //Debug.Log("LOL");
+                        _interact_pop_up.Reset_interact_pop_up();
+                    }
                 }
             }
             float distance = Mathf.Infinity;
             foreach(var interact_collider in trigger_colliders){
+                Debug.Log("interact collider: " + interact_collider);
                 if(Vector3.Distance(gameObject.transform.position,interact_collider.gameObject.transform.position) < distance){
                     distance = Vector3.Distance(gameObject.transform.position,interact_collider.gameObject.transform.position);
                     _collider_to_interact = interact_collider;
-                    Reset_turn_off_interact_pop_up();
-                }
+                    
+                        
+                    
+                } 
             }
-            if(_collider_to_interact == null)
+            if(_interact_pop_up.gameObject.activeSelf && _collider_to_interact != _previous_collider_to_interact){
+                        Debug.Log( counter + "change collider to interact" + _collider_to_interact + " " + _previous_collider_to_interact);
+                        _interact_pop_up.Reset_interact_pop_up();
+                        counter++;
+                    }
+            if(_collider_to_interact == null || _collider_to_interact == _previous_collider_to_interact){
+                //Debug.Log("Dont repeat actions");
                 return ;
-
-            if(!_interact_pop_up.activeSelf())
-                _interact_pop_up.SetActive(true);
+            }
+                Debug.Log(_collider_to_interact);
+            if(!_interact_pop_up.gameObject.activeSelf)
+                _interact_pop_up.gameObject.SetActive(true);
             if(_collider_to_interact.GetComponent<Item_dropped>()){
-                //Debug.Log("Dropped item in area");
+               // Debug.Log("Dropped item in area");
                 _in_area_to_interact_dropped_items = true;
-                _interact_pop_up.GetComponent<Interact_pop_up>().Set_interact_pop_up(_collider_to_interact.GetComponent<Item_dropped>().interactable_text);
-                
-                // if(!_text_added){
-                //     _interact_pop_up.GetComponentInChildren<Text>().text += _collider_to_interact.GetComponent<Item_dropped>().interactable_text;
-                //     _text_added = true;
-                // }               
+                _interact_pop_up.Set_interact_pop_up(_collider_to_interact.GetComponent<Item_dropped>().interactable_text);        
             }
             else if(_collider_to_interact.gameObject.tag == "Chest"){
                 _in_area_to_interact_chest = true;
-                _interact_pop_up.GetComponent<Interact_pop_up>().Set_interact_pop_up(_collider_to_interact.GetComponent<Interactable_objects>().interactable_text);
-                // if(!_text_added){
-                //     _interact_pop_up.GetComponentInChildren<Text>().text += _collider_to_interact.GetComponent<Interactable_objects>().interactable_text;
-                //     _text_added = true;
-                // }
+               _interact_pop_up.Set_interact_pop_up(_collider_to_interact.GetComponent<Interactable_objects>().interactable_text);
             }
             else if(_collider_to_interact.gameObject.tag == "Bush"){
-                if(_collider_to_interact.GetComponent<Bush_contents>().amount_of_berry == 0)
+                if(_collider_to_interact.GetComponent<Bush_contents>().amount_of_berry == 0){
+                    _interact_pop_up.gameObject.SetActive(false);
                     return ;
+                }
                 _in_area_to_interact_bush = true;
-                _interact_pop_up.GetComponent<Interact_pop_up>().Set_interact_pop_up(_collider_to_interact.GetComponent<Bush_contents>().interactable_text);
-                // if(!_text_added){
-                //     _interact_pop_up.GetComponentInChildren<Text>().text += _collider_to_interact.GetComponent<Bush_contents>().interactable_text;
-                //     _text_added = true;
-                // }
+                _interact_pop_up.Set_interact_pop_up(_collider_to_interact.GetComponent<Bush_contents>().interactable_text);
             }
             else if(_collider_to_interact.gameObject.tag == "Door"){
                 //Debug.Log("Opening Door");
                 // Door_touched = true;
                 _in_area_to_interact_door = true;
-                _interact_pop_up.GetComponent<Interact_pop_up>().Set_interact_pop_up(_collider_to_interact.GetComponent<Interactable_objects>().interactable_text);
-                // if(!_text_added){
-                //     _interact_pop_up.GetComponentInChildren<Text>().text += _collider_to_interact.GetComponent<Interactable_objects>().interactable_text;
-                //     _text_added = true;
-                // }
+                _interact_pop_up.Set_interact_pop_up(_collider_to_interact.GetComponent<Interactable_objects>().interactable_text);
             }
-            
+            _previous_collider_to_interact = _collider_to_interact;
         }
         private void OnTriggerExit(Collider other){
             //_trigger_colliders.RemoveAt(0);
@@ -378,13 +379,16 @@ namespace Player_Movemnet{
             if(other.GetComponent<Item_dropped>() || other.gameObject.tag == "Chest" || other.gameObject.tag == "Door" || other.gameObject.tag == "Bush"){
                 if(trigger_colliders.Contains(other))
                     trigger_colliders.Remove(other);
-                if(trigger_colliders.Count == 0)
+                if(trigger_colliders.Count == 0){
                     _collider_to_interact = null;
+                    _previous_collider_to_interact = null;
+                }
+                    
                 _in_area_to_interact_chest = false;
                 _in_area_to_interact_door = false;
                 _in_area_to_interact_dropped_items = false;
                 //Debug.Log("Item out of reach");
-                Reset_turn_off_interact_pop_up();
+                _interact_pop_up.Reset_interact_pop_up();
             }
         }
         private void Interact(){
@@ -397,10 +401,13 @@ namespace Player_Movemnet{
                         Destroy(_collider_to_interact.gameObject);
                         if(trigger_colliders.Contains(_collider_to_interact))
                             trigger_colliders.Remove(_collider_to_interact);
-                        if(trigger_colliders.Count == 0)
+                        if(trigger_colliders.Count == 0){
                             _collider_to_interact = null;
+                            _previous_collider_to_interact = null;
+                        }
+                            
                         _in_area_to_interact_dropped_items = false;
-                        Reset_turn_off_interact_pop_up();
+                        _interact_pop_up.Reset_interact_pop_up();
                     }
                     else{
                         _inventories.Show_items_add_rem_from_inv_window_pop_up(true,_collider_to_interact.GetComponent<Item_dropped>().item_dropped,dropped_item_new_amount);
@@ -424,6 +431,13 @@ namespace Player_Movemnet{
                     if(_inventories.added_all_items){
                         _inventories.Show_items_add_rem_from_inv_window_pop_up(true,_collider_to_interact.GetComponent<Bush_contents>().berry_in_bush,_collider_to_interact.GetComponent<Bush_contents>().amount_of_berry);
                         _collider_to_interact.GetComponent<Bush_contents>().amount_of_berry = 0;
+                        _interact_pop_up.Reset_interact_pop_up();
+                        if(trigger_colliders.Contains(_collider_to_interact))
+                            trigger_colliders.Remove(_collider_to_interact);
+                        if(trigger_colliders.Count == 0){
+                            _collider_to_interact = null;
+                            _previous_collider_to_interact = null;
+                        }
                     }
                     else{
                         _inventories.Show_items_add_rem_from_inv_window_pop_up(true,_collider_to_interact.GetComponent<Bush_contents>().berry_in_bush,dropped_item_new_amount);
@@ -431,7 +445,7 @@ namespace Player_Movemnet{
                     }
                 }
                 else if(_in_area_to_interact_door){
-                    _collider_to_interact.GetComponent<Rigidbody>().AddForce(_door_side*_root_for_shot_raycast.forward * _touch_force * _Player_speed,ForceMode.Acceleration);
+                    _collider_to_interact.GetComponent<Rigidbody>().AddForce(_door_side*_root_for_shot_raycast.forward * _touch_force * _player_speed,ForceMode.Acceleration);
                 }
             }
                 // old version with raycasts
@@ -509,12 +523,6 @@ namespace Player_Movemnet{
         private void Set_chest_color(Color color){
             _object_to_interact.GetComponent<Renderer>().material.color = color;
         }
-        private void Reset_turn_off_interact_pop_up(){
-            _interact_pop_up.GetComponent<Interact_pop_up>().Reset_interact_pop_up();
-            //_interact_pop_up.SetActive(false);
-        //     _text_added = false;
-        //     _interact_pop_up.GetComponentInChildren<Text>().text = _back_up_interact_text;
-        }
         private IEnumerator Coloring_object(){
             _object_to_interact.GetComponent<Renderer>().material.color = Color.red;
             yield return new WaitForSeconds(4.5f);
@@ -577,78 +585,59 @@ namespace Player_Movemnet{
             }
             else{
                 _animator.SetBool("Combat_movement",false);
-           
                 if(player_grounded){
                     //_controller.velocity to work properly requires only one _controller.move - tried to combine gravity,jump and mve into one but 
-                    //Debug.Log("speed: " + _controller.velocity); 
-                   // _Player_current_horizontal_speed = new Vector3 (_controller.velocity.x,0.0f,_controller.velocity.z).magnitude;    
-                    _Player_current_horizontal_speed = new Vector3(_character_speed.x,0f,_character_speed.z).magnitude;
-                   
+                    _player_speed = new Vector3 (_controller.velocity.x,0.0f,_controller.velocity.z).magnitude;    
                     if(player_crouching){
-                        _Player_target_speed = _crouch_speed;
+                        _player_target_speed = _crouch_speed;
                     }
                     else if(_input_handler.sprint_flag && _player_statistics.Current_stamina >0){
                         _player_statistics.Take_stamina(_sprinting_stamina_cost * Time.deltaTime);
-                        _Player_target_speed = _sprint_speed;
-                        _animator.SetFloat("Speed_percent",0.99f);//, 0.1f,Time.deltaTime); // last 2 arguments to smooth transision - now useless but great when i change 0.99f to player speed - fix the bug
+                        _player_target_speed = _sprint_speed;
+                        _animator.SetFloat("Speed_percent",_player_speed, 0.1f,Time.deltaTime); // last 2 arguments to smooth transision - now useless but great when i change 0.99f to player speed - fix the bug
                     }
                     else{
-                        _Player_target_speed = _walk_speed;
-                        _animator.SetFloat("Speed_percent",0.3f);//, 0.1f,Time.deltaTime);
+                        _player_target_speed = _walk_speed;
+                        _animator.SetFloat("Speed_percent",_player_speed, 0.1f,Time.deltaTime);
                     } 
                     if(_input_vector == Vector2.zero){
-                        _Player_target_speed = 1f;  // doesn't change _controller.Move becasue INput vector is 0 but allows to make depanded on speed functions etc while player is in  one place
+                        _player_target_speed = 0f;  // doesn't change _controller.Move becasue INput vector is 0 but allows to make depanded on speed functions etc while player is in  one place
                         _animator.SetFloat("Speed_percent",-1f);//, 0.1f,Time.deltaTime);
                     }
-                    //technically it works but value is inconsistent and so/through this player speed is also inconsistent and camera shakes 
-                    //Debug.Log("speed: " + _Player_current_horizontal_speed);
-                    // if(_Player_current_horizontal_speed < _Player_target_speed - 0.1f || _Player_current_horizontal_speed > _Player_target_speed + 0.1f ){
-                    //         _Player_speed = Mathf.Lerp(_Player_current_horizontal_speed,_Player_target_speed,Time.deltaTime * _player_speed_change_rate);
-                    //         _Player_speed = Mathf.Round(_Player_speed * 1000f) / 1000f;
-                    // }
-                    else
-                        _Player_speed = _Player_target_speed;
-                
-                    // if(_jump)
-
-                    // else
-                        _Move = new Vector3(_input_vector.x,_Move.y,_input_vector.y);
-                    _Move  = _main_camera.forward * _Move.z + _main_camera.right * _Move.x + _Move.y*_main_camera.up;
+                    if(_player_speed < _player_target_speed - 0.3f || _player_speed > _player_target_speed + 0.3f ){
+                        // lERP TYPE of Exponential ease toward a target  because input and output are the same so no time.delta time with linear there could/should be time.delta time included
+                        _player_speed = Mathf.Lerp(_player_speed,_player_target_speed,_player_speed_change_rate);
+                        _player_speed = Mathf.Round(_player_speed * 1000f) / 1000f;
+                    }
+                    else{
+                        _player_speed = _player_target_speed;
+                    }
+                    _Move = new Vector3(_input_vector.x,_Move.y,_input_vector.y);
+                      //Debug.Log(" 1: X: " + _Move.x +"Y: " + _Move.y +"Z: " + _Move.z );
+                      //Debug.Log((_main_camera.forward + " " + _Move.z));
+                     // Debug.Log("test" + _main_camera.forward * _Move.z + _main_camera.right * _Move.x +  new Vector3(0,1,0) * _Move.y);
+                    // _main_camera.for
+                    _Move  = _main_camera.forward * _Move.z + _main_camera.right * _Move.x +  new Vector3(0,1,0) * _Move.y ;
+                      //Debug.Log("2: X: " + _Move.x +"Y: " + _Move.y +"Z: " + _Move.z );
                     //_Move.y = 0f; 
-                    _controller.Move(_Move * Time.deltaTime * _Player_speed);
+                    //_controller.Move(_Move * Time.deltaTime * _Player_speed);
                 }
             }
         }
         private void Gravity(){
-            // _player_velocity.y += _gravity_force * Time.deltaTime;
-            // //_player_velocity.x = _player_velocity.z = 0;
-            // if (player_grounded && _player_velocity.y < 0)
-            //     _player_velocity.y = 0f;
-        
-            // _controller.Move(_player_velocity * Time.deltaTime);
             _Move.y  += _gravity_force * Time.deltaTime;
-            if (player_grounded &&  _Move.y < 0)
-                  _Move.y = 0f;
-        
-             _controller.Move( _Move * Time.deltaTime);
+            if (player_grounded &&  _Move.y < 0){
+                _Move.y = 0f;
+            }
         }
         private void Jump(){
             if(player_grounded && !player_crouching){
                 if(_timer_between_landing_next_jump >= 0.0f)
                     _timer_between_landing_next_jump -= Time.deltaTime;
-
                 if (_input_handler.jump_flag && _timer_between_landing_next_jump <=0.0f && _player_statistics.Current_stamina > _jump_stamina_cost){
-                    //_Player_velocity.y += Mathf.Sqrt(_jump_height * -2.0f * _gravity_force); // in theory should take care speed to jump higher - very high jumpo at stairs - not sure how it works
-                    //_player_velocity = _Move;
                     _player_statistics.Take_stamina(_jump_stamina_cost);
-
-                    //_player_velocity.y = Mathf.Sqrt(_jump_height * -2.0f * _gravity_force);
-                    //_controller.Move(_player_velocity * Time.deltaTime);
                     _Move.y = Mathf.Sqrt(_jump_height * -2.0f * _gravity_force);
-                    _controller.Move(_Move * Time.deltaTime);
                 }
-            // Debug.Log("X: " + move.x +"Y: " + _Player_velocity.y +"Z: " + move.z );
-            // _controller.Move(new Vector3(move.x,_Player_velocity.y,move.z) * Time.deltaTime * _Player_speed);
             }
             else{
                 _timer_between_landing_next_jump = _time_between_jumps;
@@ -675,6 +664,16 @@ namespace Player_Movemnet{
                 _controller.height = 1.78f;
                 _controller.center = (new Vector3(0,0.9f,0));
             }
+        }
+        public void Move_controller(){
+            if(_animator.GetBool("Movement_driven_by_animation"))
+                return ;
+            Vector3 move_player;
+            if(player_grounded)
+                move_player = new Vector3(_Move.x * _player_speed,_Move.y,_Move.z * _player_speed);
+            else
+                move_player = new Vector3(_Move.x * _player_speed/2,_Move.y,_Move.z * _player_speed/2);  
+            _controller.Move(move_player * Time.deltaTime);
         }        
         private void Ground_check(){
             // player_grounded = _controller.isGrounded; // buggy as fuck
@@ -695,8 +694,8 @@ namespace Player_Movemnet{
             _player_hit_ceiling = Physics.CheckSphere(Sphere_position,_grounded_check_radious,_ground_ceiling_layer,QueryTriggerInteraction.Ignore);
             if(!player_grounded && _player_hit_ceiling){
                Debug.Log("Player hit ceiling" + _controller.velocity );
-                if(_player_velocity.y > 0)
-                    _player_velocity.y = -0.4f;
+                if(_Move.y > 0)
+                    _Move.y = -0.4f;
             }
         }
         private void Rotate_player(){

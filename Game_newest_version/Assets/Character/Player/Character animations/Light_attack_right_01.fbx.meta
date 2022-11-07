@@ -5,7 +5,7 @@ ModelImporter:
   internalIDToNameTable:
   - first:
       74: -2758760756837685486
-    second: Light_attack_right
+    second: Light_attack_right_01
   externalObjects: {}
   materials:
     materialImportMode: 2
@@ -21,7 +21,10 @@ ModelImporter:
     rigImportErrors: 
     rigImportWarnings: 
     animationImportErrors: 
-    animationImportWarnings: 
+    animationImportWarnings: "\nClip 'light_attack_right' has import animation warnings
+      that might lower retargeting quality:\nNote: Activate translation DOF on avatar
+      to improve retargeting quality.\n\t'Chest' is inbetween humanoid transforms
+      and has rotation animation that will be discarded.\n"
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
     importAnimatedCustomProperties: 0
@@ -35,7 +38,7 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Light_attack_right
+      name: Light_attack_right_01
       takeName: light_attack_right
       internalID: 0
       firstFrame: 0
@@ -51,9 +54,9 @@ ModelImporter:
       loopBlendOrientation: 1
       loopBlendPositionY: 1
       loopBlendPositionXZ: 0
-      keepOriginalOrientation: 0
+      keepOriginalOrientation: 1
       keepOriginalPositionY: 1
-      keepOriginalPositionXZ: 0
+      keepOriginalPositionXZ: 1
       heightFromFeet: 0
       mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
@@ -379,22 +382,19 @@ ModelImporter:
         value: {x: 0, y: 0, z: 0}
         length: 0
         modified: 0
-    - boneName: Chest
-      humanName: Chest
-      limit:
-        min: {x: 0, y: 0, z: 0}
-        max: {x: 0, y: 0, z: 0}
-        value: {x: 0, y: 0, z: 0}
-        length: 0
-        modified: 0
     skeleton:
-    - name: Attack_right(Clone)
+    - name: Light_attack_right_01(Clone)
       parentName: 
+      position: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Armature
+      parentName: Light_attack_right_01(Clone)
       position: {x: -0, y: 0, z: 0}
       rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
       scale: {x: 100, y: 100, z: 100}
     - name: Hips
-      parentName: Attack_right(Clone)
+      parentName: Armature
       position: {x: -9.757083e-13, y: 0.00024906194, z: 0.008058997}
       rotation: {x: 0.7232365, y: 0.00000007121509, z: 0.000000074580534, w: 0.69060045}
       scale: {x: 1, y: 0.9999999, z: 0.9999999}
@@ -574,7 +574,7 @@ ModelImporter:
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Leg IK.L
-      parentName: Attack_right(Clone)
+      parentName: Armature
       position: {x: -0.0012286417, y: -0.0017215487, z: 0.0007612986}
       rotation: {x: 0.0000000022086108, y: 0.99996287, z: -0.008619729, w: -0.00000013318204}
       scale: {x: 1, y: 1.0000002, z: 0.99999994}
@@ -584,7 +584,7 @@ ModelImporter:
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Pull Target.L
-      parentName: Attack_right(Clone)
+      parentName: Armature
       position: {x: -0.0011228817, y: -0.004168174, z: 0.0049868682}
       rotation: {x: 0.99997973, y: -0.0000000880874, z: -0.000013823044, w: 0.0063723694}
       scale: {x: 1, y: 0.9999999, z: 1}
@@ -594,7 +594,7 @@ ModelImporter:
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Leg IK.R
-      parentName: Attack_right(Clone)
+      parentName: Armature
       position: {x: 0.0017558709, y: 0.0020381333, z: 0.0010726249}
       rotation: {x: -0.00000006386294, y: 0.958813, z: 0.28403807, w: -0.00000015779673}
       scale: {x: 1, y: 1, z: 0.99999994}
@@ -604,7 +604,7 @@ ModelImporter:
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Pull Target.R
-      parentName: Attack_right(Clone)
+      parentName: Armature
       position: {x: 0.0068668905, y: -0.0019917942, z: 0.004123648}
       rotation: {x: 0.99997973, y: -0.0000000880874, z: -0.000013823044, w: 0.0063723694}
       scale: {x: 1, y: 0.9999999, z: 1}
@@ -623,7 +623,7 @@ ModelImporter:
     globalScale: 1
     rootMotionBoneName: 
     hasTranslationDoF: 0
-    hasExtraRoot: 0
+    hasExtraRoot: 1
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
   autoGenerateAvatarMappingIfUnspecified: 1

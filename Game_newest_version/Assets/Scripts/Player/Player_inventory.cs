@@ -8,7 +8,7 @@ using Cinemachine;
 namespace Player_inventory_info{
     public class Player_inventory : MonoBehaviour{
         //for tests
-        // public Item_info.Item item_to_add;
+         public Item_info.Item item_to_add;
         // public Item_info.Item material_to_add;
         // public Item_info.Item material_to_add2;
 
@@ -44,7 +44,7 @@ namespace Player_inventory_info{
         }
         private void Start() {
             //just for testing
-            // _inventories.Add_item_to_player_inv_last_slot(item_to_add,1);
+             _inventories.Add_item_to_player_inv_last_slot(item_to_add,1);
             // //_inventories.Add_item_to_player_inv_last_slot(item_to_add,5);
             // _inventories.Add_item_to_player_inv_last_slot(material_to_add,4);
             // // _inventories.Add_item_to_player_inv_last_slot(material_to_add2,3);

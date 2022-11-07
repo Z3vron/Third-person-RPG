@@ -10,6 +10,8 @@ public class Bush_contents : MonoBehaviour{
 
   private int _max_amount_of_berry;
   private float _timer;
+  [SerializeField] private GameObject berry_in_bush_representation;
+ 
   private void Start() {
     _max_amount_of_berry = amount_of_berry;
   }
@@ -19,7 +21,12 @@ public class Bush_contents : MonoBehaviour{
       if(_timer >= time_to_respawn_new_berries){
         amount_of_berry = _max_amount_of_berry;
         _timer = 0f;
+        if(!berry_in_bush_representation.activeSelf)
+          berry_in_bush_representation.SetActive(true);
       }
     }
+    if(amount_of_berry == 0)
+      berry_in_bush_representation.SetActive(false);
+
   }
 }

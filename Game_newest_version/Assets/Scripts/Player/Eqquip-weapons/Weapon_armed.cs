@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Weapon_holder{
     public class Weapon_armed : MonoBehaviour{
 
-        public float weapon_scale_factor;
+        //public float weapon_scale_factor;
         public Weapon_info.Weapon current_weapon;
         [SerializeField] private  Transform _hand;
         public bool left_hand = false;
@@ -36,7 +36,7 @@ namespace Weapon_holder{
                 current_Weapon_model_instantiated = weapon;
 
                 //set scale so that weapon will look good on diffrent models both player and enemy
-                current_Weapon_model_instantiated.transform.localScale = new Vector3(current_Weapon_model_instantiated.transform.localScale.x/weapon_scale_factor,current_Weapon_model_instantiated.transform.localScale.y/weapon_scale_factor,current_Weapon_model_instantiated.transform.localScale.z/weapon_scale_factor);
+                //current_Weapon_model_instantiated.transform.localScale = new Vector3(current_Weapon_model_instantiated.transform.localScale.x/weapon_scale_factor,current_Weapon_model_instantiated.transform.localScale.y/weapon_scale_factor,current_Weapon_model_instantiated.transform.localScale.z/weapon_scale_factor);
             }
         }
         public void Unequip_weapon(){

@@ -4,25 +4,19 @@ using UnityEngine;
 
 public class Change_transform : MonoBehaviour
 {
-    public Transform character_direction;
-    public Transform animation_transform;
-    private Vector3 _move;
-    private CharacterController _cotroller;
+    private CharacterController _controller;
+    private Animator _animator;
 
     private void Start() {
-        _cotroller = GetComponent<CharacterController>();
+        _controller = GetComponentInParent<CharacterController>();
+        _animator = GetComponent<Animator>();
     }
-    private void Update() {
-        if(GetComponentInChildren<Animator>().GetBool("Movement_driven_by_animation")){
-            _move = new Vector3(animation_transform.localPosition.x,0,animation_transform.localPosition.z);
-            _move = _move.z * character_direction.forward + _move.x * character_direction.right;;
-           // Debug.Log("Moving player: " + _move.x + _move.y + _move.z);
-            _cotroller.Move(_move);
-        //     Player_transform.localPosition += Animation_transform.transform.localPosition;
-        //    Animation_transform.transform.localPosition = new Vector3(0,0,0);
-           //Debug.Log("Position:" + Animation_transform.transform.localPosition);
+    private void OnAnimatorMove() {
+        if(_animator.GetBool("Movement_driven_by_animation")){
+            Debug.Log("test");
+            Vector3 velocity = _animator.deltaPosition;
+            velocity.y = 0;
+            _controller.Move(velocity);
         }
-        animation_transform.localPosition = new Vector3(0,0,0);
-        animation_transform.localRotation = new Quaternion(0,0,0,0);
     }
 }

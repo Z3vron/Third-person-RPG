@@ -111,13 +111,17 @@ namespace Attack{
                   
             }
             else if (_Is_in_air){
-                Debug.Log("Light air attack was performed");
+                animator.CrossFadeInFixedTime("Override.Air_attack_01",0f,1);
+                //Debug.Log("Light air attack was performed");
             }
         }
         public void Handle_heavy_attack(){
             attack_durability_cost = 2;
             if(_player_inventory.current_weapon_for_right_hand != _player_inventory.unarmed && _player_inventory.current_weapon_for_left_hand == _player_inventory.unarmed){
                 Start_right_heavy_attack();
+            }
+            else if(_player_inventory.current_weapon_for_left_hand != _player_inventory.unarmed && _player_inventory.current_weapon_for_right_hand == _player_inventory.unarmed){
+                Start_left_heavy_attack();
             }
                 
             //Debug.Log("Strong ground attack was performed");
@@ -142,7 +146,7 @@ namespace Attack{
             else{
                 animator.SetFloat("Attack_speed_multiplayer",1);
             }
-            animator.CrossFadeInFixedTime("Override.Light_attack_left",0f,1);
+            animator.CrossFadeInFixedTime("Override.Light_attack_left_02",0f,1);
             _player_stats.Take_stamina(_player_inventory.current_weapon_for_left_hand.light_attack_stamina_cost);
         }
         public void Start_right_light_attack(){
@@ -157,10 +161,10 @@ namespace Attack{
             else{
                 animator.SetFloat("Attack_speed_multiplayer",1);
             }
-            animator.CrossFadeInFixedTime("Override.Light_attack_right",0f,1);
+            animator.CrossFadeInFixedTime("Override.Light_attack_right_01",0f,1);
             _player_stats.Take_stamina(_player_inventory.current_weapon_for_right_hand.light_attack_stamina_cost);
         }
-         public void Start_right_heavy_attack(){
+        public void Start_right_heavy_attack(){
             if(_player_inventory.current_weapon_for_right_hand is Dagger){
                 Dagger dagger = (Dagger)_player_inventory.current_weapon_for_right_hand;
                 animator.SetFloat("Attack_speed_multiplayer",dagger.attack_speed_multiplayer);
@@ -174,6 +178,21 @@ namespace Attack{
             }
             animator.CrossFadeInFixedTime("Override.Strong_attack_right",0f,1);
             _player_stats.Take_stamina(_player_inventory.current_weapon_for_right_hand.strong_attack_stamina_cost);
+        }
+        public void Start_left_heavy_attack(){
+            if(_player_inventory.current_weapon_for_left_hand is Dagger){
+                Dagger dagger = (Dagger)_player_inventory.current_weapon_for_left_hand;
+                animator.SetFloat("Attack_speed_multiplayer",dagger.attack_speed_multiplayer);
+            }
+            else if(_player_inventory.current_weapon_for_left_hand is Rapier){
+                Rapier rapier = (Rapier)_player_inventory.current_weapon_for_left_hand;
+                animator.SetFloat("Attack_speed_multiplayer",rapier.attack_speed_multiplayer);
+            }
+            else{
+                animator.SetFloat("Attack_speed_multiplayer",1);
+            }
+            animator.CrossFadeInFixedTime("Override.Strong_attack_left",0f,1);
+            _player_stats.Take_stamina(_player_inventory.current_weapon_for_left_hand.strong_attack_stamina_cost);
         }
     }
 
