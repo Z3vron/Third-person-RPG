@@ -20,11 +20,13 @@ namespace Weapon_info{
         public float Light_attack_damage;
         public float Strong_attack_damage;
         public float combo_dmg_bonus;
+        public float air_attack_damage;
 
         [Header("Stamina costs")]
         public float light_attack_stamina_cost;
         public float strong_attack_stamina_cost;
         public float combo_attack_stamina_cost;
+        public float air_attack_stamina_cost;
        
         public void Remove_durability(float durability_value_to_remove){
             durability -= durability_value_to_remove/material_toughness;

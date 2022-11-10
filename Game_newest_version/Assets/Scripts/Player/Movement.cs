@@ -57,7 +57,6 @@ using Cinemachine;
 
 namespace Player_Movemnet{
 
-   
     [RequireComponent(typeof(CharacterController))]
     public class Movement : MonoBehaviour
     {
@@ -547,6 +546,9 @@ namespace Player_Movemnet{
                 else if(_input_handler.attack_special_flag){
                     _handle_attacks.Handle_special_attack();
                 }
+                else if(_input_handler.attack_air_flag){
+                    _handle_attacks.Handle_air_special_attack();
+                }
         }
         private void Move_player(){
             _input_vector = _input_handler.walk_input;
@@ -804,7 +806,7 @@ namespace Player_Movemnet{
             }
         }
         public bool Is_enemy_to_lock_on_visible(GameObject potential_enemy_to_lock_on){
-            private RaycastHit _hit;
+            RaycastHit _hit;
             if(Physics.Linecast(transform.position,potential_enemy_to_lock_on.transform.position, out _hit)){
                 //Debug.DrawLine(transform.position,_closest_enemy.transform.position);
                 if(_hit.transform.gameObject.layer == _environment_layer )
@@ -842,6 +844,7 @@ namespace Player_Movemnet{
                 _input_handler.attack_light_flag = false;
                 _input_handler.attack_strong_performed_flag = false;
                 _input_handler.attack_special_flag = false;
+                _input_handler.attack_air_flag = false;
                 _input_handler.attack_combo_flag = false;
                 _input_handler.inventory_flag = false;
                 _input_handler.attack_strong_canceled_flag = false;

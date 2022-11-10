@@ -24,6 +24,7 @@ public class Input_handler : MonoBehaviour
         public bool attack_strong_performed_flag;
         public bool attack_special_flag;
         public bool attack_combo_flag;
+        public bool attack_air_flag;
         public bool attack_strong_canceled_flag;
         public bool lock_on_flag;
         public bool switch_flag;
@@ -36,6 +37,7 @@ public class Input_handler : MonoBehaviour
         private InputAction _attack_1_action;
         private InputAction _attack_2_action;
         private InputAction _attack_3_action;
+        private InputAction _attack_air_action;
         private InputAction _interact_action;
         private InputAction _crouch_action;
         private InputAction _weapon_left_action;
@@ -95,6 +97,7 @@ public class Input_handler : MonoBehaviour
         _attack_1_action = _player_input.actions["Light_attack"];
         _attack_2_action = _player_input.actions["Strong_attack"];
         _attack_3_action = _player_input.actions["Special_attack"];
+        _attack_air_action = _player_input.actions["Air_attack"];
         _interact_action = _player_input.actions["Interact"];
         _crouch_action  = _player_input.actions["Crouch"];
         _weapon_left_action = _player_input.actions["Weapon_left"];
@@ -163,6 +166,7 @@ public class Input_handler : MonoBehaviour
         }
         if(_attack_3_action.triggered)               attack_special_flag = true;{}
         if(_combo_attack_action.triggered)           attack_combo_flag = true;{}
+        if(_attack_air_action.triggered)             attack_air_flag = true;{}
         walk_input = _walk_action.ReadValue<Vector2>();
        
         //Inventory action map

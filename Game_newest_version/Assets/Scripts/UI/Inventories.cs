@@ -583,8 +583,8 @@ public class Inventories : MonoBehaviour{
                 Choose_which_inventory_type_slot(_inv_slots_backup[_slot_number_item_info]);
                 if(added_all_items){
                     _player_inventory.Remove_item_from_player_inv(_slot_selected);
-                    Move_slots_to_left_inv(_inv_slots[_slot_number_item_info],object_inv_to_show.amount_of_item_slots);
                     Show_items_add_rem_from_inv_window_pop_up(false,_inv_slots[_slot_number_item_info].item,_inv_slots[_slot_number_item_info].stack_amount);
+                    Move_slots_to_left_inv(_inv_slots[_slot_number_item_info],object_inv_to_show.amount_of_item_slots);
                 }
                 else{
                     _inv_slots[_slot_number_item_info].stack_amount = remaining_item_amount;
@@ -596,9 +596,9 @@ public class Inventories : MonoBehaviour{
                 Add_item_to_player_inv_check_for_same_object(_inv_slots[_slot_number_item_info].item,_inv_slots[_slot_number_item_info].stack_amount);
                 Choose_which_inventory_type_slot(_obj_inv_slots.obj_inv_items_slots[_slot_number_item_info]);
                 if(added_all_items){
-                    object_inv_to_show.Remove_item_from_object(_slot_number_item_info);
-                    Move_slots_to_left_inv(_inv_slots[_slot_number_item_info],object_inv_to_show.amount_of_item_slots);
+                    object_inv_to_show.Remove_item_from_object(_slot_number_item_info); 
                     Show_items_add_rem_from_inv_window_pop_up(true,_inv_slots[_slot_number_item_info].item,_inv_slots[_slot_number_item_info].stack_amount);
+                    Move_slots_to_left_inv(_inv_slots[_slot_number_item_info],object_inv_to_show.amount_of_item_slots);
                 }
                 else{
                     _inv_slots[_slot_number_item_info].stack_amount = remaining_item_amount;
