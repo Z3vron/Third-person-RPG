@@ -11,53 +11,87 @@ public class Inventories : MonoBehaviour{
     public Interactable_objects object_inv_to_show;
     public bool added_all_items;
     public int remaining_item_amount;
-    public Player_slots player_slots;
+
 
 
     [SerializeField] private  GameObject _moving_icon;
-    [SerializeField] private Input_handler _input_handler;
-    [SerializeField] private Player_inventory_info.Player_inventory _player_inventory;
-    [SerializeField] private GameObject _instance_item_info_prefab_model;  
-    [SerializeField] private GameObject _item_option_menu_prefab;
-    [SerializeField] private GameObject _item_creation_menu_prefab;
-    [SerializeField] private Rigidbody _item_dropped_prefab;
-    [SerializeField] private Transform _root_for_drop_items;
-    [SerializeField] private float _dropp_items_force = 200;
-    [SerializeField] private Object_inventory_slots _obj_inv_slots;
-    [SerializeField] private Object_inventory_slots _creation_inv_slots;
-    [SerializeField] private Creation_inv _creation_inv;
-    [SerializeField] private Inventory_slots _player_inventory_slots;
-    [SerializeField] private GameObject _crafting_menu;
-    [SerializeField] private GameObject _player_inventory_menu;
-    [SerializeField] private GameObject _inventory_buttons;
-    [SerializeField] private GameObject _input_field_prefab;
+    #region Other scripts and components references
+        [Header("Other scripts and components references")]
+        public Player_slots player_slots;
+        [SerializeField] private Input_handler _input_handler;
+        [SerializeField] private Player_inventory_info.Player_inventory _player_inventory;
+        [Tooltip("Holds both list of images and list of Slots for the object UI inventory, that player is interacting with")
+        [SerializeField] private Object_inventory_slots _obj_inv_slots;
+        [Tooltip("Holds both list of images and list of Slots for the items creation UI inventory")
+        [SerializeField] private Object_inventory_slots _creation_inv_slots;
+        [Tooltip("Holds both list of images and list of Slots for all type(rows) of items that could be stored in player inventory")]
+        [SerializeField] private Inventory_slots _player_inventory_slots;
+        [Tooltip("Holds list of images for the current type(row) of item that operation is made on in player info")]
+        private List <Image>  _inv_slots_images = new List<Image>();
+        [Tooltip("Holds list of Slots for the current type(row) of item that operation is made on in player info")]
+        private List <Slot> _inv_slots = new List<Slot>();
+    #endregion
+    #region Item dropped variables
+        [Header("Item dropped variables")]
+        [SerializeField] private Rigidbody _item_dropped_prefab;
+        [SerializeField] private Transform _root_for_drop_items;
+        [SerializeField] private float _dropp_items_force = 200;
+    #endregion
+    #region UI elements prefabs
+        [Header("UI elements prefabs")]
+        [SerializeField] private GameObject _item_info_prefab;  
+        [SerializeField] private GameObject _item_option_menu_prefab;
+        [SerializeField] private GameObject _item_creation_menu_prefab;
+        [SerializeField] private GameObject _input_field_prefab;
+    #endregion
+    #region Slots
+        [Header("Slots")]
+        [SerializeField] private Creation_inv _creation_inv;
+        
+    #endregion
+    #region Player inventory and crafting menu with buttons to change between them
+        [Header("Player inventory and crafting menu with buttons to change between them")]
+        [SerializeField] private GameObject _crafting_menu;
+        [SerializeField] private GameObject _player_inventory_menu;
+        [SerializeField] private GameObject _inventory_buttons;
+    #endregion
+x
     [SerializeField] private GameObject _items_add_rem_window_pop_up;
     
     
     
-    private int _slot_number_item_info;
-    private float _time_to_show_item_info_elapsed = 0.0f;
-    private bool _start_time = false;
-    private bool _cursor_player_inv;
-    private Slot _slot_selected;
+    
+   
+
+    #region Variables about interaction with inventory
+        private Slot _slot_selected;
+        private Item_info.Item _item_selected;
+        private bool _last_pressed_right;
+        private bool _mouse_on_item = false;
+        private bool _cursor_player_inv;
+        private bool _start_time = false;
+        private bool _item_derivative;
+        private float _time_to_show_item_info_elapsed = 0.0f;
+        private int _slot_number_item_info;
+        private int _amount_of_occupied_slots;
+    #endregion
+    
     private PointerEventData _help;
     private bool _help2 = false;
-    private bool _last_pressed_right;
+
     private GraphicRaycaster _graphicRaycaster_inv_slots;
-    private GameObject _instance_item_info;
-    private GameObject _instance_item_option_menu;
-    private GameObject _instance_item_creation_menu;
-    private GameObject _instance_item_creation_amount;
+    #region Instances of objects in inventory - instances of UI elements
+        private GameObject _instance_item_info;
+        private GameObject _instance_item_option_menu;
+        private GameObject _instance_item_creation_menu;
+        private GameObject _instance_item_creation_amount;
+    #endregion
     private TMPro.TMP_Dropdown Items_dropdown_options;
     private GameObject _dropdown_options_title;
     private bool _pressed_outside_dropdown = true;
-    private bool _mouse_on_item = false;
-    private Weapon_info.Weapon _weapon; 
-    private Item_info.Item _item_selected;
-    private int _occupied_slots;
-    private List <Image>  _inv_slots_images = new List<Image>();
-    private List <Slot> _inv_slots = new List<Slot>();
-    bool _item_derivative;
+    
+  
+
 
 
     //create variables for the texts so that i would not get to them by get compnonent in child it 
@@ -172,20 +206,20 @@ public class Inventories : MonoBehaviour{
     public void Move_items_between_player_obj_inv(Slot target_slot,Slot start_slot){
         if(!_cursor_player_inv){
             if(start_slot.item is Weapon_info.Weapon){
-                _occupied_slots = _player_inventory.inventory_weapons_slots.Count;
+                _amount_of_occupied_slots = _player_inventory.inventory_weapons_slots.Count;
             }
             else if(start_slot.item is Materials){
-                _occupied_slots = _player_inventory.inventory_materials_slots.Count;
+                _amount_of_occupied_slots = _player_inventory.inventory_materials_slots.Count;
             }
             else if(start_slot.item is Potions){
-                _occupied_slots = _player_inventory.inventory_potions_slots.Count;
+                _amount_of_occupied_slots = _player_inventory.inventory_potions_slots.Count;
             } 
             else if(start_slot.item is Item_info.Item){
-                _occupied_slots = _player_inventory.inventory_items_slots.Count;
+                _amount_of_occupied_slots = _player_inventory.inventory_items_slots.Count;
             }
         }
         else{
-            _occupied_slots = object_inv_to_show.items_in_object.Count;
+            _amount_of_occupied_slots = object_inv_to_show.items_in_object.Count;
         }
 
         int max_slots_amount;
@@ -194,7 +228,7 @@ public class Inventories : MonoBehaviour{
         else
             max_slots_amount = object_inv_to_show.amount_of_item_slots;
        
-        if(_occupied_slots >  target_slot.slot_number && start_slot.item == target_slot.item && target_slot.item.max_stack_amount > 1  && target_slot.stack_amount < target_slot.max_stack_amount && target_slot.stack_amount <start_slot.item.max_stack_amount  && start_slot.stack_amount <= target_slot.max_stack_amount) {
+        if(_amount_of_occupied_slots >  target_slot.slot_number && start_slot.item == target_slot.item && target_slot.item.max_stack_amount > 1  && target_slot.stack_amount < target_slot.max_stack_amount && target_slot.stack_amount <start_slot.item.max_stack_amount  && start_slot.stack_amount <= target_slot.max_stack_amount) {
             Debug.Log("stack items inv");
             if((target_slot.stack_amount + start_slot.stack_amount) <= target_slot.max_stack_amount && (target_slot.stack_amount + start_slot.stack_amount) <= target_slot.item.max_stack_amount){
                 target_slot.stack_amount += start_slot.stack_amount;
@@ -224,7 +258,7 @@ public class Inventories : MonoBehaviour{
                 }
             }
         }
-        else if (_occupied_slots < max_slots_amount){ 
+        else if (_amount_of_occupied_slots < max_slots_amount){ 
             if(_cursor_player_inv){
                 object_inv_to_show.Add_item_to_object(start_slot.item,start_slot.stack_amount);
                 _obj_inv_slots.obj_inv_items_slots[object_inv_to_show.items_in_object.Count-1].stack_amount += start_slot.stack_amount;
@@ -244,7 +278,7 @@ public class Inventories : MonoBehaviour{
         }
     }
     public void Change_items_in_inv(Slot target_slot,Slot start_slot,bool player_inv){
-        if(_occupied_slots > target_slot.slot_number){
+        if(_amount_of_occupied_slots > target_slot.slot_number){
             //with objects(scriptableobjects) created with creating systyem on the run line below returns false for the same objects because they are copy of the original scriptable objects but they are not the same scriptable object
             //Debug.Log(target_slot.item + " " + start_slot.item + (target_slot.item == start_slot.item));
             //stack items in inventory
@@ -336,14 +370,14 @@ public class Inventories : MonoBehaviour{
         _inv_slots[max_number_of_items-1].item = null;
     }
     public void Move_item_inv(){
-        if(_occupied_slots > _slot_selected.slot_number-1){
+        if(_amount_of_occupied_slots > _slot_selected.slot_number-1){
             _moving_icon.GetComponentInChildren<Image>().sprite = _slot_selected.item.Item_icon;
             _moving_icon.GetComponentInChildren<Image>().enabled = true;
             _moving_icon.GetComponent<RectTransform>().position= new Vector3( _input_handler.mouse_position.x,_input_handler.mouse_position.y,0);
         }
     }
     public void Drop_item_to_slot_inv(){
-        if(_occupied_slots > _slot_selected.slot_number-1){
+        if(_amount_of_occupied_slots > _slot_selected.slot_number-1){
             // Debug.Log("mouse up");
             _moving_icon.GetComponentInChildren<Image>().sprite = null;
             _moving_icon.GetComponentInChildren<Image>().enabled = false;
@@ -576,7 +610,7 @@ public class Inventories : MonoBehaviour{
     }
     private void Transfer_items_to_other_inv(){
         if(_obj_inv_slots.gameObject.activeSelf){
-            if(_cursor_player_inv && _occupied_slots > _slot_number_item_info  ){
+            if(_cursor_player_inv && _amount_of_occupied_slots > _slot_number_item_info  ){
                 //Debug.Log("transfer items from player inv to object inv");
                 List<Slot> _inv_slots_backup = _inv_slots;
                 Add_item_to_obj_inv_check_for_same_object(_inv_slots[_slot_number_item_info].item,_inv_slots[_slot_number_item_info].stack_amount);
@@ -591,7 +625,7 @@ public class Inventories : MonoBehaviour{
                     Show_items_add_rem_from_inv_window_pop_up(false,_inv_slots[_slot_number_item_info].item,remaining_item_amount);
                 }
             }
-            else if (!_cursor_player_inv && _occupied_slots > _slot_number_item_info){
+            else if (!_cursor_player_inv && _amount_of_occupied_slots > _slot_number_item_info){
                 //Debug.Log("transfer items from obj inv to player inv");
                 Add_item_to_player_inv_check_for_same_object(_inv_slots[_slot_number_item_info].item,_inv_slots[_slot_number_item_info].stack_amount);
                 Choose_which_inventory_type_slot(_obj_inv_slots.obj_inv_items_slots[_slot_number_item_info]);
@@ -632,32 +666,32 @@ public class Inventories : MonoBehaviour{
         if(_cursor_player_inv){
 
             if(_item_selected is Weapon_info.Weapon){
-                _occupied_slots = _player_inventory.inventory_weapons_slots.Count;
+                _amount_of_occupied_slots = _player_inventory.inventory_weapons_slots.Count;
                 _inv_slots_images = _player_inventory_slots.inventory_weapons_images_slots;
                 _inv_slots = _player_inventory_slots.inventory_weapons_slots;
             }
             else if(_item_selected is Materials){
-                _occupied_slots = _player_inventory.inventory_materials_slots.Count;
+                _amount_of_occupied_slots = _player_inventory.inventory_materials_slots.Count;
                 _inv_slots_images = _player_inventory_slots.inventory_materials_images_slots;
                 _inv_slots = _player_inventory_slots.inventory_materials_slots;
             }
             else if(_item_selected is Potions){
-                _occupied_slots = _player_inventory.inventory_potions_slots.Count;
+                _amount_of_occupied_slots = _player_inventory.inventory_potions_slots.Count;
                 _inv_slots_images = _player_inventory_slots.inventory_potions_images_slots;
                 _inv_slots = _player_inventory_slots.inventory_potions_slots;
             } 
             else if(_item_selected is Item_info.Item){//.GetType().IsAssignableFrom(item_type)){
-                _occupied_slots = _player_inventory.inventory_items_slots.Count;
+                _amount_of_occupied_slots = _player_inventory.inventory_items_slots.Count;
                 _inv_slots_images = _player_inventory_slots.inventory_items_images_slots;
                 _inv_slots = _player_inventory_slots.inventory_items_slots;
             }
             else if(_item_selected is null){
-                //_occupied_slots = 0;
+                //_amount_of_occupied_slots = 0;
             }
         }
         else{
             //Debug.Log("object");
-            _occupied_slots = object_inv_to_show.items_in_object.Count;
+            _amount_of_occupied_slots = object_inv_to_show.items_in_object.Count;
             _inv_slots_images = _obj_inv_slots.obj_inv_items_images_slots;
             _inv_slots = _obj_inv_slots.obj_inv_items_slots;
         }
@@ -674,13 +708,13 @@ public class Inventories : MonoBehaviour{
         _mouse_on_item = false;
         _start_time = false;
         _time_to_show_item_info_elapsed = 0.0f;
-       if(_instance_item_info != null)
+        if(_instance_item_info != null)
            Destroy(_instance_item_info);
     }
     public void Show_item_stats_inv(int slot){
         //use anchors? while playing with maximize on play window with item info tends to change its placce - either on the item slot itslef or way below it 
-        if(_occupied_slots > slot && _item_selected!= null){
-            _instance_item_info = Instantiate(_instance_item_info_prefab_model,_inv_slots_images[slot].transform.parent.transform.position,_inv_slots_images[slot].transform.parent.transform.rotation) as GameObject;
+        if(_amount_of_occupied_slots > slot && _item_selected!= null){
+            _instance_item_info = Instantiate(_item_info_prefab,_inv_slots_images[slot].transform.parent.transform.position,_inv_slots_images[slot].transform.parent.transform.rotation) as GameObject;
             _instance_item_info.transform.SetParent(gameObject.transform);
            _instance_item_info.GetComponent<RectTransform>().localPosition += new Vector3(0,-25,0);
             //_instance_item_info.GetComponent<RectTransform>().anchoredPosition = new Vector2(_inv_slots_images[slot].transform.parent.transform.position.x/1080,_inv_slots_images[slot].transform.parent.transform.position.y/607);
@@ -731,9 +765,9 @@ public class Inventories : MonoBehaviour{
         }    
     }
     public void Show_item_creation_requirements(int slot){
-        _occupied_slots = _creation_inv.recipes_for_items.Count;
+        _amount_of_occupied_slots = _creation_inv.recipes_for_items.Count;
         _slot_number_item_info = slot;
-        if(_occupied_slots > slot){
+        if(_amount_of_occupied_slots > slot){
             _item_selected = _creation_inv.recipes_for_items[slot].item_to_create;
             _inv_slots_images = _creation_inv_slots.obj_inv_items_images_slots;
             Show_item_stats_inv(slot);
@@ -766,7 +800,7 @@ public class Inventories : MonoBehaviour{
             if(_instance_item_option_menu != null)
                 Destroy(_instance_item_option_menu);
             Reset_timer();
-            if(_occupied_slots > slot){
+            if(_amount_of_occupied_slots > slot){
                 _instance_item_option_menu = Instantiate(_item_option_menu_prefab,_inv_slots_images[slot].transform.parent.transform.position,_inv_slots_images[slot].transform.parent.transform.rotation) as GameObject;
                 _instance_item_option_menu.transform.SetParent(gameObject.transform);
                 _instance_item_option_menu.GetComponent<RectTransform>().localPosition += new Vector3(0,-45,0);
@@ -911,7 +945,7 @@ public class Inventories : MonoBehaviour{
         _pressed_outside_dropdown = true;
     }
     public void Use_item_from_inv(){
-        if(_occupied_slots > _slot_number_item_info ){
+        if(_amount_of_occupied_slots > _slot_number_item_info ){
             if(_inv_slots[_slot_number_item_info].item is Health_potion || _inv_slots[_slot_number_item_info].item is Berries){
                 if(_inv_slots[_slot_number_item_info].item is Health_potion){
                     Health_potion health_potion;
@@ -967,11 +1001,11 @@ public class Inventories : MonoBehaviour{
     }
     public void Split_one_item_from_inv_stack(int slot){
         if(_slot_selected.stack_amount >1){
-            if(_cursor_player_inv && _occupied_slots < _player_inventory.amount_of_items_slots){
+            if(_cursor_player_inv && _amount_of_occupied_slots < _player_inventory.amount_of_items_slots){
                 Add_item_to_player_inv_last_slot(_item_selected,1);
                 _slot_selected.stack_amount -= 1;
             }         
-            else if(!_cursor_player_inv && _occupied_slots < object_inv_to_show.amount_of_item_slots){
+            else if(!_cursor_player_inv && _amount_of_occupied_slots < object_inv_to_show.amount_of_item_slots){
                 object_inv_to_show.Add_item_to_object(object_inv_to_show.items_in_object[slot],1);
                 _slot_selected.stack_amount -= 1;
                 _obj_inv_slots.obj_inv_items_slots[object_inv_to_show.items_in_object.Count-1].item = _item_selected;
@@ -983,11 +1017,11 @@ public class Inventories : MonoBehaviour{
     }
     public void Split_items_in_half_inv_stack(int slot){
         if( _slot_selected.stack_amount >1){
-            if(_cursor_player_inv && _occupied_slots < _player_inventory.amount_of_items_slots){
+            if(_cursor_player_inv && _amount_of_occupied_slots < _player_inventory.amount_of_items_slots){
                 Add_item_to_player_inv_last_slot(_item_selected,_slot_selected.stack_amount/2);
                 _slot_selected.stack_amount -= _slot_selected.stack_amount/2;
             }
-             else if(!_cursor_player_inv && _occupied_slots < object_inv_to_show.amount_of_item_slots){
+             else if(!_cursor_player_inv && _amount_of_occupied_slots < object_inv_to_show.amount_of_item_slots){
                 object_inv_to_show.Add_item_to_object(_item_selected,_slot_selected.stack_amount/2);
                 
                 _obj_inv_slots.obj_inv_items_slots[object_inv_to_show.items_in_object.Count-1].item = _item_selected;
@@ -1223,11 +1257,11 @@ public class Inventories : MonoBehaviour{
     public void Add_item_to_obj_inv_check_for_same_object(Item_info.Item item,int stack_amount){
         added_all_items = false;
         
-        _occupied_slots = object_inv_to_show.items_in_object.Count;
+        _amount_of_occupied_slots = object_inv_to_show.items_in_object.Count;
         _inv_slots = _obj_inv_slots.obj_inv_items_slots;
         
     
-        for(int i=0;i<_occupied_slots;i++){
+        for(int i=0;i<_amount_of_occupied_slots;i++){
             if(_inv_slots[i].item.item_id == item.item_id && _inv_slots[i].stack_amount < _inv_slots[i].max_stack_amount && _inv_slots[i].stack_amount < _inv_slots[i].item.max_stack_amount ){
                 //stack items
                 if(_inv_slots[i].stack_amount + stack_amount <= _inv_slots[i].max_stack_amount && _inv_slots[i].stack_amount + stack_amount <= _inv_slots[i].item.max_stack_amount){
@@ -1264,22 +1298,22 @@ public class Inventories : MonoBehaviour{
         added_all_items = false;
         
         if(item is Weapon_info.Weapon){
-            _occupied_slots = _player_inventory.inventory_weapons_slots.Count;
+            _amount_of_occupied_slots = _player_inventory.inventory_weapons_slots.Count;
             _inv_slots = _player_inventory_slots.inventory_weapons_slots;
         }
         else if(item  is Materials ){
-            _occupied_slots = _player_inventory.inventory_materials_slots.Count;
+            _amount_of_occupied_slots = _player_inventory.inventory_materials_slots.Count;
             _inv_slots = _player_inventory_slots.inventory_materials_slots;
         }
         else if(item is Potions){
-            _occupied_slots = _player_inventory.inventory_potions_slots.Count;
+            _amount_of_occupied_slots = _player_inventory.inventory_potions_slots.Count;
             _inv_slots = _player_inventory_slots.inventory_potions_slots;
         }
         else{
-            _occupied_slots = _player_inventory.inventory_items_slots.Count;
+            _amount_of_occupied_slots = _player_inventory.inventory_items_slots.Count;
             _inv_slots = _player_inventory_slots.inventory_items_slots;
         }
-        for(int i=0;i<_occupied_slots;i++){
+        for(int i=0;i<_amount_of_occupied_slots;i++){
             if(_inv_slots[i].item.item_id == item.item_id && _inv_slots[i].stack_amount < _inv_slots[i].max_stack_amount && _inv_slots[i].stack_amount < _inv_slots[i].item.max_stack_amount ){
                 //stack items
                 if(_inv_slots[i].stack_amount + stack_amount <= _inv_slots[i].max_stack_amount && _inv_slots[i].stack_amount + stack_amount <= _inv_slots[i].item.max_stack_amount){
