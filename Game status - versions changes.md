@@ -8,7 +8,7 @@ Think about
 - Think on Gc - could use struct rather than classes because struct doesn't create as mach garbage especially when i need container for simple type of data,for simple data eg. no arrayes,lists etc structs should be better, need to check profiler for the Garbage collector allocation, need to check If scriptable objects create garbage - where they are alocated
 - Addidng strings create small amount on garbage - i am not using it every frame but might be an option to change in the future
 - Debug.log creates lots of garbage ok while working on the game but before building game delete/comment all debug.log lines
-- Think on reusing objects
+- Think on reusing objects specially UI elemetns right now i create new instances of original prefab and later destroy them but i could turn on prefab in new desired position then i would need to reset prefab to riginal form
 - Use get-set (for example get returns value and sets change it if condition was met)
 - Move checking input flags from movement script to input handler - earlier there was a problem with it but i dont remember what was it 
 - Work on and reduce lines in code about transfering items i have separate function that calls others (i use it in the shortcut and item option) but i also have old code that i use for the tranfer while dragging item with mouse - there are some diffrence i think but I'm not sure - need to thoroughly read code and delete one part
