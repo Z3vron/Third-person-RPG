@@ -561,7 +561,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Strong_attack_right
+  m_Name: Heavy_attack_right_01
   m_Speed: 0.75
   m_CycleOffset: 0
   m_Transitions:
@@ -1869,7 +1869,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Strong_attack_left
+  m_Name: Heavy_attack_left_01
   m_Speed: 0.75
   m_CycleOffset: 0
   m_Transitions:
@@ -3015,7 +3015,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: -203655887218126122, guid: c900deacdabbf654499f34ac3d03b830, type: 3}
+  m_Motion: {fileID: -203655887218126122, guid: ca1a5c23bf6f3594fa5e9c2076b26b63, type: 3}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 

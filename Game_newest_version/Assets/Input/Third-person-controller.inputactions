@@ -51,6 +51,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "Air_attack",
+                    "type": "Button",
+                    "id": "90c4c75a-8a8d-46b3-841a-d36cc8d60619",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "Jump",
                     "type": "Button",
                     "id": "e3b4f8fa-f2fe-492c-a2ad-83bc372dbb09",
@@ -644,6 +653,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Fourth_potion",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "aaab6a1e-c9cf-430f-9a6c-7cdfa17c78d2",
+                    "path": "<Keyboard>/z",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Air_attack",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

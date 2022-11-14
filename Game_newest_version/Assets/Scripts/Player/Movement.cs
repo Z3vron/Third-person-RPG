@@ -67,7 +67,7 @@ namespace Player_Movemnet{
             [Header("Player movement flags")]
             public bool player_grounded = false;
             public bool player_crouching = false;
-            public bool player_hit_ceiling = false;  
+            public bool player_hit_ceiling = false;
         #endregion
         // public bool Door_touched = false; // variable used to control door in another script but I decided to handle it here  - not sure if good habbit but another script would be too simple
         public bool Trap_active = false; 
@@ -220,9 +220,8 @@ namespace Player_Movemnet{
             }
             Gravity();
             Ground_check();
-            Handle_jump_on_top_of_enemy();
             Ceiling_check();
-            if(!_player_info.active_animation){
+            if(!_animator.GetBool("Active_animation")){
                 Equip_items();
                 if(!_player_inventory.inventory_open){
                     Lock_on_enemy();
@@ -234,6 +233,7 @@ namespace Player_Movemnet{
                     Attack();
                     Interact();
                 }
+                Handle_jump_on_top_of_enemy();
                 Move_controller();
             }
             
@@ -552,7 +552,7 @@ namespace Player_Movemnet{
         }
         private void Move_player(){
             _input_vector = _input_handler.walk_input;
-            if(_player_info.locked_on_enemy && _animator.GetBool("Active_animation") == false){
+            if(_player_info.locked_on_enemy && ! _animator.GetBool("Active_animation")){
                 //Debug.Log(_animator.GetBool("Active_animation") + "combat movement");
                 _animator.SetBool("Combat_movement",true);
                 if(_input_vector == Vector2.zero){
@@ -577,7 +577,7 @@ namespace Player_Movemnet{
             }
             else{
                 _animator.SetBool("Combat_movement",false);
-                if(player_grounded){
+                //if(player_grounded){
                     //_controller.velocity to work properly requires only one _controller.move - tried to combine gravity,jump and mve into one but 
                     _player_speed = new Vector3 (_controller.velocity.x,0.0f,_controller.velocity.z).magnitude;    
                     if(player_crouching){
@@ -605,15 +605,8 @@ namespace Player_Movemnet{
                         _player_speed = _player_target_speed;
                     }
                     _Move = new Vector3(_input_vector.x,_Move.y,_input_vector.y);
-                      //Debug.Log(" 1: X: " + _Move.x +"Y: " + _Move.y +"Z: " + _Move.z );
-                      //Debug.Log((_main_camera.forward + " " + _Move.z));
-                     // Debug.Log("test" + _main_camera.forward * _Move.z + _main_camera.right * _Move.x +  new Vector3(0,1,0) * _Move.y);
-                    // _main_camera.for
-                    _Move  = _main_camera.forward * _Move.z + _main_camera.right * _Move.x +  new Vector3(0,1,0) * _Move.y ;
-                      //Debug.Log("2: X: " + _Move.x +"Y: " + _Move.y +"Z: " + _Move.z );
-                    //_Move.y = 0f; 
-                    //_controller.Move(_Move * Time.deltaTime * _Player_speed);
-                }
+                    _Move  = Vector3.ProjectOnPlane(_main_camera.forward, Vector3.up).normalized * _Move.z + Vector3.ProjectOnPlane(_main_camera.right, Vector3.up).normalized * _Move.x +  new Vector3(0,1,0) * _Move.y ;
+                //}
             }
         }
         private void Gravity(){
@@ -676,9 +669,9 @@ namespace Player_Movemnet{
         private void Handle_jump_on_top_of_enemy(){
             Vector3 Sphere_position = new Vector3(transform.position.x,transform.position.y + 2 * _grounded_help,transform.position.z);
             if(Physics.CheckSphere(Sphere_position,_grounded_check_radious,128,QueryTriggerInteraction.Ignore)){
-                //Debug.Log("Push player from the top of the enemy");
-                //Vector3 move = new Vector3()
-                _controller.Move( Vector3.back * Time.deltaTime * 4f);
+                _Move.z = -4;
+                _player_speed = 1;
+               
             }
         }   
         private void Ceiling_check(){
@@ -726,6 +719,7 @@ namespace Player_Movemnet{
                     _target_group.AddMember(_closest_enemy.transform,1,2);
                     _player_info.locked_on_enemy = true;
                     _lock_on_camera.SetActive(true);
+                    _Move = Vector3.zero;
                 }
             }
             else if(_input_handler.lock_on_flag && _player_info.locked_on_enemy)
@@ -792,14 +786,12 @@ namespace Player_Movemnet{
         }
         private void Handle_dashes(){
             if(_input_handler.dash_flag && _player_statistics.Current_stamina > _dash_stamina_cost){
-                //Debug.Log(_Move * _dash_speed);
                 if(_input_handler.walk_input.x < 0){
                     _animator.CrossFade("Base Layer.Dash_left",0f,0);
                 }
                 else if(_input_handler.walk_input.x > 0){
                     _animator.CrossFade("Base Layer.Dash_right",0f,0);
-                }
-                    
+                }   
                 else
                     return;
                 _player_statistics.Take_stamina(_dash_stamina_cost);

@@ -15743,6 +15743,10 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: 4ff8366f-c203-496d-906c-a6e92b53adae
     m_ActionName: Inventory/Fourth_potion_inv[/Keyboard/6]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 90c4c75a-8a8d-46b3-841a-d36cc8d60619
+    m_ActionName: Player/Air_attack[/Keyboard/z]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: Keyboard&Mouse
   m_DefaultActionMap: Player
@@ -15778,12 +15782,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a46804df02efad64dbf8868c9206167a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  counter: 0
   dropped_item_new_amount: 0
-  enemies_lock_on: []
   player_grounded: 0
   player_crouching: 0
+  player_hit_ceiling: 0
   Trap_active: 0
+  _touch_force: 80
+  _door_side: 0
   _sprinting_stamina_cost: 1.2
   _jump_stamina_cost: 3
   _dash_stamina_cost: 5
@@ -15795,20 +15800,17 @@ MonoBehaviour:
   _dash_speed: 1.5
   _player_speed: 0
   _player_target_speed: 0
-  _jump_height: 2.5
   _gravity_force: -9.81
+  _jump_height: 2.5
   _time_between_jumps: 0.6
   _timer_between_landing_next_jump: 0
-  _player_hit_ceiling: 0
   _grounded_check_radious: 0.19
   _grounded_help: -0.09
   _ceiling_help: -1.77
-  _active_action: 0
-  _distance_to_interact: 0.9
-  _touch_force: 80
-  _door_side: 0
   _interact_pop_up: {fileID: 1266198146}
   _load_strong_attack_fillbar: {fileID: 845328001}
+  _object_inventory: {fileID: 2017934174}
+  _inventories: {fileID: 150640207}
   _ground_ceiling_layer:
     serializedVersion: 2
     m_Bits: 8
@@ -15818,16 +15820,14 @@ MonoBehaviour:
   _environment_layer:
     serializedVersion: 2
     m_Bits: 8
-  _object_inventory: {fileID: 2017934174}
-  _inventories: {fileID: 150640207}
-  _root_for_shot_raycast: {fileID: 1433371631}
   _free_look_camera: {fileID: 991274433}
   _lock_on_camera: {fileID: 1671373017}
   _target_group: {fileID: 1904238686}
+  _root_for_shot_raycast: {fileID: 1433371631}
   _Move: {x: 0, y: 0, z: 0}
+  enemies_lock_on: []
   trigger_colliders: []
   _collider_to_interact: {fileID: 0}
-  _previous_collider_to_interact: {fileID: 0}
 --- !u!114 &1264486893
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15908,13 +15908,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 210bf65ae4deec04591e0193504663eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  animator: {fileID: 0}
   damage_given_left: 0
   damage_given_right: 0
   attack_durability_cost: 0
   _projectile_prefab_model: {fileID: 6760700617968504323, guid: 89a5da1ed9f72c04794a0d54cdda3ff5, type: 3}
   _root_for_shooting_projectile: {fileID: 1612621402}
   _projectile_speed: 2000
-  animator: {fileID: 0}
+  _player_list_light_attacks:
+  - {fileID: 11400000, guid: 499a6359d01fde744860ffa98d84e40a, type: 2}
+  - {fileID: 11400000, guid: ec0fc3bbcd1a03a45be7b3181ec1ff8c, type: 2}
+  - {fileID: 11400000, guid: 9caab638b89dca24db02d77b5525d88d, type: 2}
+  - {fileID: 11400000, guid: 31a4d97ea4ff4c5439a4193eb979684a, type: 2}
+  _player_list_heavy_attacks:
+  - {fileID: 11400000, guid: 238a0cdb8f8220a4eb200e0abf2b4989, type: 2}
+  - {fileID: 11400000, guid: f5e6e3497ef4c664a9cbbd7aceb52989, type: 2}
+  _player_list_combo_attacks: []
+  _player_list_air_special_attacks: []
 --- !u!114 &1264486898
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15943,6 +15953,7 @@ MonoBehaviour:
   attack_strong_performed_flag: 0
   attack_special_flag: 0
   attack_combo_flag: 0
+  attack_air_flag: 0
   attack_strong_canceled_flag: 0
   lock_on_flag: 0
   switch_flag: 0
@@ -22453,7 +22464,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1920904958}
-  m_LocalRotation: {x: 0.039274182, y: -0.025608728, z: 0.016128983, w: 0.99877006}
+  m_LocalRotation: {x: 0.039274182, y: -0.025608769, z: 0.01612901, w: 0.99877006}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -25567,6 +25578,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5615770495873344493, guid: 90926102a6d84764db613c424a0ff807, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5615770495873344495, guid: 90926102a6d84764db613c424a0ff807, type: 3}
       propertyPath: m_Name
       value: Skeleton_01
@@ -25575,6 +25590,10 @@ PrefabInstance:
       propertyPath: player
       value: 
       objectReference: {fileID: 1264486888}
+    - target: {fileID: 5615770495873344496, guid: 90926102a6d84764db613c424a0ff807, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5615770495873344496, guid: 90926102a6d84764db613c424a0ff807, type: 3}
       propertyPath: _world_canvas
       value: 
@@ -25591,6 +25610,34 @@ PrefabInstance:
       propertyPath: _enemy_attacks.Array.data[0]
       value: 
       objectReference: {fileID: 11400000, guid: c2cad5c6a045fee46a996e17271c777c, type: 2}
+    - target: {fileID: 5615770495873344496, guid: 90926102a6d84764db613c424a0ff807, type: 3}
+      propertyPath: _enemy_attacks.Array.data[1]
+      value: 
+      objectReference: {fileID: 11400000, guid: d00e65eea2e1e2747901dd533517f9f6, type: 2}
+    - target: {fileID: 5615770495873344497, guid: 90926102a6d84764db613c424a0ff807, type: 3}
+      propertyPath: m_Mass
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5615770495873344497, guid: 90926102a6d84764db613c424a0ff807, type: 3}
+      propertyPath: m_IsKinematic
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5615770495873344498, guid: 90926102a6d84764db613c424a0ff807, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5615770495873344499, guid: 90926102a6d84764db613c424a0ff807, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5615770497115700894, guid: 90926102a6d84764db613c424a0ff807, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7330560965583898824, guid: 90926102a6d84764db613c424a0ff807, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: ae5de54ed8f449a4abee0e2eabd8678a, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 90926102a6d84764db613c424a0ff807, type: 3}
 --- !u!1001 &5670158287449516863

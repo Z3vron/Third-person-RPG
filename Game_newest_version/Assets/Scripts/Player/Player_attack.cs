@@ -264,5 +264,4 @@ namespace Attack{
             _player_stats.Take_stamina(_player_inventory.current_weapon_for_left_hand.strong_attack_stamina_cost);
         }
     }
-
 }

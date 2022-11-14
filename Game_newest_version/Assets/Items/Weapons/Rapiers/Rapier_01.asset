@@ -28,8 +28,10 @@ MonoBehaviour:
   Light_attack_damage: 40
   Strong_attack_damage: 50
   combo_dmg_bonus: 15
+  air_attack_damage: 55
   light_attack_stamina_cost: 7
   strong_attack_stamina_cost: 17
   combo_attack_stamina_cost: 20
+  air_attack_stamina_cost: 35
   attack_speed_multiplayer: 1.15
   critical_damage_bonus: 2
