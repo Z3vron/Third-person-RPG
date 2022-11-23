@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   slot_number: 1
   stack_amount: 1
-  max_stack_amount: 10
+  max_stack_amount: 15
   in_inventory: 0
   isRight: 0
   in_obj_inv: 1
-  item: {fileID: 11400000, guid: 9bae07d7315f7c842a6652e2036a56f6, type: 2}
+  item: {fileID: 11400000, guid: 4949f92078708f44a8e78a6c725c3a63, type: 2}

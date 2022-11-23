@@ -20,12 +20,12 @@ public class Inventories : MonoBehaviour{
         public Player_slots player_slots;
         [SerializeField] private Input_handler _input_handler;
         [SerializeField] private Player_inventory_info.Player_inventory _player_inventory;
-        [Tooltip("Holds both list of images and list of Slots for the object UI inventory, that player is interacting with")
+        [Tooltip("Holds both list of images and list of Slots for the object UI inventory, that player is interacting with")]
         [SerializeField] private Object_inventory_slots _obj_inv_slots;
-        [Tooltip("Holds both list of images and list of Slots for the items creation UI inventory")
+        [Tooltip("Holds both list of images and list of Slots for the items creation UI inventory")]
         [SerializeField] private Object_inventory_slots _creation_inv_slots;
         [Tooltip("Holds both list of images and list of Slots for all type(rows) of items that could be stored in player inventory")]
-        [SerializeField] private Inventory_slots _player_inventory_slots;
+        [SerializeField] private Player_inventory_slots _player_inventory_slots;
         [Tooltip("Holds list of images for the current type(row) of item that operation is made on in player info")]
         private List <Image>  _inv_slots_images = new List<Image>();
         [Tooltip("Holds list of Slots for the current type(row) of item that operation is made on in player info")]
@@ -55,14 +55,6 @@ public class Inventories : MonoBehaviour{
         [SerializeField] private GameObject _player_inventory_menu;
         [SerializeField] private GameObject _inventory_buttons;
     #endregion
-x
-    [SerializeField] private GameObject _items_add_rem_window_pop_up;
-    
-    
-    
-    
-   
-
     #region Variables about interaction with inventory
         private Slot _slot_selected;
         private Item_info.Item _item_selected;
@@ -92,7 +84,7 @@ x
     
   
 
-
+    [SerializeField] private GameObject _items_add_rem_window_pop_up;
 
     //create variables for the texts so that i would not get to them by get compnonent in child it 
     private TMPro.TMP_Text _items_add_rem_window_pop_up_text;
@@ -109,7 +101,6 @@ x
         _items_add_rem_window_pop_up_icon = _items_add_rem_window_pop_up.GetComponentInChildren<Image>();
     }
     // watchout for choose which inv function - called on pointer enter - changing some values - be carefull with using 3 variables above their values isn't changing  by add weapons functions but they change originall values 
-    //do automatic stack of same objects whilk transfering items to the object/player inventory, handle situation when transfer item to capped inv - done mouse gives more control - no stack and transfer do auto stack if possible, if inv full than it transfer as much as possible and rest stay at original inv
     public void Check_hits_inv(){
         _item_derivative = false;   
         _help.position = new Vector3( _input_handler.mouse_position.x,_input_handler.mouse_position.y,0);
@@ -117,9 +108,6 @@ x
         _graphicRaycaster_inv_slots.Raycast(_help, results);
 
         foreach(var hit in results){
-            // var item_slot = hit.gameObject.GetComponent<Drop_slot>();
-            // //Debug.Log("hitted something");
-            // if(item_slot){i
             if(hit.gameObject.TryGetComponent(out Drop_slot item_slot)){
                 //started at player inv
                 if(_cursor_player_inv){
@@ -155,7 +143,7 @@ x
                         }
                     }
                     else if(item_slot.slot.in_obj_inv){
-                        Move_items_between_player_obj_inv(item_slot.slot,_slot_selected);
+                        Move_items_to_object_inv(_item_selected,_slot_selected.stack_amount);
                         Choose_which_inventory(false);
                         Choose_which_inventory_type_slot(item_slot.slot);
                         _mouse_on_item = true;
@@ -188,7 +176,7 @@ x
                         if(_slot_selected.item is Materials || _slot_selected.item is Potions || _slot_selected.item is Weapon_info.Weapon || item_slot.slot.item is Materials || item_slot.slot.item is Potions || item_slot.slot.item is Weapon_info.Weapon)
                            _item_derivative = true;
                         if(_slot_selected.item is Materials && (item_slot.slot.item is Materials || item_slot.slot.item is null) || _slot_selected.item is Potions && (item_slot.slot.item is Potions || item_slot.slot.item is null)   || _slot_selected.item is Weapon_info.Weapon && (item_slot.slot.item is Weapon_info.Weapon || item_slot.slot.item is null)  || (_slot_selected.item is Item_info.Item && (item_slot.slot.item is Item_info.Item || item_slot.slot.item is null) && !_item_derivative)){
-                            Move_items_between_player_obj_inv(item_slot.slot,_slot_selected);
+                            Move_items_to_player_inv(_item_selected,_slot_selected.stack_amount);
                             Choose_which_inventory(true);
                             Choose_which_inventory_type_slot(item_slot.slot);
                             _mouse_on_item = true;
@@ -201,80 +189,6 @@ x
                     }
                 }
             }
-        }
-    }
-    public void Move_items_between_player_obj_inv(Slot target_slot,Slot start_slot){
-        if(!_cursor_player_inv){
-            if(start_slot.item is Weapon_info.Weapon){
-                _amount_of_occupied_slots = _player_inventory.inventory_weapons_slots.Count;
-            }
-            else if(start_slot.item is Materials){
-                _amount_of_occupied_slots = _player_inventory.inventory_materials_slots.Count;
-            }
-            else if(start_slot.item is Potions){
-                _amount_of_occupied_slots = _player_inventory.inventory_potions_slots.Count;
-            } 
-            else if(start_slot.item is Item_info.Item){
-                _amount_of_occupied_slots = _player_inventory.inventory_items_slots.Count;
-            }
-        }
-        else{
-            _amount_of_occupied_slots = object_inv_to_show.items_in_object.Count;
-        }
-
-        int max_slots_amount;
-        if(_cursor_player_inv)
-            max_slots_amount = _player_inventory.amount_of_items_slots;
-        else
-            max_slots_amount = object_inv_to_show.amount_of_item_slots;
-       
-        if(_amount_of_occupied_slots >  target_slot.slot_number && start_slot.item == target_slot.item && target_slot.item.max_stack_amount > 1  && target_slot.stack_amount < target_slot.max_stack_amount && target_slot.stack_amount <start_slot.item.max_stack_amount  && start_slot.stack_amount <= target_slot.max_stack_amount) {
-            Debug.Log("stack items inv");
-            if((target_slot.stack_amount + start_slot.stack_amount) <= target_slot.max_stack_amount && (target_slot.stack_amount + start_slot.stack_amount) <= target_slot.item.max_stack_amount){
-                target_slot.stack_amount += start_slot.stack_amount;
-                start_slot.stack_amount = 0;
-                if(_cursor_player_inv)
-                    _player_inventory.Remove_item_from_player_inv(start_slot); 
-                else
-                    object_inv_to_show.Remove_item_from_object(start_slot.slot_number);
-                Move_slots_to_left_inv(start_slot,_player_inventory.amount_of_items_slots);
-            }
-            else if ((target_slot.stack_amount + start_slot.stack_amount) <= target_slot.max_stack_amount && (target_slot.stack_amount + start_slot.stack_amount) > target_slot.item.max_stack_amount){
-                start_slot.stack_amount -= (target_slot.item.max_stack_amount - target_slot.stack_amount);
-                target_slot.stack_amount = target_slot.item.max_stack_amount;
-            }
-            else if ((target_slot.stack_amount + start_slot.stack_amount) > target_slot.max_stack_amount && (target_slot.stack_amount + start_slot.stack_amount) <= target_slot.item.max_stack_amount){
-                start_slot.stack_amount -= (target_slot.max_stack_amount - target_slot.stack_amount);
-                target_slot.stack_amount = target_slot.max_stack_amount;
-            }
-            else if ((target_slot.stack_amount + start_slot.stack_amount) > target_slot.max_stack_amount && (target_slot.stack_amount + start_slot.stack_amount) > target_slot.item.max_stack_amount){
-                if(target_slot.item.max_stack_amount < target_slot.max_stack_amount){
-                    start_slot.stack_amount -= (target_slot.item.max_stack_amount - target_slot.stack_amount);
-                    target_slot.stack_amount = target_slot.item.max_stack_amount;
-                }
-                else{
-                    start_slot.stack_amount -= (target_slot.max_stack_amount - target_slot.stack_amount);
-                    target_slot.stack_amount = target_slot.max_stack_amount;
-                }
-            }
-        }
-        else if (_amount_of_occupied_slots < max_slots_amount){ 
-            if(_cursor_player_inv){
-                object_inv_to_show.Add_item_to_object(start_slot.item,start_slot.stack_amount);
-                _obj_inv_slots.obj_inv_items_slots[object_inv_to_show.items_in_object.Count-1].stack_amount += start_slot.stack_amount;
-                _obj_inv_slots.obj_inv_items_slots[object_inv_to_show.items_in_object.Count-1].item = start_slot.item;
-                _player_inventory.Remove_item_from_player_inv(start_slot);
-                start_slot.stack_amount = 0;
-                start_slot.item = null;
-                Move_slots_to_left_inv(start_slot,max_slots_amount);
-            }
-            else{
-                Add_item_to_player_inv_last_slot(start_slot.item,start_slot.stack_amount);
-                if(added_all_items){
-                    object_inv_to_show.Remove_item_from_object(_slot_selected.slot_number);
-                    Move_slots_to_left_inv(start_slot,max_slots_amount);
-                }
-            }                          
         }
     }
     public void Change_items_in_inv(Slot target_slot,Slot start_slot,bool player_inv){
@@ -369,7 +283,7 @@ x
         _inv_slots[max_number_of_items-1].stack_amount = 0;
         _inv_slots[max_number_of_items-1].item = null;
     }
-    public void Move_item_inv(){
+    public void Move_item__icon(){
         if(_amount_of_occupied_slots > _slot_selected.slot_number-1){
             _moving_icon.GetComponentInChildren<Image>().sprite = _slot_selected.item.Item_icon;
             _moving_icon.GetComponentInChildren<Image>().enabled = true;
@@ -392,7 +306,7 @@ x
     }
     public void Assign_weapons_amount_to_slots(){
         if(object_inv_to_show !=null){
-            //Debug.Log("Assing amount");
+            //Debug.Log("Assigning amount");
             for(int i=0;i<object_inv_to_show.items_in_object.Count;i++){
                 _obj_inv_slots.obj_inv_items_slots[i].stack_amount = object_inv_to_show.obj_inv_item_amount_on_slot[i];
                 _obj_inv_slots.obj_inv_items_slots[i].item = object_inv_to_show.items_in_object[i];
@@ -403,39 +317,6 @@ x
             }
         }
     } 
-    public void Update_inventory_object_UI(){
-        if(object_inv_to_show !=null){
-            for(int i=0;i<object_inv_to_show.items_in_object.Count ;i++){
-                _obj_inv_slots.Add_inventory_item_icon(object_inv_to_show.items_in_object[i],i);
-                _obj_inv_slots.Check_item_amount(i,_obj_inv_slots.obj_inv_items_images_slots,_obj_inv_slots.obj_inv_items_slots);
-            }
-            for(int i=object_inv_to_show.items_in_object.Count;i<object_inv_to_show.amount_of_item_slots;i++){
-                _obj_inv_slots.Remove_inventory_item_icon(i,_obj_inv_slots.obj_inv_items_images_slots);
-            }
-        }
-    }
-    public void Update_inventory_player_UI(){
-        //weapons
-        List<Item_info.Item> list_of_items = _player_inventory.inventory_weapons_slots.Cast<Item_info.Item>().ToList();
-        Update_UI_inventory_row(list_of_items,_player_inventory_slots.inventory_weapons_images_slots,_player_inventory_slots.inventory_weapons_slots);
-        //materials
-        list_of_items = _player_inventory.inventory_materials_slots.Cast<Item_info.Item>().ToList();
-        Update_UI_inventory_row(list_of_items,_player_inventory_slots.inventory_materials_images_slots,_player_inventory_slots.inventory_materials_slots);
-        //potions
-        list_of_items = _player_inventory.inventory_potions_slots.Cast<Item_info.Item>().ToList();
-        Update_UI_inventory_row(list_of_items,_player_inventory_slots.inventory_potions_images_slots,_player_inventory_slots.inventory_potions_slots);
-        //items
-        Update_UI_inventory_row(_player_inventory.inventory_items_slots,_player_inventory_slots.inventory_items_images_slots,_player_inventory_slots.inventory_items_slots);
-    }
-    private void Update_UI_inventory_row(List<Item_info.Item> list_of_items,List<Image> list_of_icons,List<Slot> list_of_slots){
-        for(int i=0;i<list_of_items.Count;i++){
-            _player_inventory_slots.Add_inventory_item_icon(list_of_items[i],i);
-            _player_inventory_slots.Check_item_amount(i,list_of_icons,list_of_slots);
-        }
-        for(int i=list_of_items.Count;i<_player_inventory.amount_of_items_slots;i++){
-            _player_inventory_slots.Remove_inventory_item_icon(i,list_of_icons);
-        }
-    }
     private void Update_quick_slots_potions_UI(){
         for(int i=0;i<4;i++){
             _player_inventory_slots.Check_item_amount(i,player_slots.quick_slots_potions_icons,_player_inventory.quick_slots_potions);
@@ -444,10 +325,10 @@ x
     public void Update_creation_inventory_UI(){
         if(_creation_inv.gameObject.activeSelf == true){
             for(int i=0;i<_creation_inv.recipes_for_items.Count;i++){
-                _creation_inv_slots.Add_inventory_item_icon(_creation_inv.recipes_for_items[i].item_to_create,i);
+                _creation_inv_slots.Add_inventory_item_icon(_creation_inv.recipes_for_items[i].item_to_create,_creation_inv_slots.obj_inv_items_images_slots,i);
             }
             for(int i=_creation_inv.recipes_for_items.Count;i<_creation_inv.amount_of_items_possible_to_create;i++){
-                _creation_inv_slots.Remove_inventory_item_icon(i,_creation_inv_slots.obj_inv_items_images_slots);
+                _creation_inv_slots.Remove_inventory_item_icon(_creation_inv_slots.obj_inv_items_images_slots,i);
             }
         }
     }
@@ -487,13 +368,13 @@ x
         //     if(Items_dropdown_options.onValueChanged.())
         //     _help2 = false;
         // }
-       // Update_inventory_player_data();
+        // updating UI doesn't need to be done in each frame !!!
         Handle_exiting_inventory();
         Handle_shortcuts();
         Set_object_inv_items_amount();
-        Update_inventory_object_UI();
-        Update_inventory_player_UI();
-        Update_creation_inventory_UI();
+        _obj_inv_slots.Update_inventory_object_UI(object_inv_to_show);
+        _player_inventory_slots.Update_inventory_player_UI(_player_inventory);
+        //Update_creation_inventory_UI();
         Update_quick_slots_potions_UI();
        
          if(_start_time){
@@ -612,32 +493,11 @@ x
         if(_obj_inv_slots.gameObject.activeSelf){
             if(_cursor_player_inv && _amount_of_occupied_slots > _slot_number_item_info  ){
                 //Debug.Log("transfer items from player inv to object inv");
-                List<Slot> _inv_slots_backup = _inv_slots;
-                Add_item_to_obj_inv_check_for_same_object(_inv_slots[_slot_number_item_info].item,_inv_slots[_slot_number_item_info].stack_amount);
-                Choose_which_inventory_type_slot(_inv_slots_backup[_slot_number_item_info]);
-                if(added_all_items){
-                    _player_inventory.Remove_item_from_player_inv(_slot_selected);
-                    Show_items_add_rem_from_inv_window_pop_up(false,_inv_slots[_slot_number_item_info].item,_inv_slots[_slot_number_item_info].stack_amount);
-                    Move_slots_to_left_inv(_inv_slots[_slot_number_item_info],object_inv_to_show.amount_of_item_slots);
-                }
-                else{
-                    _inv_slots[_slot_number_item_info].stack_amount = remaining_item_amount;
-                    Show_items_add_rem_from_inv_window_pop_up(false,_inv_slots[_slot_number_item_info].item,remaining_item_amount);
-                }
+                Move_items_to_object_inv(_item_selected,_slot_selected.stack_amount);
             }
             else if (!_cursor_player_inv && _amount_of_occupied_slots > _slot_number_item_info){
                 //Debug.Log("transfer items from obj inv to player inv");
-                Add_item_to_player_inv_check_for_same_object(_inv_slots[_slot_number_item_info].item,_inv_slots[_slot_number_item_info].stack_amount);
-                Choose_which_inventory_type_slot(_obj_inv_slots.obj_inv_items_slots[_slot_number_item_info]);
-                if(added_all_items){
-                    object_inv_to_show.Remove_item_from_object(_slot_number_item_info); 
-                    Show_items_add_rem_from_inv_window_pop_up(true,_inv_slots[_slot_number_item_info].item,_inv_slots[_slot_number_item_info].stack_amount);
-                    Move_slots_to_left_inv(_inv_slots[_slot_number_item_info],object_inv_to_show.amount_of_item_slots);
-                }
-                else{
-                    _inv_slots[_slot_number_item_info].stack_amount = remaining_item_amount;
-                    Show_items_add_rem_from_inv_window_pop_up(true,_inv_slots[_slot_number_item_info].item,remaining_item_amount);
-                }
+                Move_items_to_player_inv(_inv_slots[_slot_number_item_info].item,_inv_slots[_slot_number_item_info].stack_amount);
             }
         }
     }
@@ -772,20 +632,16 @@ x
             _inv_slots_images = _creation_inv_slots.obj_inv_items_images_slots;
             Show_item_stats_inv(slot);
             _instance_item_info.GetComponent<RectTransform>().sizeDelta += new Vector2(0,25);
-            _instance_item_info.GetComponentInChildren<Text>().text += "\n Required ingredients";
+            _instance_item_info.GetComponentInChildren<Text>().text += "\n Required ingredients:";
             List<Item_info.Item> already_displayed_ingredients = new List<Item_info.Item>();
             foreach(Item_info.Item ingredient in _creation_inv.recipes_for_items[slot].crafting_ingredients){
-                Item_info.Item result = already_displayed_ingredients.Find(
-                    delegate (Item_info.Item  item_to_found) {
-                        return  item_to_found == ingredient;
-                    });
-                if(result == null){
+                if(!already_displayed_ingredients.Contains(ingredient)){   
                     already_displayed_ingredients.Add(ingredient);
-                    List <Item_info.Item> repeated_items = _creation_inv.recipes_for_items[slot].crafting_ingredients.FindAll(
-                        delegate(Item_info.Item item_to_found){
-                            return item_to_found == ingredient;
-                        });
-                    _instance_item_info.GetComponent<RectTransform>().sizeDelta += new Vector2(0,25);
+                    List <Item_info.Item> repeated_items = _creation_inv.recipes_for_items[slot].crafting_ingredients.FindAll(item_to_find => item_to_find == ingredient);
+                        // delegate(Item_info.Item item_to_find){
+                        //     return item_to_find == ingredient;
+                        // });
+                    _instance_item_info.GetComponent<RectTransform>().sizeDelta += new Vector2(0,30);
                     if(repeated_items.Count > 1)
                         _instance_item_info.GetComponentInChildren<Text>().text += "\n" +ingredient.Item_name + " x" + repeated_items.Count;
                     else
@@ -923,7 +779,7 @@ x
         //     // Transfer_items_to_other_inv();
         // }
         // if(sender.value == 2){
-        //    Debug.Log("2");
+        //    Debug.Log("2");Repair_item
         //    // Drop_item_from_inventory();
         // }
         // if(sender.value == 3){
@@ -1251,23 +1107,21 @@ x
         }
     }
     //do more functions that return private fields etc - think which variables should be public and which private
-    public  Inventory_slots Get_player_inv_slots() =>  _player_inventory_slots;
+    public  Player_inventory_slots Get_player_inv_slots() =>  _player_inventory_slots;
     // two pairs of ad items functions - definitely could combine checking func to one - not for now - i am done with this part of inv for the moment
     //maybe functions could return number of left items - 0 if all items were transfered and some number if inv was full - it would save doing extra variables in other scripts - not sure if good idea - could look into it
-    public void Add_item_to_obj_inv_check_for_same_object(Item_info.Item item,int stack_amount){
+    private void Add_item_to_obj_inv_check_for_same_object(Item_info.Item item,int stack_amount){
         added_all_items = false;
-        
         _amount_of_occupied_slots = object_inv_to_show.items_in_object.Count;
         _inv_slots = _obj_inv_slots.obj_inv_items_slots;
-        
-    
+
         for(int i=0;i<_amount_of_occupied_slots;i++){
             if(_inv_slots[i].item.item_id == item.item_id && _inv_slots[i].stack_amount < _inv_slots[i].max_stack_amount && _inv_slots[i].stack_amount < _inv_slots[i].item.max_stack_amount ){
                 //stack items
                 if(_inv_slots[i].stack_amount + stack_amount <= _inv_slots[i].max_stack_amount && _inv_slots[i].stack_amount + stack_amount <= _inv_slots[i].item.max_stack_amount){
                     _inv_slots[i].stack_amount += stack_amount;
                     added_all_items = true;
-                    goto Object_found2;
+                    return ;//goto Object_found2;
                 }
                 else if (_inv_slots[i].stack_amount + stack_amount > _inv_slots[i].max_stack_amount && _inv_slots[i].stack_amount + stack_amount <= _inv_slots[i].item.max_stack_amount){
                     stack_amount -= (_inv_slots[i].max_stack_amount - _inv_slots[i].stack_amount);
@@ -1291,8 +1145,39 @@ x
         }
         // no same object in inventory or totally capped - add on last free slot
         Add_item_to_obj_inv_last_slot(item,stack_amount);
-        Object_found2:
-            Debug.Log("");
+        // Object_found2:
+        //     Debug.Log("");
+    }
+    private void Add_item_to_obj_inv_last_slot(Item_info.Item item,int stack_amount){
+        added_all_items = false;
+        //do check for overcapping slot use general variables like _occupied slots
+        // add on last free slot
+        if(item is Item_info.Item && _obj_inv_slots.obj_inv_items_slots[5].item == null ){
+            object_inv_to_show.Add_item_to_object(item,stack_amount);
+            _obj_inv_slots.obj_inv_items_slots[object_inv_to_show.items_in_object.Count-1].item = item;
+            if(_obj_inv_slots.obj_inv_items_slots[object_inv_to_show.items_in_object.Count-1].max_stack_amount >= stack_amount &&  _obj_inv_slots.obj_inv_items_slots[object_inv_to_show.items_in_object.Count-1].item.max_stack_amount >= stack_amount){
+                _obj_inv_slots.obj_inv_items_slots[object_inv_to_show.items_in_object.Count-1].stack_amount = stack_amount;
+                added_all_items= true;
+            }
+            else{
+                //slot max is capping
+                if( _obj_inv_slots.obj_inv_items_slots[object_inv_to_show.items_in_object.Count-1].max_stack_amount < stack_amount){
+                    stack_amount -=  _obj_inv_slots.obj_inv_items_slots[object_inv_to_show.items_in_object.Count-1].max_stack_amount;
+                    _obj_inv_slots.obj_inv_items_slots[object_inv_to_show.items_in_object.Count-1].stack_amount =  _obj_inv_slots.obj_inv_items_slots[object_inv_to_show.items_in_object.Count-1].max_stack_amount;
+                }
+                //item max is capping
+                else{
+                    stack_amount -=  _obj_inv_slots.obj_inv_items_slots[object_inv_to_show.items_in_object.Count-1].item.max_stack_amount;
+                    _obj_inv_slots.obj_inv_items_slots[object_inv_to_show.items_in_object.Count-1].stack_amount =  _obj_inv_slots.obj_inv_items_slots[object_inv_to_show.items_in_object.Count-1].item.max_stack_amount;
+                }
+                Add_item_to_obj_inv_last_slot(item,stack_amount);
+            }
+        }
+        else{
+            Debug.Log("No space in object inventory");
+           //_player_inventory.GetComponent<Player_Movemnet.Movement>().dropped_item_new_amount = stack_amount;
+           remaining_item_amount = stack_amount;
+        }
     }
     public void Add_item_to_player_inv_check_for_same_object(Item_info.Item item,int stack_amount){
         added_all_items = false;
@@ -1319,7 +1204,7 @@ x
                 if(_inv_slots[i].stack_amount + stack_amount <= _inv_slots[i].max_stack_amount && _inv_slots[i].stack_amount + stack_amount <= _inv_slots[i].item.max_stack_amount){
                     _inv_slots[i].stack_amount += stack_amount;
                     added_all_items = true;
-                    goto Object_found2;
+                     return ;//goto Object_found2;
                 }
                 else if (_inv_slots[i].stack_amount + stack_amount > _inv_slots[i].max_stack_amount && _inv_slots[i].stack_amount + stack_amount <= _inv_slots[i].item.max_stack_amount){
                     stack_amount -= (_inv_slots[i].max_stack_amount - _inv_slots[i].stack_amount);
@@ -1343,10 +1228,12 @@ x
         }
         // no same object in inventory or totally capped - add on last free slot
         Add_item_to_player_inv_last_slot(item,stack_amount);
-        Object_found2:
-            Debug.Log("");
+        // Object_found2:
+        //     Debug.Log("");
     }
     public void Add_item_to_player_inv_last_slot(Item_info.Item item,int stack_amount){
+        if(item == null)
+            return ;
         added_all_items = false;
         _item_derivative = false;
         //do check for overcapping slot use general variables like _occupied slots
@@ -1393,40 +1280,33 @@ x
             }
             Add_item_to_player_inv_last_slot(item,stack_amount);
         }
-    }
-     public void Add_item_to_obj_inv_last_slot(Item_info.Item item,int stack_amount){
-        added_all_items = false;
-        //do check for overcapping slot use general variables like _occupied slots
-        // add on last free slot
-        if(item is Weapon_info.Weapon || item is Materials || item is Potions)
-            _item_derivative = true;
-    
-        if(item is Item_info.Item && _obj_inv_slots.obj_inv_items_slots[5].item == null ){
-            object_inv_to_show.Add_item_to_object(item,stack_amount);
-            _obj_inv_slots.obj_inv_items_slots[object_inv_to_show.items_in_object.Count-1].item = item;
-            if(_obj_inv_slots.obj_inv_items_slots[object_inv_to_show.items_in_object.Count-1].max_stack_amount >= stack_amount &&  _obj_inv_slots.obj_inv_items_slots[object_inv_to_show.items_in_object.Count-1].item.max_stack_amount >= stack_amount){
-                _obj_inv_slots.obj_inv_items_slots[object_inv_to_show.items_in_object.Count-1].stack_amount = stack_amount;
-                added_all_items= true;
-            }
-            else{
-                //slot max is capping
-                if( _obj_inv_slots.obj_inv_items_slots[object_inv_to_show.items_in_object.Count-1].max_stack_amount < stack_amount){
-                    stack_amount -=  _obj_inv_slots.obj_inv_items_slots[object_inv_to_show.items_in_object.Count-1].max_stack_amount;
-                    _obj_inv_slots.obj_inv_items_slots[object_inv_to_show.items_in_object.Count-1].stack_amount =  _obj_inv_slots.obj_inv_items_slots[object_inv_to_show.items_in_object.Count-1].max_stack_amount;
-                }
-                //item max is capping
-                else{
-                    stack_amount -=  _obj_inv_slots.obj_inv_items_slots[object_inv_to_show.items_in_object.Count-1].item.max_stack_amount;
-                    _obj_inv_slots.obj_inv_items_slots[object_inv_to_show.items_in_object.Count-1].stack_amount =  _obj_inv_slots.obj_inv_items_slots[object_inv_to_show.items_in_object.Count-1].item.max_stack_amount;
-                }
-               
-                Add_item_to_player_inv_last_slot(item,stack_amount);
-            }
+    }  
+    private void Move_items_to_player_inv(Item_info.Item item,int stack_amount){
+        Add_item_to_player_inv_check_for_same_object(item,stack_amount);
+        Choose_which_inventory(false);
+        Choose_which_inventory_type_slot(_slot_selected);
+        if(added_all_items){
+            object_inv_to_show.Remove_item_from_object(_slot_selected.slot_number); 
+            Show_items_add_rem_from_inv_window_pop_up(true,_item_selected,_slot_selected.stack_amount);
+            Move_slots_to_left_inv(_slot_selected,object_inv_to_show.amount_of_item_slots);
         }
         else{
-            Debug.Log("No space in items type slots");
-           _player_inventory.GetComponent<Player_Movemnet.Movement>().dropped_item_new_amount = stack_amount;
-           remaining_item_amount = stack_amount;
+            Show_items_add_rem_from_inv_window_pop_up(true,_item_selected,_slot_selected.stack_amount - remaining_item_amount);
+            _slot_selected.stack_amount = remaining_item_amount;
+        }
+    }
+    private void Move_items_to_object_inv(Item_info.Item item,int stack_amount){
+        Add_item_to_obj_inv_check_for_same_object(item,stack_amount);
+        Choose_which_inventory(true);
+        Choose_which_inventory_type_slot(_slot_selected);
+        if(added_all_items){
+            _player_inventory.Remove_item_from_player_inv(_slot_selected);
+            Show_items_add_rem_from_inv_window_pop_up(false,_item_selected,_slot_selected.stack_amount);
+            Move_slots_to_left_inv(_slot_selected,_player_inventory.amount_of_items_slots);
+        }
+        else{
+            Show_items_add_rem_from_inv_window_pop_up(false,_item_selected,_slot_selected.stack_amount - remaining_item_amount);
+            _slot_selected.stack_amount = remaining_item_amount;
         }
     }
     public void Show_items_add_rem_from_inv_window_pop_up(bool items_added, Item_info.Item item, int amount_of_items){
@@ -1449,10 +1329,12 @@ x
         Function_timer.Stop_timer("inv_item_balance_window_pop_up");
         Function_timer.Create(() =>  _items_add_rem_window_pop_up.SetActive(false),3.5f,"inv_item_balance_window_pop_up");
     }
-    //buttons to toggle between crafting and player inv
+    
+    #region buttons to toggle between crafting and player inv
     public void Show_crafting_menu(){
         _crafting_menu.SetActive(true);
         _player_inventory_menu.SetActive(false);
+        Update_creation_inventory_UI();
         if(_instance_item_info != null)
             Destroy(_instance_item_info);
         if(_instance_item_option_menu != null)
@@ -1481,4 +1363,5 @@ x
     public void Hide_crafting_menu(){
         _crafting_menu.SetActive(false);
     }
+    #endregion
 }

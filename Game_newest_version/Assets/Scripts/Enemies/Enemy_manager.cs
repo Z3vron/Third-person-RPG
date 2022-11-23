@@ -43,11 +43,13 @@ public class Enemy_manager : MonoBehaviour
     private float _poison_time=0;
     private float _poison_damage = 0;
      [SerializeField] private bool _isPoisoned = false;
+    private State_manager state_manager;
 
     private void Awake() {
         nav_mesh_agent = GetComponent<NavMeshAgent>();
         animator = GetComponentInChildren<Animator>();
         _enemy_weapon_slot_manager = GetComponent<Enemy_weapon_slot_manager>();
+        state_manager = GetComponentInChildren<State_manager>();
     }
     private void Start() {
         //enemy_stats.Set_defaults_stats(300,100,0.1f,0.01f,20,2,0,0);
@@ -58,14 +60,10 @@ public class Enemy_manager : MonoBehaviour
         instance_enemy_stats.armour_effectiveness = enemy_Armour.Chest_armour + enemy_Armour.Helmet_armour + enemy_Armour.Legs_armour;
     }
     //Put in the scriptable object?? - Characters_statistics.cs
-    void Update(){
-        if(instance_enemy_stats.isDead)
-            return;       
+    void Update(){    
         Handle_HUD_enemies_lock_on_list();
         Handle_stamina_health_regen();
-        Handle_death();
         Handle_recovery_time();
-
         if(_isPoisoned){
             _poison_timer += Time.deltaTime;
             instance_enemy_stats.Take_damage_bypass_armour(_poison_damage * Time.deltaTime);
@@ -101,6 +99,8 @@ public class Enemy_manager : MonoBehaviour
             _health_regen_timer = 0;
             instance_enemy_stats.Taken_dmg = false;
             _instance_enemy_HUD.GetComponent<Enemy_HUD>().Set_health_bar_fill_amount(instance_enemy_stats.Current_health/instance_enemy_stats.Max_health);
+            if(instance_enemy_stats.Current_health <= 0)
+                Handle_death();
         }
         _health_regen_timer += Time.deltaTime;
         if(_health_regen_timer >= health_regen_delay){
@@ -117,20 +117,20 @@ public class Enemy_manager : MonoBehaviour
         }
     }
     private void Handle_death(){
-         if(instance_enemy_stats.Current_health <= 0){
-            animator.CrossFade("Death",0f,0);
-            instance_enemy_stats.isDead = true;
-            nav_mesh_agent.isStopped = true;
-            
-            player.GetComponent<Player_info>().player_stats.current_exp += instance_enemy_stats.exp_reward;
-            if(player.GetComponent<Player_Movemnet.Movement>().enemies_lock_on.Contains(gameObject))
-                player.GetComponent<Player_Movemnet.Movement>().enemies_lock_on.Remove(gameObject);
-            if(player.GetComponent<Player_Movemnet.Movement>().enemies_lock_on.Count == 0 && player.GetComponent<Player_info>().locked_on_enemy)
-                player.GetComponent<Player_Movemnet.Movement>().Release_lock_on_enemy();
-            Destroy(gameObject,2.167f);
-            Destroy(_instance_enemy_HUD);
-            Destroy(instance_enemy_stats,2.167f);
-        }
+         
+        animator.CrossFade("Death",0f,0);
+        nav_mesh_agent.isStopped = true;
+        player.GetComponent<Player_info>().player_stats.current_exp += instance_enemy_stats.exp_reward;
+        if(player.GetComponent<Player_Movemnet.Movement>().enemies_lock_on.Contains(gameObject))
+            player.GetComponent<Player_Movemnet.Movement>().enemies_lock_on.Remove(gameObject);
+        if(player.GetComponent<Player_Movemnet.Movement>().enemies_lock_on.Count == 0 && player.GetComponent<Player_info>().locked_on_enemy)
+            player.GetComponent<Player_Movemnet.Movement>().Release_lock_on_enemy();
+        state_manager.enabled = false;
+        this.enabled = false;
+        Destroy(gameObject,2.167f);
+        Destroy(_instance_enemy_HUD);
+        Destroy(instance_enemy_stats,2.167f);
+        
     }
     private void Handle_recovery_time(){
         if(current_recovery_time > 0){

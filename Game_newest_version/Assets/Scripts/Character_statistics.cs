@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 //[CreateAssetMenu(menuName = "Character Statistics")]
 public class Character_statistics : ScriptableObject{
 
@@ -15,9 +16,9 @@ public class Character_statistics : ScriptableObject{
     public float Current_stamina;
     public bool Taken_dmg = false;
     public bool Taken_stamina = false;
-    public bool isDead = false;
     public int level = 0;
 
+    
     public void Set_defaults_stats(float M_hp,float M_s,float R_hp,float R_s,float Strength,int base_level,int current_exp_base_0,int exp_for_level_1){
         Max_health = M_hp;
         Max_stamina = M_s;
@@ -31,10 +32,6 @@ public class Character_statistics : ScriptableObject{
         level = base_level;
         //exp_to_next_level = exp_for_level_1;
     }
-    private void Update() {
-        
-    }
-
     public void Health_regen(){
         if(Current_health < Max_health && Current_health >0){
             Current_health += Regenerate_healh_rate;
@@ -49,6 +46,7 @@ public class Character_statistics : ScriptableObject{
         if(Current_health > 0)
             Current_health -= ( damage * (100 -armour_effectiveness)/100);
         Taken_dmg = true;
+       
     }
     public void Take_damage_bypass_armour(float damage){
         if(Current_health > 0)

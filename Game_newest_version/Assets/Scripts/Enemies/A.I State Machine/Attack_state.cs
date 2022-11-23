@@ -6,8 +6,6 @@ public class Attack_state : State{
     public Combat_stance_state combat_stance_state;
     public override State Run_current_state(Enemy_manager enemy_manager){
         //Debug.Log("Start  attacking");
-        if(enemy_manager.instance_enemy_stats.isDead)
-            return this;
         if(enemy_manager.current_attack == null){
             enemy_manager.Get_new_attack();
             return this;

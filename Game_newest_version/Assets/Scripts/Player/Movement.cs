@@ -65,6 +65,8 @@ namespace Player_Movemnet{
        
         #region Player flags
             [Header("Player movement flags")]
+          // [field: SerializeField] public bool player_grounded {get;private set;}
+           // array[index++ % array.Length] // will go until last element in array and then go again from the first element
             public bool player_grounded = false;
             public bool player_crouching = false;
             public bool player_hit_ceiling = false;
@@ -204,6 +206,8 @@ namespace Player_Movemnet{
 
             _player_speed = 1;
             _timer_between_landing_next_jump = _time_between_jumps;
+
+            Player_info.Player_death +=  Disable_movement;
             //read on this shit, layermask from raycast return number but from variable set in inspector UnityEngine.layermask
             _environment_layer = LayerMask.NameToLayer("Environment");
         }
@@ -214,6 +218,7 @@ namespace Player_Movemnet{
             // Move_player();
         }
         void Update(){
+
             _input_handler.Check_flags();
             if(_player_info.locked_on_enemy){
                 Handle_state_while_lock_on_enemy();
@@ -314,7 +319,7 @@ namespace Player_Movemnet{
             }
             float distance = Mathf.Infinity;
             foreach(var interact_collider in trigger_colliders){
-                Debug.Log("interact collider: " + interact_collider);
+                //Debug.Log("interact collider: " + interact_collider);
                 if(Vector3.Distance(gameObject.transform.position,interact_collider.gameObject.transform.position) < distance){
                     distance = Vector3.Distance(gameObject.transform.position,interact_collider.gameObject.transform.position);
                     _collider_to_interact = interact_collider;
@@ -331,7 +336,7 @@ namespace Player_Movemnet{
                 //Debug.Log("Dont repeat actions");
                 return ;
             }
-                Debug.Log(_collider_to_interact);
+                //Debug.Log(_collider_to_interact);
             if(!_interact_pop_up.gameObject.activeSelf)
                 _interact_pop_up.gameObject.SetActive(true);
             if(_collider_to_interact.GetComponent<Item_dropped>()){
@@ -859,6 +864,9 @@ namespace Player_Movemnet{
                 _input_handler.third_potion_inv_flag = false;
                 _input_handler.fourth_potion_inv_flag = false;
             #endregion
+        }
+        private void Disable_movement(){
+            this.enabled = false;
         }
     }
 }

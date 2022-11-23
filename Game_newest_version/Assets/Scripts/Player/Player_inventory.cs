@@ -65,7 +65,7 @@ namespace Player_inventory_info{
         }
         private void Start() {
             //just for testing
-            _inventories.Add_item_to_player_inv_last_slot(_item_to_add_1,_item_to_add_1_amount;
+            _inventories.Add_item_to_player_inv_last_slot(_item_to_add_1,_item_to_add_1_amount);
             _inventories.Add_item_to_player_inv_last_slot(_item_to_add_2,_item_to_add_2_amount);
             _inventories.Add_item_to_player_inv_last_slot(_item_to_add_3,_item_to_add_3_amount);           
             
@@ -445,7 +445,7 @@ namespace Player_inventory_info{
                 //open inventory
                 _inventories.Show_player_inventory();
                 _inventories.Show_change_inv_buttons();
-                _inventories.Update_inventory_player_UI();
+                _inventories.Get_player_inv_slots().Update_inventory_player_UI(this);
                 Cursor.lockState = CursorLockMode.Confined;
                 inventory_open = true;
                 _cinemachine_camera_x_sensitivity = _cinemachine_camera.m_XAxis.m_MaxSpeed;
