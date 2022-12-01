@@ -218,7 +218,6 @@ namespace Player_Movemnet{
             // Move_player();
         }
         void Update(){
-
             _input_handler.Check_flags();
             if(_player_info.locked_on_enemy){
                 Handle_state_while_lock_on_enemy();
@@ -247,7 +246,7 @@ namespace Player_Movemnet{
             Set_input_flags_false();
         }
         void  Equip_items(){
-            if(_input_handler.inventory_flag)
+            if(_input_handler.inventory_flag && player_grounded)
                 _player_inventory.Handle_inventory();
             if(_input_handler.inventory_close_inv_flag)
                 _object_inventory.SetActive(false);
@@ -415,7 +414,9 @@ namespace Player_Movemnet{
                     Function_timer.Create(() => Set_chest_color(Color.red),2);
                     Function_timer.Create(() => Set_chest_color(Color.white),8);
                     _object_inventory.SetActive(true);
+                    
                     _inventories.object_inv_to_show = _object_to_interact.GetComponent<Interactable_objects>();
+                    _inventories.Get_object_inv_slots().Update_inventory_object_UI(_inventories.object_inv_to_show);
                     _inventories.Assign_weapons_amount_to_slots();
                     _player_inventory.Handle_inventory();
                 }
@@ -683,7 +684,6 @@ namespace Player_Movemnet{
             Vector3 Sphere_position = new Vector3(transform.position.x,transform.position.y - _ceiling_help ,transform.position.z );
             player_hit_ceiling = Physics.CheckSphere(Sphere_position,_grounded_check_radious,_ground_ceiling_layer,QueryTriggerInteraction.Ignore);
             if(!player_grounded && player_hit_ceiling){
-               Debug.Log("Player hit ceiling" + _controller.velocity );
                 if(_Move.y > 0)
                     _Move.y = -0.4f;
             }
@@ -867,6 +867,9 @@ namespace Player_Movemnet{
         }
         private void Disable_movement(){
             this.enabled = false;
+        }
+        public void Stop_player(){
+            _Move = Vector3.zero;
         }
     }
 }

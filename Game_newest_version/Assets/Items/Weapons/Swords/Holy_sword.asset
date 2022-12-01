@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 082d0db37e73f434baee25e62ea8c906, type: 3}
+  m_Name: Holy_sword
+  m_EditorClassIdentifier: 
+  Item_icon: {fileID: 21300000, guid: 5704dee54ac268245bef6442f7969da0, type: 3}
+  Item_name: Holy sword
+  max_stack_amount: 1
+  Item_weight: 0
+  item_id: 1.000005
+  Weapon_model: {fileID: 7186287135004782533, guid: 54e9048593bdb894ba9844d170fc3f82, type: 3}
+  durability: 100
+  material_toughness: 3.7
+  unarmed: 0
+  weapon_lvl: 15
+  poison_damage: 0
+  poison_duration: 0
+  isPoisoned: 0
+  Light_attack_damage: 35
+  Strong_attack_damage: 90
+  combo_dmg_bonus: 90
+  air_attack_damage: 150
+  light_attack_stamina_cost: 15
+  strong_attack_stamina_cost: 35
+  combo_attack_stamina_cost: 45
+  air_attack_stamina_cost: 60
+  defense_points: 0

@@ -46,6 +46,7 @@ namespace Player_inventory_info{
             [SerializeField] private CinemachineFreeLook _cinemachine_camera;
             private Input_handler _input_handler;
             private Weapon_slot_manager.Weapon_manager weapon_slot_manager;
+            private Player_Movemnet.Movement _player_movement;
             private Animator _animator;
         #endregion
         #region Variables used to store camera values to restore them after freezing camera for browsing inventory
@@ -61,6 +62,8 @@ namespace Player_inventory_info{
         #endregion
         private void Awake() {
             weapon_slot_manager = GetComponent<Weapon_slot_manager.Weapon_manager>();
+            _input_handler = GetComponent<Input_handler>();
+            _player_movement = GetComponent<Player_Movemnet.Movement>();
             _animator = GetComponentInChildren<Animator>();
         }
         private void Start() {
@@ -79,7 +82,7 @@ namespace Player_inventory_info{
     
            backup_weapon_left = unarmed;
            backup_weapon_right = unarmed;
-           _input_handler = GetComponent<Input_handler>();
+           
             for(int i=0;i<4;i++){
                 quick_slots_potions[i].item = null;
                 quick_slots_potions[i].stack_amount = 0;
@@ -221,7 +224,9 @@ namespace Player_inventory_info{
                 else{
                     Debug.Log("Weapon has 0 durability");
                 }
-            } 
+            }
+            _inventories.Get_player_inv_slots().Update_inventory_player_UI(this);
+            _inventories.Get_object_inv_slots().Update_inventory_object_UI(_inventories.object_inv_to_show);
         }
         public void Change_weapon_for_right_hand(Slot weapon_slot_inv,bool slot_in_playyer_inv){
             Weapon_info.Weapon temp_weapon;
@@ -303,8 +308,10 @@ namespace Player_inventory_info{
                     Debug.Log("Weapon has 0 durability");
                 }
             } 
+            _inventories.Get_player_inv_slots().Update_inventory_player_UI(this);
+            _inventories.Get_object_inv_slots().Update_inventory_object_UI(_inventories.object_inv_to_show);
         }
-        public bool Change_potion_in_slot(Slot potion_slot_inv,int quick_slot_number,bool slot_in_playyer_inv){
+        public void Change_potion_in_slot(Slot potion_slot_inv,int quick_slot_number,bool slot_in_playyer_inv){
             Potions temp_potion;
             if(quick_slots_potions[quick_slot_number].item == null){
                 quick_slots_potions[quick_slot_number].item = potion_slot_inv.item;
@@ -320,12 +327,11 @@ namespace Player_inventory_info{
                     quick_slots_potions[quick_slot_number].stack_amount = quick_slots_potions[quick_slot_number].max_stack_amount;
                     potion_slot_inv.stack_amount -= quick_slots_potions[quick_slot_number].max_stack_amount;
                 }
-                return true;
             }
             else if(quick_slots_potions[quick_slot_number].item.item_id == potion_slot_inv.item.item_id){
                 if(quick_slots_potions[quick_slot_number].stack_amount + potion_slot_inv.stack_amount <= quick_slots_potions[quick_slot_number].max_stack_amount){
                     quick_slots_potions[quick_slot_number].stack_amount += potion_slot_inv.stack_amount;
-                     if(slot_in_playyer_inv)
+                    if(slot_in_playyer_inv)
                         Remove_item_from_player_inv(potion_slot_inv);
                     else
                         _inventories.object_inv_to_show.Remove_item_from_object(potion_slot_inv.slot_number);
@@ -337,7 +343,6 @@ namespace Player_inventory_info{
                     potion_slot_inv.stack_amount -= (quick_slots_potions[quick_slot_number].max_stack_amount - quick_slots_potions[quick_slot_number].stack_amount);
                     quick_slots_potions[quick_slot_number].stack_amount = quick_slots_potions[quick_slot_number].max_stack_amount;
                 }
-                return false;
             }
             else if(quick_slots_potions[quick_slot_number].item != null && inventory_potions_slots.Count < amount_of_items_slots){
                 
@@ -359,9 +364,8 @@ namespace Player_inventory_info{
                     quick_slots_potions[quick_slot_number].stack_amount = quick_slots_potions[quick_slot_number].max_stack_amount;
                     potion_slot_inv.stack_amount -= quick_slots_potions[quick_slot_number].max_stack_amount;
                 }
-                return true;
             }
-            else if(quick_slots_potions[quick_slot_number].item != null && inventory_potions_slots.Count == amount_of_items_slots){
+            else if(quick_slots_potions[quick_slot_number].item != null && inventory_potions_slots.Count == amount_of_items_slots){ 
                 temp_potion = (Potions)quick_slots_potions[quick_slot_number].item;
                 int temp_stack_amount = quick_slots_potions[quick_slot_number].stack_amount;
                 quick_slots_potions[quick_slot_number].item = potion_slot_inv.item;
@@ -376,7 +380,6 @@ namespace Player_inventory_info{
                     _inventories.Move_slots_to_left_inv(potion_slot_inv,amount_of_items_slots);
                     //Add_item_to_player_inv_list(temp_potion);
                     _inventories.Add_item_to_player_inv_check_for_same_object(temp_potion,temp_stack_amount);
-                    return true;
                 }
                 else{
                     _inventories.remaining_item_amount = 0;
@@ -384,16 +387,11 @@ namespace Player_inventory_info{
                     if(_inventories.remaining_item_amount == 0){
                         quick_slots_potions[quick_slot_number].stack_amount = quick_slots_potions[quick_slot_number].max_stack_amount;
                         potion_slot_inv.stack_amount -= quick_slots_potions[quick_slot_number].max_stack_amount;
-                        return true;
                     }
                     else{
                         quick_slots_potions[quick_slot_number].stack_amount -= _inventories.remaining_item_amount; 
-                        return false;
                     }
                 }
-            }
-            else{
-                return false;
             }
         }
         public void Use_potion_from_quick_slot(int slot_number){
@@ -441,6 +439,7 @@ namespace Player_inventory_info{
             }
             else{
                 _animator.SetFloat("Speed_percent",-1f);
+                _player_movement.Stop_player();
                 _input_handler.Switch_action_map_to_inv();
                 //open inventory
                 _inventories.Show_player_inventory();

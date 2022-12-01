@@ -21,6 +21,7 @@ Next update:
 - Changed enemy death handler so that it would be less often checked - i disable script when enemy or player die so that update function won't be called - not sure is there better way
 - Started working on redoing Invenotires script - clearing extra unuseful code and rewriting it to be more easly understand and less complicated - oh boy what a spaghetti code i have made if someone would try to understand it than i can only wish that person good luck
 - I created base class for inventory slots making it more general but than original classes were reduced to just store variables that i use from the inventories script - I am not sure if this is the best solution - originally i just pass an argument(item) to function in class and within func body it would choose on which variable it should work - now i require to pass exact variable(list) into function not sure which solution is better
+- Moved updating UI elements from update to when they are changed
 
 Update 14.11.2022
 - Fixed bug when player was stuck at ceiling after hitting it

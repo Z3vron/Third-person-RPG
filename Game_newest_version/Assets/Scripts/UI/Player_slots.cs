@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Player_slots : MonoBehaviour{
+public class Player_slots : Inventory_slots{
     public List<Image> quick_slots_potions_icons;
     [SerializeField] private  Image _quick_slots_left_weapon_icon;
     [SerializeField] private  Image _quick_slots_right_weapon_icon;
@@ -40,5 +40,10 @@ public class Player_slots : MonoBehaviour{
         }
         quick_slots_potions_icons[slot_number].sprite = potion.Item_icon;
         quick_slots_potions_icons[slot_number].enabled = true;
+    }
+    public void Update_quick_slots_potions_amount(Player_inventory_info.Player_inventory player_inventory){
+        for(int i=0;i<4;i++){
+            Check_item_amount(i,quick_slots_potions_icons,player_inventory.quick_slots_potions);
+        }
     }
 }

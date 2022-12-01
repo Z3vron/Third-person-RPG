@@ -11,10 +11,7 @@ public class Inventories : MonoBehaviour{
     public Interactable_objects object_inv_to_show;
     public bool added_all_items;
     public int remaining_item_amount;
-
-
-
-    [SerializeField] private  GameObject _moving_icon;
+   
     #region Other scripts and components references
         [Header("Other scripts and components references")]
         public Player_slots player_slots;
@@ -23,9 +20,11 @@ public class Inventories : MonoBehaviour{
         [Tooltip("Holds both list of images and list of Slots for the object UI inventory, that player is interacting with")]
         [SerializeField] private Object_inventory_slots _obj_inv_slots;
         [Tooltip("Holds both list of images and list of Slots for the items creation UI inventory")]
-        [SerializeField] private Object_inventory_slots _creation_inv_slots;
+        [SerializeField] private Creation_inv_slots _creation_inv_slots;
         [Tooltip("Holds both list of images and list of Slots for all type(rows) of items that could be stored in player inventory")]
         [SerializeField] private Player_inventory_slots _player_inventory_slots;
+        [Tooltip("Items possible to create")]
+        [SerializeField] private Creation_inv _creation_inv;
         [Tooltip("Holds list of images for the current type(row) of item that operation is made on in player info")]
         private List <Image>  _inv_slots_images = new List<Image>();
         [Tooltip("Holds list of Slots for the current type(row) of item that operation is made on in player info")]
@@ -44,11 +43,7 @@ public class Inventories : MonoBehaviour{
         [SerializeField] private GameObject _item_creation_menu_prefab;
         [SerializeField] private GameObject _input_field_prefab;
     #endregion
-    #region Slots
-        [Header("Slots")]
-        [SerializeField] private Creation_inv _creation_inv;
-        
-    #endregion
+   
     #region Player inventory and crafting menu with buttons to change between them
         [Header("Player inventory and crafting menu with buttons to change between them")]
         [SerializeField] private GameObject _crafting_menu;
@@ -68,8 +63,7 @@ public class Inventories : MonoBehaviour{
         private int _amount_of_occupied_slots;
     #endregion
     
-    private PointerEventData _help;
-    private bool _help2 = false;
+    private PointerEventData _UI_under_mouse;
 
     private GraphicRaycaster _graphicRaycaster_inv_slots;
     #region Instances of objects in inventory - instances of UI elements
@@ -80,10 +74,8 @@ public class Inventories : MonoBehaviour{
     #endregion
     private TMPro.TMP_Dropdown Items_dropdown_options;
     private GameObject _dropdown_options_title;
-    private bool _pressed_outside_dropdown = true;
-    
-  
-
+    [SerializeField] private GameObject _detect_mouse_outside_pop_up;
+    [SerializeField] private  GameObject _moving_icon;
     [SerializeField] private GameObject _items_add_rem_window_pop_up;
 
     //create variables for the texts so that i would not get to them by get compnonent in child it 
@@ -94,18 +86,19 @@ public class Inventories : MonoBehaviour{
     // nope went with original :)
     //check variables and their values at hover mouse over dropslot - specially choose functions etc 
     private void Start() {
-        _help = new PointerEventData(null);
+        _UI_under_mouse = new PointerEventData(null);
         _graphicRaycaster_inv_slots = GetComponent<GraphicRaycaster>();
         player_slots = GetComponentInChildren<Player_slots>();
         _items_add_rem_window_pop_up_text = _items_add_rem_window_pop_up.GetComponentInChildren<TMPro.TMP_Text>();
         _items_add_rem_window_pop_up_icon = _items_add_rem_window_pop_up.GetComponentInChildren<Image>();
+        _detect_mouse_outside_pop_up.SetActive(false);
     }
     // watchout for choose which inv function - called on pointer enter - changing some values - be carefull with using 3 variables above their values isn't changing  by add weapons functions but they change originall values 
     public void Check_hits_inv(){
         _item_derivative = false;   
-        _help.position = new Vector3( _input_handler.mouse_position.x,_input_handler.mouse_position.y,0);
+        _UI_under_mouse.position = new Vector3( _input_handler.mouse_position.x,_input_handler.mouse_position.y,0);
         List<RaycastResult> results = new List<RaycastResult>();
-        _graphicRaycaster_inv_slots.Raycast(_help, results);
+        _graphicRaycaster_inv_slots.Raycast(_UI_under_mouse, results);
 
         foreach(var hit in results){
             if(hit.gameObject.TryGetComponent(out Drop_slot item_slot)){
@@ -126,10 +119,7 @@ public class Inventories : MonoBehaviour{
                         }
                     }
                     else if(!item_slot.slot.in_inventory && !item_slot.slot.in_obj_inv && _item_selected is Health_potion){
-                        if(_player_inventory.Change_potion_in_slot(_slot_selected,item_slot.slot.slot_number,_cursor_player_inv)){
-                            Potions potion = (Potions)_item_selected;
-                            player_slots.Update_quick_slot_potions_icon(potion,item_slot.slot.slot_number);
-                        }
+                        Change_quick_slot_potion_and_UI(item_slot.slot.slot_number);
                     }
                     else if (item_slot.slot.in_inventory && item_slot.slot != _slot_selected ){
                         //must be a better way to do this
@@ -167,10 +157,7 @@ public class Inventories : MonoBehaviour{
                         }
                     }
                     else if(!item_slot.slot.in_inventory && !item_slot.slot.in_obj_inv && _item_selected is Health_potion){
-                        if(_player_inventory.Change_potion_in_slot(_slot_selected,item_slot.slot.slot_number,_cursor_player_inv)){
-                            Potions potion = (Potions)_item_selected;
-                            player_slots.Update_quick_slot_potions_icon(potion,item_slot.slot.slot_number);
-                        }
+                        Change_quick_slot_potion_and_UI(item_slot.slot.slot_number);
                     }
                     else if(item_slot.slot.in_inventory){
                         if(_slot_selected.item is Materials || _slot_selected.item is Potions || _slot_selected.item is Weapon_info.Weapon || item_slot.slot.item is Materials || item_slot.slot.item is Potions || item_slot.slot.item is Weapon_info.Weapon)
@@ -300,9 +287,11 @@ public class Inventories : MonoBehaviour{
     }
     public void Unequip_weapon_slot(bool isRight){
         _player_inventory.Remove_weapon_from_hand_slot(isRight);
+        _player_inventory_slots.Update_inventory_player_UI(_player_inventory);
     }
     public void Unequip_potion_slot(int slot_number){
         _player_inventory.Remove_potion_from_quick_slot(slot_number);
+        _player_inventory_slots.Update_inventory_player_UI(_player_inventory);
     }
     public void Assign_weapons_amount_to_slots(){
         if(object_inv_to_show !=null){
@@ -317,24 +306,8 @@ public class Inventories : MonoBehaviour{
             }
         }
     } 
-    private void Update_quick_slots_potions_UI(){
-        for(int i=0;i<4;i++){
-            _player_inventory_slots.Check_item_amount(i,player_slots.quick_slots_potions_icons,_player_inventory.quick_slots_potions);
-        }
-    }
-    public void Update_creation_inventory_UI(){
-        if(_creation_inv.gameObject.activeSelf == true){
-            for(int i=0;i<_creation_inv.recipes_for_items.Count;i++){
-                _creation_inv_slots.Add_inventory_item_icon(_creation_inv.recipes_for_items[i].item_to_create,_creation_inv_slots.obj_inv_items_images_slots,i);
-            }
-            for(int i=_creation_inv.recipes_for_items.Count;i<_creation_inv.amount_of_items_possible_to_create;i++){
-                _creation_inv_slots.Remove_inventory_item_icon(_creation_inv_slots.obj_inv_items_images_slots,i);
-            }
-        }
-    }
-    private void Update() {  
+    void Update(){  
         _input_handler.Check_flags();
-        //Debug.Log("update click  " + _input_handler.mouse_right_pressed_inv_flag );
         
         //option menu on only right click not left
         if(_input_handler.mouse_right_pressed_inv_flag)
@@ -342,40 +315,21 @@ public class Inventories : MonoBehaviour{
         if(_input_handler.mouse_left_pressed_inv_flag)
             _last_pressed_right = false;
        
-        // when player need to choose one of the option
-        // if( _instance_item_option_menu != null  && _input_handler.mouse_left_pressed_inv_flag && !_pressed_outside_dropdown){
-        //     Check_if_mouse_click_on_dropdown_options();
-        // }
-        // //when player need to choose main button to show other option about actions to items
-        // if((_instance_item_option_menu != null || _instance_item_creation_menu != null || _instance_item_creation_amount != null)  && _pressed_outside_dropdown && (_input_handler.mouse_left_pressed_inv_flag  || _input_handler.mouse_right_pressed_inv_flag)){
-        //     Check_if_mouse_click_on_dropdown_title();
-        // }
         //creating given number of items
         if(_instance_item_creation_amount != null && _input_handler.confirmed_action_inv_flag && _instance_item_creation_amount.GetComponent<TMP_InputField>().text != ""){
-                int counter = 0;
-                //Debug.Log( "Trying to create: " + (_instance_item_creation_amount.GetComponent<TMP_InputField>().text));
-                while(true && counter < int.Parse(_instance_item_creation_amount.GetComponent<TMP_InputField>().text)){
-                    if(! Create_item(_slot_number_item_info))
-                        break;
-                    counter++;
-                }
-                Destroy(_instance_item_creation_amount);
+            int counter = 0;
+            //Debug.Log( "Trying to create: " + (_instance_item_creation_amount.GetComponent<TMP_InputField>().text));
+            while(counter < int.Parse(_instance_item_creation_amount.GetComponent<TMP_InputField>().text)){
+                if(! Create_item(_slot_number_item_info))
+                    break;
+                counter++;
             }
-        // if (EventSystem.current.)
-        //     Debug.Log("left-click over a GUI element!");
-
-        // if(_help2){
-        //     if(Items_dropdown_options.onValueChanged.())
-        //     _help2 = false;
-        // }
+            Destroy(_instance_item_creation_amount);
+        }
         // updating UI doesn't need to be done in each frame !!!
         Handle_exiting_inventory();
         Handle_shortcuts();
         Set_object_inv_items_amount();
-        _obj_inv_slots.Update_inventory_object_UI(object_inv_to_show);
-        _player_inventory_slots.Update_inventory_player_UI(_player_inventory);
-        //Update_creation_inventory_UI();
-        Update_quick_slots_potions_UI();
        
          if(_start_time){
             _time_to_show_item_info_elapsed += Time.deltaTime;
@@ -390,13 +344,8 @@ public class Inventories : MonoBehaviour{
         if(_input_handler.inventory_close_inv_flag){
             if(_instance_item_info != null)
                 Destroy(_instance_item_info);
-            if(_instance_item_option_menu != null)
-                Destroy(_instance_item_option_menu);
-            if(_instance_item_creation_menu != null)
-                Destroy(_instance_item_creation_menu);
-            if(_instance_item_creation_amount != null)
-                Destroy(_instance_item_creation_amount);
-            _pressed_outside_dropdown = true;
+            Close_item_option_menu();
+            Close_item_creation_menu_and_amount();
             _mouse_on_item = false;
         }
     }
@@ -440,38 +389,22 @@ public class Inventories : MonoBehaviour{
             }
             if(_input_handler.first_potion_inv_flag){
                 if(_item_selected is Health_potion){
-                    if(_player_inventory.Change_potion_in_slot(_slot_selected,0,_cursor_player_inv)){
-                        Potions potion = (Potions)_item_selected;
-                        player_slots.Update_quick_slot_potions_icon(potion,0);
-                        Reset_item_info_pop_up();
-                    }
+                    Change_quick_slot_potion_and_UI(0);
                 }
             }
             if(_input_handler.second_potion_inv_flag){
                 if(_item_selected is Health_potion){
-                    if(_player_inventory.Change_potion_in_slot(_slot_selected,1,_cursor_player_inv)){
-                        Potions potion = (Potions)_item_selected;
-                        player_slots.Update_quick_slot_potions_icon(potion,1);
-                        Reset_item_info_pop_up();
-                    }
+                    Change_quick_slot_potion_and_UI(1);
                 }
             }
             if(_input_handler.third_potion_inv_flag){
                 if(_item_selected is Health_potion){
-                    if(_player_inventory.Change_potion_in_slot(_slot_selected,2,_cursor_player_inv)){
-                        Potions potion = (Potions)_item_selected;
-                        player_slots.Update_quick_slot_potions_icon(potion,2);
-                        Reset_item_info_pop_up();
-                    }
+                   Change_quick_slot_potion_and_UI(2);
                 }
             }
             if(_input_handler.fourth_potion_inv_flag){
                 if(_item_selected is Health_potion){
-                    if(_player_inventory.Change_potion_in_slot(_slot_selected,3,_cursor_player_inv)){
-                        Potions potion = (Potions)_item_selected;
-                        player_slots.Update_quick_slot_potions_icon(potion,3);
-                        Reset_item_info_pop_up();
-                    }
+                    Change_quick_slot_potion_and_UI(3);
                 }
             }
         }
@@ -515,6 +448,8 @@ public class Inventories : MonoBehaviour{
                 object_inv_to_show.Remove_item_from_object(_slot_selected.slot_number);
             Move_slots_to_left_inv(_inv_slots[_slot_selected.slot_number],6);
         }
+        _player_inventory_slots.Update_inventory_player_UI(_player_inventory);
+        _obj_inv_slots.Update_inventory_object_UI(object_inv_to_show);
     }
     public void Choose_which_inventory(bool player_inventory){
         _cursor_player_inv = player_inventory;
@@ -629,7 +564,7 @@ public class Inventories : MonoBehaviour{
         _slot_number_item_info = slot;
         if(_amount_of_occupied_slots > slot){
             _item_selected = _creation_inv.recipes_for_items[slot].item_to_create;
-            _inv_slots_images = _creation_inv_slots.obj_inv_items_images_slots;
+            _inv_slots_images = _creation_inv_slots.creation_inv_items_images_slots;
             Show_item_stats_inv(slot);
             _instance_item_info.GetComponent<RectTransform>().sizeDelta += new Vector2(0,25);
             _instance_item_info.GetComponentInChildren<Text>().text += "\n Required ingredients:";
@@ -651,12 +586,11 @@ public class Inventories : MonoBehaviour{
         }
     }
     public void Show_item_options_menu(int slot){
-        // Debug.Log("after click  " + _input_handler.mouse_right_pressed_inv_flag );
         if(_last_pressed_right){
-            if(_instance_item_option_menu != null)
-                Destroy(_instance_item_option_menu);
+            Close_item_option_menu();
             Reset_timer();
             if(_amount_of_occupied_slots > slot){
+                _detect_mouse_outside_pop_up.SetActive(true);
                 _instance_item_option_menu = Instantiate(_item_option_menu_prefab,_inv_slots_images[slot].transform.parent.transform.position,_inv_slots_images[slot].transform.parent.transform.rotation) as GameObject;
                 _instance_item_option_menu.transform.SetParent(gameObject.transform);
                 _instance_item_option_menu.GetComponent<RectTransform>().localPosition += new Vector3(0,-45,0);
@@ -723,32 +657,16 @@ public class Inventories : MonoBehaviour{
           _player_inventory.Change_weapon_for_right_hand(_slot_selected,_cursor_player_inv);
         }
         if(sender.options[index].text == "Equip to first slot (3)"){
-            if(_player_inventory.Change_potion_in_slot(_slot_selected,0,_cursor_player_inv)){
-                Potions potion = (Potions)_item_selected;
-                player_slots.Update_quick_slot_potions_icon(potion,0);
-                Reset_item_info_pop_up();
-            }
+           Change_quick_slot_potion_and_UI(0);
         }
         if(sender.options[index].text == "Equip to second slot (4)"){
-            if(_player_inventory.Change_potion_in_slot(_slot_selected,1,_cursor_player_inv)){
-                Potions potion = (Potions)_item_selected;
-                player_slots.Update_quick_slot_potions_icon(potion,1);
-                Reset_item_info_pop_up();
-            }
+            Change_quick_slot_potion_and_UI(1);
         }
         if(sender.options[index].text == "Equip to third slot (5)"){
-            if(_player_inventory.Change_potion_in_slot(_slot_selected,2,_cursor_player_inv)){
-                Potions potion = (Potions)_item_selected;
-                player_slots.Update_quick_slot_potions_icon(potion,2);
-                Reset_item_info_pop_up();
-            }
+           Change_quick_slot_potion_and_UI(2);
         }
         if(sender.options[index].text == "Equip to fourth slot (6)"){
-            if(_player_inventory.Change_potion_in_slot(_slot_selected,3,_cursor_player_inv)){
-                Potions potion = (Potions)_item_selected;
-                player_slots.Update_quick_slot_potions_icon(potion,3);
-                Reset_item_info_pop_up();
-            }
+            Change_quick_slot_potion_and_UI(3);
         }
         if(sender.options[index].text == "Transfer items (T)"){
             Transfer_items_to_other_inv();
@@ -768,6 +686,7 @@ public class Inventories : MonoBehaviour{
         if(sender.options[index].text == "Exit"){
             
         }
+       
         // if(sender.value == 0){
         //     Debug.Log("0");
         //     // _mouse_on_item = true;  
@@ -797,8 +716,7 @@ public class Inventories : MonoBehaviour{
         // if(sender.value == 6){
 
         // }
-        Destroy(_instance_item_option_menu);
-        _pressed_outside_dropdown = true;
+        Close_item_option_menu();
     }
     public void Use_item_from_inv(){
         if(_amount_of_occupied_slots > _slot_number_item_info ){
@@ -837,10 +755,10 @@ public class Inventories : MonoBehaviour{
                 }
             }
         }
+        _obj_inv_slots.Update_inventory_object_UI(object_inv_to_show);
+        _player_inventory_slots.Update_inventory_player_UI(_player_inventory);
     }
     public void Drop_item_from_inventory(){
-        if(!_mouse_on_item)
-            return ;
         Rigidbody _instance_item_dropped;
         _instance_item_dropped = Instantiate(_item_dropped_prefab,_root_for_drop_items.position,_root_for_drop_items.rotation) as Rigidbody;
         _instance_item_dropped.AddForce(_root_for_drop_items.forward * _dropp_items_force);
@@ -854,6 +772,8 @@ public class Inventories : MonoBehaviour{
             object_inv_to_show.Remove_item_from_object(_slot_selected.slot_number);
         //Reset_item_info_pop_up();
         Move_slots_to_left_inv(_slot_selected,_player_inventory.amount_of_items_slots);
+        _obj_inv_slots.Update_inventory_object_UI(object_inv_to_show);
+        _player_inventory_slots.Update_inventory_player_UI(_player_inventory);
     }
     public void Split_one_item_from_inv_stack(int slot){
         if(_slot_selected.stack_amount >1){
@@ -870,6 +790,8 @@ public class Inventories : MonoBehaviour{
         }
         else 
             Debug.Log("Item in one copy - cant split");
+        _obj_inv_slots.Update_inventory_object_UI(object_inv_to_show);
+        _player_inventory_slots.Update_inventory_player_UI(_player_inventory);
     }
     public void Split_items_in_half_inv_stack(int slot){
         if( _slot_selected.stack_amount >1){
@@ -887,6 +809,8 @@ public class Inventories : MonoBehaviour{
         }
         else 
             Debug.Log("Item in one copy - cant split");
+        _obj_inv_slots.Update_inventory_object_UI(object_inv_to_show);
+        _player_inventory_slots.Update_inventory_player_UI(_player_inventory);
     }
     public void Repair_item(int slot){
         if(_item_selected is Weapon_info.Weapon){
@@ -934,67 +858,19 @@ public class Inventories : MonoBehaviour{
         Debug.Log("You don't have required whetstone to reapired weapon");
         return false;
     }      
-    public void Check_if_mouse_click_on_dropdown_title(){
-        _help.position = new Vector3( _input_handler.mouse_position.x,_input_handler.mouse_position.y,0);
-        List<RaycastResult> results = new List<RaycastResult>();
-        _graphicRaycaster_inv_slots.Raycast(_help, results);
-
-        foreach(var hit in results){
-            var Dropdown_select_button = hit.gameObject.GetComponent<TMPro.TMP_Dropdown>();
-            //Debug.Log("hitted something");
-            if(Dropdown_select_button){
-                _help2 = true;
-                _pressed_outside_dropdown = false;
-                //Debug.Log("Dropdown menu clicked");
-            }
-            else{
-                //Debug.Log("Dropdown menu not clicked");
-            }
-        }
-        if(_instance_item_option_menu!=null && _pressed_outside_dropdown){
-            Destroy(_instance_item_option_menu);
-        }
-        if(_instance_item_creation_menu!=null && _pressed_outside_dropdown){
-            Destroy(_instance_item_creation_menu);
-        }
-        if(_instance_item_creation_amount != null && _pressed_outside_dropdown)
-            Destroy(_instance_item_creation_amount);
-    }
-    public void Check_if_mouse_click_on_dropdown_options(){
-        _help.position = new Vector3( _input_handler.mouse_position.x,_input_handler.mouse_position.y,0);
-        List<RaycastResult> results = new List<RaycastResult>();
-        _graphicRaycaster_inv_slots.Raycast(_help, results);
-
-        foreach(var hit in results){
-            var Dropdown_select_button = hit.gameObject.GetComponent<TMPro.TextMeshPro>();
-            //Debug.Log("hitted something");
-            if(Dropdown_select_button){
-                //Debug.Log("one of options clicked");
-               // _pressed_outside_dropdown = false;
-            }
-            else{
-                //Debug.Log("none of options clicked");
-            }
-        }
-        // if(!_pressed_outside_dropdown){
-        //     Destroy(_instance_item_option_menu);
-        // }
-    }
-    public void Show_item_creation_menu(int slot){
+    public void Show_item_creation_menu(int slot_number){
         if(_last_pressed_right){
-            if(_instance_item_creation_menu != null)
-                Destroy(_instance_item_creation_menu);
-            if(_instance_item_creation_amount != null)
-                Destroy(_instance_item_creation_amount);
+            Close_item_creation_menu_and_amount();
             Reset_timer();
-            if(_creation_inv.recipes_for_items[slot] != null){
-                _instance_item_creation_menu = Instantiate(_item_creation_menu_prefab,_creation_inv_slots.obj_inv_items_images_slots[slot].transform.parent.transform.position,_creation_inv_slots.obj_inv_items_images_slots[slot].transform.parent.transform.rotation) as GameObject;
+            if(_creation_inv.recipes_for_items.Count > slot_number){
+                _detect_mouse_outside_pop_up.SetActive(true);
+                _instance_item_creation_menu = Instantiate(_item_creation_menu_prefab,_creation_inv_slots.creation_inv_items_images_slots[slot_number].transform.parent.transform.position,_creation_inv_slots.creation_inv_items_images_slots[slot_number].transform.parent.transform.rotation) as GameObject;
                 _instance_item_creation_menu.transform.SetParent(gameObject.transform);
                 _instance_item_creation_menu.GetComponent<RectTransform>().localPosition += new Vector3(0,-45,0);
                 Items_dropdown_options = _instance_item_creation_menu.GetComponent<TMPro.TMP_Dropdown>();
                 _dropdown_options_title = _instance_item_creation_menu.GetComponentInChildren<TMPro.TMP_Text>().gameObject;
                 Items_dropdown_options.onValueChanged.AddListener(delegate{
-                    Item_creation_dropdown(Items_dropdown_options,slot);
+                    Item_creation_dropdown(Items_dropdown_options,slot_number);
                 });
             }        
         }
@@ -1006,6 +882,8 @@ public class Inventories : MonoBehaviour{
         if(sender.value == 0){
             //create one item
             Create_item(slot);
+            Destroy(_instance_item_creation_menu);
+            _detect_mouse_outside_pop_up.SetActive(false);
         }
         if(sender.value == 1){
             //create all possible copies of selected item
@@ -1013,25 +891,28 @@ public class Inventories : MonoBehaviour{
                 if(! Create_item(slot))
                     break;
             }
+            Destroy(_instance_item_creation_menu);
+            _detect_mouse_outside_pop_up.SetActive(false);
         }
         if(sender.value == 2){
+            Destroy(_instance_item_creation_menu);
             //create given number amount of item
-            _instance_item_creation_amount = Instantiate(_input_field_prefab,_creation_inv_slots.obj_inv_items_images_slots[slot].transform.parent.transform.position,_creation_inv_slots.obj_inv_items_images_slots[slot].transform.parent.transform.rotation) as GameObject;
+            _instance_item_creation_amount = Instantiate(_input_field_prefab,_creation_inv_slots.creation_inv_items_images_slots[slot].transform.parent.transform.position,_creation_inv_slots.creation_inv_items_images_slots[slot].transform.parent.transform.rotation) as GameObject;
             _instance_item_creation_amount.transform.SetParent(gameObject.transform);
             _instance_item_creation_amount.GetComponent<RectTransform>().localPosition += new Vector3(0,-45,0);
         }
         if(sender.value == 3){
-            //exit
-
+            Destroy(_instance_item_creation_menu);
+            _detect_mouse_outside_pop_up.SetActive(false);
         }
-        Destroy(_instance_item_creation_menu);
-        _pressed_outside_dropdown = true;
+        
     }
     public bool Create_item(int slot){
         if(Check_for_ingredients_to_create(slot)){
             //Debug.Log("creating item: " + _creation_inv.recipes_for_items[slot].item_to_create);
             Item_info.Item new_item = ScriptableObject.Instantiate(_creation_inv.recipes_for_items[slot].item_to_create);
             Add_item_to_player_inv_check_for_same_object(new_item,1);
+            _player_inventory_slots.Update_inventory_player_UI(_player_inventory);
             // Whetstones new_whetstone;
             // //Debug.Log("Creating item: " + _creation_inv.recipes_for_items[slot].item_to_create);
             // new_whetstone = (Whetstones)ScriptableObject.CreateInstance(typeof(Whetstones));
@@ -1108,6 +989,7 @@ public class Inventories : MonoBehaviour{
     }
     //do more functions that return private fields etc - think which variables should be public and which private
     public  Player_inventory_slots Get_player_inv_slots() =>  _player_inventory_slots;
+    public Object_inventory_slots Get_object_inv_slots() => _obj_inv_slots;
     // two pairs of ad items functions - definitely could combine checking func to one - not for now - i am done with this part of inv for the moment
     //maybe functions could return number of left items - 0 if all items were transfered and some number if inv was full - it would save doing extra variables in other scripts - not sure if good idea - could look into it
     private void Add_item_to_obj_inv_check_for_same_object(Item_info.Item item,int stack_amount){
@@ -1152,7 +1034,7 @@ public class Inventories : MonoBehaviour{
         added_all_items = false;
         //do check for overcapping slot use general variables like _occupied slots
         // add on last free slot
-        if(item is Item_info.Item && _obj_inv_slots.obj_inv_items_slots[5].item == null ){
+        if(item is Item_info.Item && _obj_inv_slots.obj_inv_items_slots[5].item is null ){
             object_inv_to_show.Add_item_to_object(item,stack_amount);
             _obj_inv_slots.obj_inv_items_slots[object_inv_to_show.items_in_object.Count-1].item = item;
             if(_obj_inv_slots.obj_inv_items_slots[object_inv_to_show.items_in_object.Count-1].max_stack_amount >= stack_amount &&  _obj_inv_slots.obj_inv_items_slots[object_inv_to_show.items_in_object.Count-1].item.max_stack_amount >= stack_amount){
@@ -1180,6 +1062,8 @@ public class Inventories : MonoBehaviour{
         }
     }
     public void Add_item_to_player_inv_check_for_same_object(Item_info.Item item,int stack_amount){
+        if(item is null)
+            return ;
         added_all_items = false;
         
         if(item is Weapon_info.Weapon){
@@ -1232,7 +1116,7 @@ public class Inventories : MonoBehaviour{
         //     Debug.Log("");
     }
     public void Add_item_to_player_inv_last_slot(Item_info.Item item,int stack_amount){
-        if(item == null)
+        if(item is null)
             return ;
         added_all_items = false;
         _item_derivative = false;
@@ -1245,13 +1129,13 @@ public class Inventories : MonoBehaviour{
             Add_item_to_player_inv_category_last_slot(item,stack_amount,_player_inventory_slots.inventory_weapons_slots,_player_inventory.inventory_weapons_slots.Count);
         }
             
-        else if(item is Materials && _player_inventory_slots.inventory_materials_slots[5].item == null){
+        else if(item is Materials && _player_inventory_slots.inventory_materials_slots[5].item is null){
             Add_item_to_player_inv_category_last_slot(item,stack_amount,_player_inventory_slots.inventory_materials_slots,_player_inventory.inventory_materials_slots.Count);
         }
-        else if(item is Potions && _player_inventory_slots.inventory_potions_slots[5].item == null){
+        else if(item is Potions && _player_inventory_slots.inventory_potions_slots[5].item is null){
             Add_item_to_player_inv_category_last_slot(item,stack_amount,_player_inventory_slots.inventory_potions_slots,_player_inventory.inventory_potions_slots.Count);
         }
-        else if(item is Item_info.Item && _player_inventory_slots.inventory_items_slots[5].item == null && !_item_derivative){
+        else if(item is Item_info.Item && _player_inventory_slots.inventory_items_slots[5].item is null && !_item_derivative){
             Add_item_to_player_inv_category_last_slot(item,stack_amount,_player_inventory_slots.inventory_items_slots,_player_inventory.inventory_items_slots.Count);
         }
         else{
@@ -1294,6 +1178,8 @@ public class Inventories : MonoBehaviour{
             Show_items_add_rem_from_inv_window_pop_up(true,_item_selected,_slot_selected.stack_amount - remaining_item_amount);
             _slot_selected.stack_amount = remaining_item_amount;
         }
+        _player_inventory_slots.Update_inventory_player_UI(_player_inventory);
+        _obj_inv_slots.Update_inventory_object_UI(object_inv_to_show);
     }
     private void Move_items_to_object_inv(Item_info.Item item,int stack_amount){
         Add_item_to_obj_inv_check_for_same_object(item,stack_amount);
@@ -1308,6 +1194,8 @@ public class Inventories : MonoBehaviour{
             Show_items_add_rem_from_inv_window_pop_up(false,_item_selected,_slot_selected.stack_amount - remaining_item_amount);
             _slot_selected.stack_amount = remaining_item_amount;
         }
+        _player_inventory_slots.Update_inventory_player_UI(_player_inventory);
+        _obj_inv_slots.Update_inventory_object_UI(object_inv_to_show);
     }
     public void Show_items_add_rem_from_inv_window_pop_up(bool items_added, Item_info.Item item, int amount_of_items){
         if(_items_add_rem_window_pop_up.activeSelf == true &&  _items_add_rem_window_pop_up_text.text.Contains(item.Item_name)){
@@ -1329,16 +1217,39 @@ public class Inventories : MonoBehaviour{
         Function_timer.Stop_timer("inv_item_balance_window_pop_up");
         Function_timer.Create(() =>  _items_add_rem_window_pop_up.SetActive(false),3.5f,"inv_item_balance_window_pop_up");
     }
-    
+    public void Close_item_option_menu(){
+        if(_instance_item_option_menu != null){
+            Destroy(_instance_item_option_menu);
+            _detect_mouse_outside_pop_up.SetActive(false);
+        }
+    }
+    public void Close_item_creation_menu_and_amount(){
+        if(_instance_item_creation_menu != null){
+            Destroy(_instance_item_creation_menu);
+            _detect_mouse_outside_pop_up.SetActive(false);
+        }
+        if(_instance_item_creation_amount != null){
+            Destroy(_instance_item_creation_amount);
+            _detect_mouse_outside_pop_up.SetActive(false);
+        }
+    }
+    private void Change_quick_slot_potion_and_UI(int slot_number){
+        _player_inventory.Change_potion_in_slot(_slot_selected,slot_number,_cursor_player_inv);
+        Potions potion = (Potions)_item_selected;
+        player_slots.Update_quick_slot_potions_icon(potion,slot_number);
+        player_slots.Update_quick_slots_potions_amount(_player_inventory);
+        _player_inventory_slots.Update_inventory_player_UI(_player_inventory);
+        _obj_inv_slots.Update_inventory_object_UI(object_inv_to_show);
+        Reset_item_info_pop_up();
+    }
     #region buttons to toggle between crafting and player inv
     public void Show_crafting_menu(){
         _crafting_menu.SetActive(true);
         _player_inventory_menu.SetActive(false);
-        Update_creation_inventory_UI();
+        _creation_inv_slots.Update_crafting_inventory_UI();
         if(_instance_item_info != null)
             Destroy(_instance_item_info);
-        if(_instance_item_option_menu != null)
-            Destroy(_instance_item_option_menu);
+        Close_item_option_menu();
     }
     public void Show_player_inventory(){
         _crafting_menu.SetActive(false);
@@ -1346,10 +1257,7 @@ public class Inventories : MonoBehaviour{
         
         if(_instance_item_info != null)
             Destroy(_instance_item_info);
-        if(_instance_item_creation_menu != null)
-            Destroy(_instance_item_creation_menu);
-        if(_instance_item_creation_amount != null)
-            Destroy(_instance_item_creation_amount);
+        Close_item_creation_menu_and_amount();
     }
     public void Show_change_inv_buttons(){
         _inventory_buttons.SetActive(true);

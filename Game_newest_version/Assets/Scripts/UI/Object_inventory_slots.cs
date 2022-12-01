@@ -26,6 +26,5 @@ public class Object_inventory_slots : Inventory_slots{
             Remove_inventory_item_icon(obj_inv_items_images_slots,i);
             Remove_invenotry_item_amount(obj_inv_items_images_slots,i);
         }
-         
     }
 }

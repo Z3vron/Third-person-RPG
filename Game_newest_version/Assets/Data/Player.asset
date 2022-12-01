@@ -19,9 +19,9 @@ MonoBehaviour:
   Regenerate_stamina_rate: 0.01
   Raw_strength: 20
   Max_stamina: 100
-  Current_stamina: 100
+  Current_stamina: 0.46438217
   Taken_dmg: 0
   Taken_stamina: 0
-  level: 0
-  current_exp: 0
-  exp_to_next_level: 100
+  level: 2
+  current_exp: 150
+  exp_to_next_level: 200
