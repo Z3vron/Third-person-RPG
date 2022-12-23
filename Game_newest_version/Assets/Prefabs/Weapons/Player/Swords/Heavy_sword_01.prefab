@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 8791346347350675902}
   - component: {fileID: 325845231098710838}
   - component: {fileID: 1189376863516126843}
-  - component: {fileID: 3825462172592359295}
   - component: {fileID: 8862185778736833603}
+  - component: {fileID: 2378352998282325817}
   m_Layer: 0
   m_Name: Heavy_sword_01
   m_TagString: Untagged
@@ -83,19 +83,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &3825462172592359295
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2258298832145623003}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c9ac3514f0fe4c346919e823a0d87e2c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _isRight: 1
 --- !u!65 &8862185778736833603
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -109,6 +96,19 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.3260413, y: 1.1768904, z: 0.09328399}
   m_Center: {x: 0.040021684, y: 0.64420193, z: 0.0000008164694}
+--- !u!114 &2378352998282325817
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2258298832145623003}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 675cfd719935bb24da2e4b4d9443609e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _isRight: 1
 --- !u!1 &4452211867208237752
 GameObject:
   m_ObjectHideFlags: 0
@@ -258,8 +258,8 @@ GameObject:
   - component: {fileID: 398586617694217754}
   - component: {fileID: 7464881832021667359}
   - component: {fileID: 8801567253814450208}
-  - component: {fileID: 6461539112742945863}
   - component: {fileID: 8593628195465718926}
+  - component: {fileID: 2123812745037824705}
   m_Layer: 0
   m_Name: Heavy_sword_01 (1)
   m_TagString: Untagged
@@ -330,19 +330,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &6461539112742945863
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8378275147862724490}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c9ac3514f0fe4c346919e823a0d87e2c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _isRight: 0
 --- !u!65 &8593628195465718926
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -356,3 +343,16 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.32604137, y: 1.1893406, z: 0.09328399}
   m_Center: {x: 0.040022317, y: 0.637978, z: 0.00000017110742}
+--- !u!114 &2123812745037824705
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8378275147862724490}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 675cfd719935bb24da2e4b4d9443609e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _isRight: 0

@@ -105,7 +105,7 @@ GameObject:
   - component: {fileID: 416378503511901843}
   - component: {fileID: 1453278277732255531}
   - component: {fileID: 8464822590763136350}
-  - component: {fileID: 5797642179376094046}
+  - component: {fileID: 2458181124694093571}
   m_Layer: 0
   m_Name: Sabre
   m_TagString: Untagged
@@ -189,7 +189,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.21617222, y: 0.94253135, z: 0.11394727}
   m_Center: {x: -0.0074519515, y: 0.47360176, z: 0.00085127354}
---- !u!114 &5797642179376094046
+--- !u!114 &2458181124694093571
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -198,7 +198,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2677740602173533349}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c9ac3514f0fe4c346919e823a0d87e2c, type: 3}
+  m_Script: {fileID: 11500000, guid: 675cfd719935bb24da2e4b4d9443609e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _isRight: 1
@@ -259,7 +259,7 @@ GameObject:
   - component: {fileID: 5260621708232491389}
   - component: {fileID: 5692283440981736218}
   - component: {fileID: 992338240659984547}
-  - component: {fileID: 3500408662226649306}
+  - component: {fileID: 4560167369871167729}
   m_Layer: 0
   m_Name: Sabre
   m_TagString: Untagged
@@ -343,7 +343,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.21617222, y: 0.94253135, z: 0.11394727}
   m_Center: {x: -0.0074519515, y: 0.47360176, z: 0.00085127354}
---- !u!114 &3500408662226649306
+--- !u!114 &4560167369871167729
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -352,7 +352,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 7690702997325785924}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c9ac3514f0fe4c346919e823a0d87e2c, type: 3}
+  m_Script: {fileID: 11500000, guid: 675cfd719935bb24da2e4b4d9443609e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _isRight: 0

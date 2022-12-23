@@ -11,6 +11,7 @@ namespace Weapon_info{
         public float material_toughness;
         public bool unarmed;
         public int weapon_lvl;
+        
         [Header("Poison efect")]
         public float poison_damage;
         public float poison_duration;
@@ -22,11 +23,16 @@ namespace Weapon_info{
         public float combo_dmg_bonus;
         public float air_attack_damage;
 
+        [Header("Defense values")]
+        public int blocking_value;
+
         [Header("Stamina costs")]
         public float light_attack_stamina_cost;
         public float strong_attack_stamina_cost;
         public float combo_attack_stamina_cost;
         public float air_attack_stamina_cost;
+        public float blocking_stamina_cost;
+        public float parry_stamina_cost;
        
         public void Remove_durability(float durability_value_to_remove){
             durability -= durability_value_to_remove/material_toughness;

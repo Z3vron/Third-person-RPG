@@ -1,13 +1,19 @@
 fileFormatVersion: 2
 guid: b4ed12fcea5716a4b88a664cf716cfc6
 ModelImporter:
-  serializedVersion: 19301
+  serializedVersion: 20200
   internalIDToNameTable:
   - first:
       74: 416870459326255563
     second: tpose
   - first:
       74: 190365492218098281
+    second: PunchRight
+  - first:
+      74: 190365492218098281
+    second: human_male_punch_mirrored_01
+  - first:
+      74: -1628610361925504437
     second: PunchRight
   externalObjects: {}
   materials:
@@ -42,11 +48,11 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: tpose
-      takeName: tpose
+      name: human_male_punch_mirrored_01
+      takeName: human_male_punch_mirrored_01
       internalID: 0
-      firstFrame: 0
-      lastFrame: 1
+      firstFrame: 2
+      lastFrame: 62
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -117,6 +123,7 @@ ModelImporter:
     useFileUnits: 1
     keepQuads: 0
     weldVertices: 1
+    bakeAxisConversion: 0
     preserveHierarchy: 0
     skinWeightsMode: 0
     maxBonesPerVertex: 4
@@ -126,6 +133,9 @@ ModelImporter:
     secondaryUVAngleDistortion: 8
     secondaryUVAreaDistortion: 15.000001
     secondaryUVHardAngle: 88
+    secondaryUVMarginMethod: 1
+    secondaryUVMinLightmapResolution: 40
+    secondaryUVMinObjectScale: 1
     secondaryUVPackMargin: 4
     useFileScale: 1
   tangentSpace:
@@ -1034,6 +1044,7 @@ ModelImporter:
   animationType: 3
   humanoidOversampling: 1
   avatarSetup: 1
+  addHumanoidExtraRootOnlyWhenUsingAvatar: 0
   additionalBone: 0
   userData: 
   assetBundleName: 

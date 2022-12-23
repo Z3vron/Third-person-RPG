@@ -25,6 +25,7 @@ namespace Player_inventory_info{
             public Weapon_info.Weapon current_weapon_for_left_hand;
             public Weapon_info.Weapon backup_weapon_left;
             public Weapon_info.Weapon unarmed;
+            public Weapon_info.Weapon current_blocking_weapon;
             public List<Slot> quick_slots_potions = new List<Slot>();
             public Potions empty_potion;
         #endregion

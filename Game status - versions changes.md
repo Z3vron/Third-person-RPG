@@ -15,6 +15,8 @@ Think about
 - Camera shakes on stairs 
 - some things i do to often (each frame etc) should be done less time
 - delegates in C#, pointers or their counterparts use var => var.something etc
+- Do I want to be possible to put all weapons to both enemies and player hands? it creates some mess in code
+- Same button for tap and hold - some issues is it even possible?
 
 Next update:
 - Added event action to handle player death so that code would be more clean and there would be less references between scripts
@@ -22,6 +24,13 @@ Next update:
 - Started working on redoing Invenotires script - clearing extra unuseful code and rewriting it to be more easly understand and less complicated - oh boy what a spaghetti code i have made if someone would try to understand it than i can only wish that person good luck
 - I created base class for inventory slots making it more general but than original classes were reduced to just store variables that i use from the inventories script - I am not sure if this is the best solution - originally i just pass an argument(item) to function in class and within func body it would choose on which variable it should work - now i require to pass exact variable(list) into function not sure which solution is better
 - Moved updating UI elements from update to when they are changed
+- Added blocking attacks - some issues with consistency for both shield in left hand and weapon in right hand
+- Added parrying attacks - but still issues when enemy attack is registered sometimes it just goes through player 
+- Started using static Game manager to connect some scripts - think about it  
+- Fixed issue when player would still be in lock on mode even that he shouldn't
+- Fixed issue when player wouldn't lock on enemy because of the small obstacle between them
+- 
+
 
 Update 14.11.2022
 - Fixed bug when player was stuck at ceiling after hitting it

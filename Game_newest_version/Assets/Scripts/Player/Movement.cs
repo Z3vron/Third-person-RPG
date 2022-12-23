@@ -135,7 +135,7 @@ namespace Player_Movemnet{
             [Tooltip("Script that handles operations on inventories")]
             [SerializeField] private Inventories _inventories;
             private Input_handler _input_handler;
-            private Attack.Player_attack  _handle_attacks;
+            private Player_attack_handler  _handle_attacks;
             private Player_statistics _player_statistics;
             private Player_info _player_info;
             private Player_inventory_info.Player_inventory _player_inventory;
@@ -198,7 +198,7 @@ namespace Player_Movemnet{
             _animator = GetComponentInChildren<Animator>();
             _main_camera = Camera.main.transform;
 
-            _handle_attacks = GetComponent<Attack.Player_attack>();
+            _handle_attacks = GetComponent<Player_attack_handler>();
             _player_info = GetComponent<Player_info>();
             _player_statistics =  _player_info.player_stats;
             _player_inventory = GetComponent<Player_inventory_info.Player_inventory>();
@@ -219,7 +219,7 @@ namespace Player_Movemnet{
         }
         void Update(){
             _input_handler.Check_flags();
-            if(_player_info.locked_on_enemy){
+            if(_player_info.locked_on_enemy && _closest_enemy != null){
                 Handle_state_while_lock_on_enemy();
             }
             Gravity();
@@ -234,6 +234,9 @@ namespace Player_Movemnet{
                     Move_player();
                     if(!_player_info.locked_on_enemy)
                         Rotate_player();
+                    Parry();
+                    Block();
+                    
                     Attack();
                     Interact();
                 }
@@ -526,7 +529,7 @@ namespace Player_Movemnet{
         private void Attack(){
                 if(_input_handler.attack_light_flag){
                     //Debug.Log("Light attack button pressed");
-                    _handle_attacks.Handle_light_attack();
+                    _handle_attacks.Handle_light_attack(_input_handler.sprint_flag && _input_vector != Vector2.zero && !_animator.GetBool("Combat_movement"));
                 }
                 else if(_input_handler.attack_combo_flag){
                     _handle_attacks.Handle_combo_attack();
@@ -556,11 +559,22 @@ namespace Player_Movemnet{
                     _handle_attacks.Handle_air_special_attack();
                 }
         }
+        private void Block(){
+            if(_input_handler.block_attacks_flag)
+                _handle_attacks.Start_blocking_attacks();
+            else
+                _handle_attacks.Stop_blocking_attacks();
+        }
+        private void Parry(){
+            if(_input_handler.parry_attack_flag){
+                _handle_attacks.Parry_attack();
+            }
+        }
         private void Move_player(){
             _input_vector = _input_handler.walk_input;
-            if(_player_info.locked_on_enemy && ! _animator.GetBool("Active_animation")){
+            if(_player_info.locked_on_enemy && ! _animator.GetBool("Active_animation") ){
                 //Debug.Log(_animator.GetBool("Active_animation") + "combat movement");
-                _animator.SetBool("Combat_movement",true);
+                _animator.SetBool("Combat_movement",true);                
                 if(_input_vector == Vector2.zero){
                     _animator.CrossFade("Base Layer.Lock on movement.Lock on Idle",0,0);
                 }
@@ -708,18 +722,6 @@ namespace Player_Movemnet{
                         }    
                     }
                 }
-                // Collider[] enemies = Physics.OverlapSphere(transform.position,10);
-                // float distance_to_closest_enemy = Mathf.Infinity;
-                // foreach(var enemy in enemies){
-                //     float viewable_anlge = Vector3.Angle(enemy.transform.position - transform.position,_root_for_shot_raycast.forward);
-                //     if(enemy.CompareTag("Enemy") && viewable_anlge > -50 && viewable_anlge < 50 ){
-                //         enemies_lock_on.Add(enemy.gameObject);
-                //         if(Vector3.Distance(gameObject.transform.position,enemy.transform.position) < distance_to_closest_enemy){
-                //             distance_to_closest_enemy = Vector3.Distance(gameObject.transform.position,enemy.transform.position);
-                //             _closest_enemy = enemy.gameObject;
-                //         }    
-                //     } 
-                // }
                 if(_closest_enemy != null){
                     _target_group.AddMember(_closest_enemy.transform,1,2);
                     _player_info.locked_on_enemy = true;
@@ -804,8 +806,8 @@ namespace Player_Movemnet{
         }
         public bool Is_enemy_to_lock_on_visible(GameObject potential_enemy_to_lock_on){
             RaycastHit _hit;
-            if(Physics.Linecast(transform.position,potential_enemy_to_lock_on.transform.position, out _hit)){
-                //Debug.DrawLine(transform.position,_closest_enemy.transform.position);
+            if(Physics.Linecast(_root_for_shot_raycast.position,potential_enemy_to_lock_on.GetComponent<Enemy_manager>().raycast_root_transform.position, out _hit)){
+                Debug.DrawLine(_root_for_shot_raycast.position,potential_enemy_to_lock_on.GetComponent<Enemy_manager>().raycast_root_transform.position);
                 if(_hit.transform.gameObject.layer == _environment_layer )
                     return false;
                 else
@@ -838,6 +840,8 @@ namespace Player_Movemnet{
                 _input_handler.third_potion_flag = false;
                 _input_handler.fourth_potion_flag = false;
                 _input_handler.interact_flag = false;
+                _input_handler.block_attacks_flag = false;
+                _input_handler.parry_attack_flag = false;
                 _input_handler.attack_light_flag = false;
                 _input_handler.attack_strong_performed_flag = false;
                 _input_handler.attack_special_flag = false;

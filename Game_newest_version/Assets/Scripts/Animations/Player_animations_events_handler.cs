@@ -6,6 +6,7 @@ public class Player_animations_events_handler : MonoBehaviour
 {
    private Animator _animator;
    private Weapon_slot_manager.Weapon_manager weapon_manager;
+    [SerializeField] private GameObject _block_collider;
     void Start(){
         weapon_manager = GetComponentInParent<Weapon_slot_manager.Weapon_manager>();
         _animator = GetComponent<Animator>();
@@ -30,4 +31,19 @@ public class Player_animations_events_handler : MonoBehaviour
     public void Disable_invulnerability(){
         _animator.SetBool("Invulnerability",false);
     }
+    public void Enable_blocking(){
+        _block_collider.SetActive(true);
+    }
+    public void Disable_blocking(){
+        _block_collider.SetActive(false);
+    } 
+    public void Enable_parry(){
+        _animator.SetBool("Parry",true);
+        _block_collider.SetActive(true);
+    }
+    public void Disable_parry(){
+        _animator.SetBool("Parry",false);
+        _block_collider.SetActive(false);
+    }
+
 }

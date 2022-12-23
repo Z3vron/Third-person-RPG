@@ -57,7 +57,7 @@ GameObject:
   - component: {fileID: 8789874818428542121}
   - component: {fileID: 3589879900272218812}
   - component: {fileID: 4373666693739854176}
-  - component: {fileID: 7766258228650684709}
+  - component: {fileID: 4725832269440935944}
   m_Layer: 0
   m_Name: Holy_sword
   m_TagString: Untagged
@@ -141,7 +141,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.288198, y: 0.9613699, z: 0.07788086}
   m_Center: {x: 0, y: 0.60982925, z: 0}
---- !u!114 &7766258228650684709
+--- !u!114 &4725832269440935944
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -150,7 +150,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 6669907672622192885}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c9ac3514f0fe4c346919e823a0d87e2c, type: 3}
+  m_Script: {fileID: 11500000, guid: 675cfd719935bb24da2e4b4d9443609e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _isRight: 0
@@ -259,7 +259,7 @@ GameObject:
   - component: {fileID: 5021314622708334589}
   - component: {fileID: 7438470374234192855}
   - component: {fileID: 4519261408805735681}
-  - component: {fileID: 3644794233092536107}
+  - component: {fileID: 6143992307534543122}
   m_Layer: 0
   m_Name: Holy_sword
   m_TagString: Untagged
@@ -343,7 +343,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.288198, y: 0.9613699, z: 0.07788086}
   m_Center: {x: 0, y: 0.60982925, z: 0}
---- !u!114 &3644794233092536107
+--- !u!114 &6143992307534543122
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -352,7 +352,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 8731121435235938124}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c9ac3514f0fe4c346919e823a0d87e2c, type: 3}
+  m_Script: {fileID: 11500000, guid: 675cfd719935bb24da2e4b4d9443609e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _isRight: 1

@@ -16,7 +16,7 @@ public class Enemy_manager : MonoBehaviour
     public float enemy_rotation_speed = 4f;
     public  LayerMask characters_layer_mask;
     public GameObject targeted_character;
-    
+    public Transform raycast_root_transform;
     //some variables might be put into enemy statistics scriptible object script like health_taken_bar_multiplayer or health/stamina delay/timer? Think about it
    
     [SerializeField] private float _rotation_speed = 22;
@@ -26,7 +26,6 @@ public class Enemy_manager : MonoBehaviour
     public bool performing_action = false;
     [SerializeField] private GameObject _over_head_info_display_prefab;
     [SerializeField] private Camera _camera_to_rotate_to;
-    public GameObject player;
     [SerializeField] private Canvas _world_canvas;
     [SerializeField] private Enemy_attack[] _enemy_attacks;
     [SerializeField] private Enemy_weapon_slot_manager _enemy_weapon_slot_manager;
@@ -79,19 +78,22 @@ public class Enemy_manager : MonoBehaviour
         if(_instance_enemy_HUD != null){
             _instance_enemy_HUD.transform.GetComponent<RectTransform>().position =  new Vector3( gameObject.transform.position.x,gameObject.transform.position.y + GetComponent<CapsuleCollider>().height + 0.3f,gameObject.transform.position.z);  
             _instance_enemy_HUD.transform.localRotation = Quaternion.RotateTowards(_instance_enemy_HUD.transform.rotation,_camera_to_rotate_to.transform.rotation,180);
-            if(player != null){
-                if(Vector3.Distance(transform.position,player.transform.position) > 10){
+            if(Game_manager.Instance.player_movement != null){
+                if(_instance_enemy_HUD.activeSelf &&  Vector3.Distance(transform.position,Game_manager.Instance.player_movement.transform.position) > 10){
                     _instance_enemy_HUD.SetActive(false);
-                    if(player.GetComponent<Player_Movemnet.Movement>().enemies_lock_on.Contains(gameObject))
-                        player.GetComponent<Player_Movemnet.Movement>().enemies_lock_on.Remove(gameObject);
+                    if(Game_manager.Instance.player_movement.enemies_lock_on.Contains(gameObject))
+                        Game_manager.Instance.player_movement.enemies_lock_on.Remove(gameObject);
+                    if(Game_manager.Instance.player_movement.enemies_lock_on.Count == 0 && Game_manager.Instance.player_info.locked_on_enemy)
+                        Game_manager.Instance.player_movement.Release_lock_on_enemy();
                 }  
-                else{
+                else if(!_instance_enemy_HUD.activeSelf &&  Vector3.Distance(transform.position,Game_manager.Instance.player_movement.transform.position) <= 10){
                     _instance_enemy_HUD.SetActive(true);
-                    if(!player.GetComponent<Player_Movemnet.Movement>().enemies_lock_on.Contains(gameObject))
-                        player.GetComponent<Player_Movemnet.Movement>().enemies_lock_on.Add(gameObject);
+                    if(!Game_manager.Instance.player_movement.enemies_lock_on.Contains(gameObject))
+                        Game_manager.Instance.player_movement.enemies_lock_on.Add(gameObject);
                 }
             }
         }
+        
        
     }
     private void Handle_stamina_health_regen(){
@@ -120,11 +122,11 @@ public class Enemy_manager : MonoBehaviour
          
         animator.CrossFade("Death",0f,0);
         nav_mesh_agent.isStopped = true;
-        player.GetComponent<Player_info>().player_stats.current_exp += instance_enemy_stats.exp_reward;
-        if(player.GetComponent<Player_Movemnet.Movement>().enemies_lock_on.Contains(gameObject))
-            player.GetComponent<Player_Movemnet.Movement>().enemies_lock_on.Remove(gameObject);
-        if(player.GetComponent<Player_Movemnet.Movement>().enemies_lock_on.Count == 0 && player.GetComponent<Player_info>().locked_on_enemy)
-            player.GetComponent<Player_Movemnet.Movement>().Release_lock_on_enemy();
+        Game_manager.Instance.player_info.player_stats.current_exp += instance_enemy_stats.exp_reward;
+        if(Game_manager.Instance.player_movement.enemies_lock_on.Contains(gameObject))
+            Game_manager.Instance.player_movement.enemies_lock_on.Remove(gameObject);
+        if(Game_manager.Instance.player_movement.enemies_lock_on.Count == 0 && Game_manager.Instance.player_info.locked_on_enemy)
+            Game_manager.Instance.player_movement.Release_lock_on_enemy();
         state_manager.enabled = false;
         this.enabled = false;
         Destroy(gameObject,2.167f);
@@ -133,7 +135,7 @@ public class Enemy_manager : MonoBehaviour
         
     }
     private void Handle_recovery_time(){
-        if(current_recovery_time > 0){
+        if(current_recovery_time > 0 && animator.GetCurrentAnimatorStateInfo(0).IsName("Idle") ){
             current_recovery_time -= Time.deltaTime;
         }
         if(performing_action && current_recovery_time <=0){

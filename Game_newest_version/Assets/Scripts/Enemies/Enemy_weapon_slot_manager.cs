@@ -7,8 +7,8 @@ public class Enemy_weapon_slot_manager : MonoBehaviour{
     public Weapon_info.Weapon left_hand_weapon;
     [SerializeField] private  Weapon_holder.Weapon_armed _right_hand_slot;
     [SerializeField] private  Weapon_holder.Weapon_armed _left_hand_slot;
-    private Weapons_damage_collider _left_hand_weapon_collider;
-    private Weapons_damage_collider _right_hand_weapon_collider;
+    private Weapon_damage_collider_enemy _left_hand_weapon_collider;
+    private Weapon_damage_collider_enemy _right_hand_weapon_collider;
     private void Awake() {
         Weapon_holder.Weapon_armed[] Weapons_slots = GetComponentsInChildren<Weapon_holder.Weapon_armed>();
         foreach (Weapon_holder.Weapon_armed slot in Weapons_slots){
@@ -56,11 +56,11 @@ public class Enemy_weapon_slot_manager : MonoBehaviour{
     }
     private void Assign_weapon_collider(bool isRight){
         if(isRight){
-            //Debug.Log(_right_hand_slot.current_Weapon_model_instantiated.GetComponentInChildren<Weapons_damage_collider>());
-            _right_hand_weapon_collider = _right_hand_slot.current_Weapon_model_instantiated.GetComponentInChildren<Weapons_damage_collider>();
+            //Debug.Log(_right_hand_slot.current_Weapon_model_instantiated.GetComponentInChildren<Weapon_damage_collider_enemy>());
+            _right_hand_weapon_collider = _right_hand_slot.current_Weapon_model_instantiated.GetComponentInChildren<Weapon_damage_collider_enemy>();
         }
         else{
-            _left_hand_weapon_collider = _left_hand_slot.current_Weapon_model_instantiated.GetComponentInChildren<Weapons_damage_collider>();
+            _left_hand_weapon_collider = _left_hand_slot.current_Weapon_model_instantiated.GetComponentInChildren<Weapon_damage_collider_enemy>();
         }
     }
     public void Enable_collider_on_right_weapon(){

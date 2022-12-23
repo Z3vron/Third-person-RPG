@@ -6,6 +6,7 @@ using System;
 public class Player_info : MonoBehaviour{
     public bool active_animation = false;
     public bool player_invulnerability;
+    public bool player_parrying;
     public bool player_grounded;
     public bool player_crouching;
     public bool locked_on_enemy = false;
@@ -29,7 +30,8 @@ public class Player_info : MonoBehaviour{
     //public delegate void Player_death
     // public static event Player_death player_death
     private void Start() {
-        player_stats.Set_defaults_stats(30,100,0.1f,0.01f,20,1,0,100);
+        Player_death += Stop_healing_and_stamina_regen;
+        player_stats.Set_defaults_stats(300,100,0.1f,0.08f,20,1,0,100);
         player_stats.level = 1;
         player_stats.exp_to_next_level = 100;
         player_stats.current_exp = 0;
@@ -43,6 +45,7 @@ public class Player_info : MonoBehaviour{
         player_crouching = GetComponent<Player_Movemnet.Movement>().player_crouching;
         active_animation = _animator.GetBool("Active_animation");
         player_invulnerability = _animator.GetBool("Invulnerability");
+        player_parrying = _animator.GetBool("Parry");
         if(player_stats.Taken_dmg){
             if(player_stats.Current_health <= 0){
                 Player_death?.Invoke();// if Player_death is diffrent from null then Invoke else dont do anything
@@ -66,9 +69,7 @@ public class Player_info : MonoBehaviour{
             player_stats.level += 1;
             player_stats.exp_to_next_level = player_stats.exp_to_next_level * player_stats.level;
         }
-        Handle_healing_player();
-        //Death_check();
-         
+        Handle_healing_player();  
     }
     void Update_UI(){
         _player_UI_info.Set_current_health(player_stats.Current_health/player_stats.Max_health);
@@ -93,4 +94,7 @@ public class Player_info : MonoBehaviour{
             _healing_timer = 0;
         }
     }    
+    private void Stop_healing_and_stamina_regen(){
+        this.enabled = false;
+    }
 }

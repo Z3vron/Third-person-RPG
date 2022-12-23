@@ -8,8 +8,8 @@ namespace Weapon_slot_manager{
 
         private Weapon_holder.Weapon_armed _left_slot;
         private Weapon_holder.Weapon_armed _right_slot;
-        private Weapons_damage_collider _left_hand_weapon_collider;
-        private Weapons_damage_collider _right_hand_weapon_collider;
+        private Weapon_damage_collider_player _left_hand_weapon_collider;
+        private Weapon_damage_collider_player _right_hand_weapon_collider;
         private Player_slots _player_quick_access_slots;
         private void Awake() {
             Weapon_holder.Weapon_armed[] Weapons_slots = GetComponentsInChildren<Weapon_holder.Weapon_armed>();
@@ -66,7 +66,7 @@ namespace Weapon_slot_manager{
             }
         }
         public void assign_left_weapon_collider(){
-            _left_hand_weapon_collider = _left_slot.current_Weapon_model_instantiated.GetComponentInChildren<Weapons_damage_collider>();
+            _left_hand_weapon_collider = _left_slot.current_Weapon_model_instantiated.GetComponentInChildren<Weapon_damage_collider_player>();
                 // if(_left_hand_weapon_collider == null)
                 //     Debug.Log("left error ");
                 // else
@@ -74,7 +74,7 @@ namespace Weapon_slot_manager{
         }
         public void assign_right_weapon_collider(){
              
-            _right_hand_weapon_collider = _right_slot.current_Weapon_model_instantiated.GetComponentInChildren<Weapons_damage_collider>();
+            _right_hand_weapon_collider = _right_slot.current_Weapon_model_instantiated.GetComponentInChildren<Weapon_damage_collider_player>();
         }
         public void Enable_collider_on_right_weapon(){
             _right_hand_weapon_collider.Enable_collider();

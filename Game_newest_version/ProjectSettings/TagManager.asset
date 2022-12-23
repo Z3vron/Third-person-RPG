@@ -11,6 +11,7 @@ TagManager:
   - Door_pull
   - Enemy
   - Bush
+  - Block_collider
   layers:
   - Default
   - TransparentFX

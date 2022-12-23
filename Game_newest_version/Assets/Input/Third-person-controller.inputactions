@@ -24,6 +24,24 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "Block",
+                    "type": "Value",
+                    "id": "58914f07-1a68-494c-967a-cf7e19253c16",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Parry",
+                    "type": "Button",
+                    "id": "9ec78682-f1d2-4d04-bedf-2d3a8f55e154",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "Light_attack",
                     "type": "Button",
                     "id": "fb0c1374-6a4c-4f21-937b-adbbcc45f7e8",
@@ -664,6 +682,28 @@
                     "processors": "",
                     "groups": "Keyboard&Mouse",
                     "action": "Air_attack",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "19313613-5b06-4e5b-9c26-c73cec870643",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Block",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "98635cd8-6dea-46a3-a5df-bff37e6bc336",
+                    "path": "<Mouse>/forwardButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Parry",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

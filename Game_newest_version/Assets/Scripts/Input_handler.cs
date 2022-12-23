@@ -19,13 +19,15 @@ public class Input_handler : MonoBehaviour
         public bool third_potion_flag;
         public bool fourth_potion_flag;
         public bool interact_flag;
+        public bool block_attacks_flag;
+        public bool parry_attack_flag;
         public bool attack_light_flag;
         public bool attack_strong_started_flag;
+        public bool attack_strong_canceled_flag;
         public bool attack_strong_performed_flag;
         public bool attack_special_flag;
         public bool attack_combo_flag;
         public bool attack_air_flag;
-        public bool attack_strong_canceled_flag;
         public bool lock_on_flag;
         public bool switch_flag;
         public bool dash_flag;
@@ -34,6 +36,8 @@ public class Input_handler : MonoBehaviour
         private InputAction _jump_action;
         private InputAction _walk_action;
         private InputAction _sprint_action;
+        private InputAction _block_attack_action;
+        private InputAction _parry_attack_action;
         private InputAction _attack_1_action;
         private InputAction _attack_2_action;
         private InputAction _attack_3_action;
@@ -55,7 +59,7 @@ public class Input_handler : MonoBehaviour
         
         private InputAction _help_action;
     #endregion
-    #region  Invenotry_action_map
+    #region  Inventory_action_map
         public bool mouse_right_pressed_inv_flag;
         public bool mouse_left_pressed_inv_flag;
         public bool transfer_items_inv_flag;
@@ -94,6 +98,8 @@ public class Input_handler : MonoBehaviour
         _jump_action = _player_input.actions["Jump"];
         _walk_action = _player_input.actions["Move"];
         _sprint_action = _player_input.actions["Sprint"];
+        _block_attack_action  = _player_input.actions["Block"];
+        _parry_attack_action = _player_input.actions["Parry"];
         _attack_1_action = _player_input.actions["Light_attack"];
         _attack_2_action = _player_input.actions["Strong_attack"];
         _attack_3_action = _player_input.actions["Special_attack"];
@@ -147,6 +153,8 @@ public class Input_handler : MonoBehaviour
         if(_lock_on_action.triggered)                lock_on_flag = true;{}
         if(_switch_action_player.triggered)                 switch_flag = true;{}
         if(_dash_action.triggered)                   dash_flag = true;{}
+        if(_block_attack_action.ReadValue<float>() == 1) block_attacks_flag = true;{}
+        if(_parry_attack_action.triggered)           parry_attack_flag = true;{}
         if(_attack_1_action.triggered)               attack_light_flag = true;{}
         if(_attack_2_action.phase == InputActionPhase.Started){
             attack_strong_started_flag = true;

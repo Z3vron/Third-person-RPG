@@ -57,7 +57,7 @@ GameObject:
   - component: {fileID: 995115905062251562}
   - component: {fileID: 7807362409617347567}
   - component: {fileID: 3656494470952200448}
-  - component: {fileID: 8077935558968667433}
+  - component: {fileID: 6489182721032689915}
   m_Layer: 0
   m_Name: Fist
   m_TagString: Untagged
@@ -143,7 +143,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0, y: 0, z: 0}
   m_Center: {x: -0.0000017014514, y: 0.01645541, z: 0.00038456154}
---- !u!114 &8077935558968667433
+--- !u!114 &6489182721032689915
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -152,10 +152,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 2580693060015087528}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c9ac3514f0fe4c346919e823a0d87e2c, type: 3}
+  m_Script: {fileID: 11500000, guid: 675cfd719935bb24da2e4b4d9443609e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _attack: {fileID: 0}
   _isRight: 0
 --- !u!1 &3156064060645915811
 GameObject:
@@ -169,7 +168,7 @@ GameObject:
   - component: {fileID: 465949657521006330}
   - component: {fileID: 2419442314021818928}
   - component: {fileID: 474647325971861533}
-  - component: {fileID: 8785725926263390672}
+  - component: {fileID: 5559051374278657271}
   m_Layer: 0
   m_Name: Fist
   m_TagString: Untagged
@@ -255,7 +254,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0, y: 0, z: 0}
   m_Center: {x: -0.0000017014514, y: 0.01645541, z: 0.00038456154}
---- !u!114 &8785725926263390672
+--- !u!114 &5559051374278657271
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -264,10 +263,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 3156064060645915811}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c9ac3514f0fe4c346919e823a0d87e2c, type: 3}
+  m_Script: {fileID: 11500000, guid: 675cfd719935bb24da2e4b4d9443609e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _attack: {fileID: 0}
   _isRight: 1
 --- !u!1 &4323639295151373101
 GameObject:

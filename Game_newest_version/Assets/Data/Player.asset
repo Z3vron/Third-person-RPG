@@ -14,12 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   armour_effectiveness: 0
   Max_health: 300
-  Current_health: 300
+  Current_health: 176
   Regenerate_healh_rate: 0.1
-  Regenerate_stamina_rate: 0.01
+  Regenerate_stamina_rate: 0.08
   Raw_strength: 20
   Max_stamina: 100
-  Current_stamina: 0.46438217
+  Current_stamina: 9.529444
   Taken_dmg: 0
   Taken_stamina: 0
   level: 2
