@@ -17,6 +17,8 @@ Think about
 - delegates in C#, pointers or their counterparts use var => var.something etc
 - Do I want to be possible to put all weapons to both enemies and player hands? it creates some mess in code
 - Same button for tap and hold - some issues is it even possible?
+- I added game manager but i am not sure what data/references to put inside and where to use them because i am afraid that i will use it everywhere - right now i store player scripts like inventory etc but i use it in only few places i could change it to use it everywhere i called it bot not sure
+
 - Using game manager to access some values in scripts(specially ones related to player ) or use observer pattern(events)
 
 Update 09.01.2023
@@ -30,7 +32,7 @@ Update 09.01.2023
 - Started using static Game manager to connect some scripts - think about it  
 - Fixed issue when player would still be in lock on mode even that he shouldn't
 - Fixed issue when player wouldn't lock on enemy because of the small obstacle between them
-- Change updating UI so that it is separated from the logic - used C# Events(observer pattern) - with player UI no issue but with enemy there was a problem that event was called on all enemies HUD in world canvas so i pass specifc one to check - not most efficient
+- Change updating UI so that it is separated from the logic - used C# Events(observer pattern) - with player UI no issue but with enemy there was a problem that event was called on all enemies HUD in world canvas so i pass specifc one to check - not most efficientAdded game mangaer but i am still not sure where i could use it
 
 
 Update 14.11.2022
