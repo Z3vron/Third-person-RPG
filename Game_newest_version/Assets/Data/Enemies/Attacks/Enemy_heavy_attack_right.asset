@@ -19,6 +19,6 @@ MonoBehaviour:
   maximum_attack_angle: 35
   minimum_distance_to_attack: 1
   maximum_distance_to_attack: 3
-  damage: 45
+  damage: 100
   require_left_weapon: 0
   require_right_weapon: 1

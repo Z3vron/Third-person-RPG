@@ -17,6 +17,8 @@ namespace Player_inventory_info{
             [SerializeField] private int _item_to_add_2_amount;
             [SerializeField] private Item_info.Item _item_to_add_3;
             [SerializeField] private int _item_to_add_3_amount;
+            [SerializeField] private Item_info.Item _item_to_add_4;
+            [SerializeField] private int _item_to_add_4_amount;
         #endregion
         #region Weapons and potions in quick slots
             [Header("Weapons and potions in quick slots")]       
@@ -72,7 +74,7 @@ namespace Player_inventory_info{
             _inventories.Add_item_to_player_inv_last_slot(_item_to_add_1,_item_to_add_1_amount);
             _inventories.Add_item_to_player_inv_last_slot(_item_to_add_2,_item_to_add_2_amount);
             _inventories.Add_item_to_player_inv_last_slot(_item_to_add_3,_item_to_add_3_amount);           
-            
+            _inventories.Add_item_to_player_inv_last_slot(_item_to_add_4,_item_to_add_4_amount);    
             //definition here elsewhere value is changed 
             //load fists at the start to left hand
             weapon_slot_manager.Load_weapon_to_slot(unarmed,false);
@@ -446,6 +448,7 @@ namespace Player_inventory_info{
                 _inventories.Show_player_inventory();
                 _inventories.Show_change_inv_buttons();
                 _inventories.Get_player_inv_slots().Update_inventory_player_UI(this);
+                Game_manager.Instance.player_info.player_stats.Invoke_change_player_lvl_UI_event();
                 Cursor.lockState = CursorLockMode.Confined;
                 inventory_open = true;
                 _cinemachine_camera_x_sensitivity = _cinemachine_camera.m_XAxis.m_MaxSpeed;

@@ -64,12 +64,15 @@ namespace Player_Movemnet{
         public int dropped_item_new_amount;
        
         #region Player flags
-            [Header("Player movement flags")]
-          // [field: SerializeField] public bool player_grounded {get;private set;}
+            [field: SerializeField, Header("Player movement flags")]
+            //[Range(1,6)]
+            //int,float value
            // array[index++ % array.Length] // will go until last element in array and then go again from the first element
-            public bool player_grounded = false;
-            public bool player_crouching = false;
-            public bool player_hit_ceiling = false;
+           //[field: SerializeField] public bool player_grounded {get; private set;}
+           //header field needs to be serializefield or it won't show in inspector with properties, this means for first property that it doesn't need own serializefield field declaration 
+            public bool player_grounded {get; private set;} = false;
+            [field: SerializeField]  public bool player_crouching {get; private set;}  = false;
+            [field: SerializeField] public bool player_hit_ceiling {get; private set;} = false;
         #endregion
         // public bool Door_touched = false; // variable used to control door in another script but I decided to handle it here  - not sure if good habbit but another script would be too simple
         public bool Trap_active = false; 
@@ -179,7 +182,7 @@ namespace Player_Movemnet{
             [Header("Interact with objects variables")]
             private  GameObject _object_to_interact;
             private bool _text_added = false;
-           // [Tooltip("Distance to interactable object that within player must be to interact with given object - not using right now changed from raycast to triggers")]
+            // [Tooltip("Distance to interactable object that within player must be to interact with given object - not using right now changed from raycast to triggers")]
             //[SerializeField] private float _distance_to_interact = 0.9f;
 
             private bool _in_area_to_interact_chest = false;
@@ -236,19 +239,17 @@ namespace Player_Movemnet{
                         Rotate_player();
                     Parry();
                     Block();
-                    
                     Attack();
                     Interact();
                 }
                 Handle_jump_on_top_of_enemy();
                 Move_controller();
             }
-            
         }
         private void LateUpdate() {
             Set_input_flags_false();
         }
-        void  Equip_items(){
+        private void  Equip_items(){
             if(_input_handler.inventory_flag && player_grounded)
                 _player_inventory.Handle_inventory();
             if(_input_handler.inventory_close_inv_flag)
@@ -670,7 +671,7 @@ namespace Player_Movemnet{
                 _controller.center = (new Vector3(0,0.9f,0));
             }
         }
-        public void Move_controller(){
+        private void Move_controller(){
             if(_animator.GetBool("Movement_driven_by_animation"))
                 return ;
             Vector3 move_player;
@@ -691,7 +692,6 @@ namespace Player_Movemnet{
             if(Physics.CheckSphere(Sphere_position,_grounded_check_radious,128,QueryTriggerInteraction.Ignore)){
                 _Move.z = -4;
                 _player_speed = 1;
-               
             }
         }   
         private void Ceiling_check(){

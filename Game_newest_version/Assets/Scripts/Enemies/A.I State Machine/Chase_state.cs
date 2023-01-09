@@ -14,8 +14,8 @@ public class Chase_state : State{
             enemy_manager.animator.SetFloat("Vertical",0);//,0.1f,Time.fixedDeltaTime);//with damping animation is still going
             return  idle_state;
         }
-        else if(Vector3.Distance(enemy_manager.transform.position,enemy_manager.targeted_character.transform.position) > enemy_manager.distance_to_attack){
-           // Debug.Log("Moving to target");
+        else if(Vector3.Distance(enemy_manager.transform.position,enemy_manager.targeted_character.transform.position) > enemy_manager.distance_to_attack && !enemy_manager.performing_action){
+            //Debug.Log("Moving to target");
             enemy_manager.nav_mesh_agent.SetDestination(enemy_manager.targeted_character.transform.position);
             if(enemy_manager.nav_mesh_agent.isStopped){
                 enemy_manager.nav_mesh_agent.isStopped = false;

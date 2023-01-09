@@ -32,26 +32,32 @@ public class Character_statistics : ScriptableObject{
         level = base_level;
         //exp_to_next_level = exp_for_level_1;
     }
-    public void Health_regen(){
+    public void Health_regen(float delta_time){
         if(Current_health < Max_health && Current_health >0){
-            Current_health += Regenerate_healh_rate;
+            Current_health += Regenerate_healh_rate * delta_time;
+            Invoke_change_character_hp_UI_event();
         }
     }
-    public void Stamina_regen(){
+    public virtual void Invoke_change_character_hp_UI_event(){}
+    public virtual void Invoke_change_player_stamina_UI_event(){}
+    public void Stamina_regen(float delta_time){
         if(Current_stamina < Max_stamina){
-            Current_stamina += Regenerate_stamina_rate;
+            Current_stamina += Regenerate_stamina_rate * delta_time;
+            Invoke_change_player_stamina_UI_event();
         }
     }
     public void Take_damage(float damage){
-        if(Current_health > 0)
+        if(Current_health > 0){
             Current_health -= ( damage * (100 -armour_effectiveness)/100);
-        Taken_dmg = true;
-       
+            Taken_dmg = true;
+            Invoke_change_character_hp_UI_event();
+        }
     }
     public void Take_damage_bypass_armour(float damage){
         if(Current_health > 0)
             Current_health -= damage;
         Taken_dmg = true;
+        Invoke_change_character_hp_UI_event();
     }
     public void Take_stamina(float stamina){
         if(Current_stamina > 0){
@@ -60,11 +66,13 @@ public class Character_statistics : ScriptableObject{
         if(Current_stamina < 0)
             Current_stamina = 0;    
         Taken_stamina = true;
+        Invoke_change_player_stamina_UI_event();
     }
     public void Restore_health(float  health_restore_amount){
         if(Current_health + health_restore_amount < Max_health)
             Current_health += health_restore_amount;
         else
             Current_health = Max_health;
+        Invoke_change_character_hp_UI_event();
     }
 }

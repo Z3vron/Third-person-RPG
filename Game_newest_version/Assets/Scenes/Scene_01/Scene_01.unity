@@ -5425,9 +5425,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc476d50dfa9c4140ace2dad63361ca8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player_info: {fileID: 1264486896}
-  player_inventory: {fileID: 1264486893}
-  player_movement: {fileID: 1264486892}
+  <player_info>k__BackingField: {fileID: 1264486896}
+  <player_inventory>k__BackingField: {fileID: 1264486893}
+  <player_movement>k__BackingField: {fileID: 1264486892}
 --- !u!4 &450098234
 Transform:
   m_ObjectHideFlags: 0
@@ -14502,9 +14502,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dropped_item_new_amount: 0
-  player_grounded: 0
-  player_crouching: 0
-  player_hit_ceiling: 0
+  <player_grounded>k__BackingField: 0
+  <player_crouching>k__BackingField: 0
+  <player_hit_ceiling>k__BackingField: 0
   Trap_active: 0
   _touch_force: 80
   _door_side: 0
@@ -14565,6 +14565,8 @@ MonoBehaviour:
   _item_to_add_2_amount: 1
   _item_to_add_3: {fileID: 11400000, guid: 483a8c4126776c445ac07c5053e92b79, type: 2}
   _item_to_add_3_amount: 1
+  _item_to_add_4: {fileID: 11400000, guid: 3f14a7bfee4fd2e41acc8cfd2ec4cdbe, type: 2}
+  _item_to_add_4_amount: 2
   current_weapon_for_right_hand: {fileID: 11400000, guid: 9bd14b93b9d209b439f5cb3974fd4cd5, type: 2}
   backup_weapon_right: {fileID: 0}
   current_weapon_for_left_hand: {fileID: 0}
@@ -14640,17 +14642,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87babc9192da3124684d0d1a50e62e1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  active_animation: 0
-  player_invulnerability: 0
-  player_parrying: 0
-  player_grounded: 0
-  player_crouching: 0
-  locked_on_enemy: 0
-  player_stats: {fileID: 11400000, guid: 2d535093f1bd17a4c85d76beca2102ea, type: 2}
+  <active_animation>k__BackingField: 0
+  <player_invulnerability>k__BackingField: 0
+  <player_parrying>k__BackingField: 0
+  <player_grounded>k__BackingField: 0
+  <player_crouching>k__BackingField: 0
+  <locked_on_enemy>k__BackingField: 0
+  <player_stats>k__BackingField: {fileID: 11400000, guid: 2d535093f1bd17a4c85d76beca2102ea, type: 2}
   eat_food: {fileID: 8300000, guid: 0e2b20ce442fbf64fb862aa80f621a38, type: 3}
   drink_potion: {fileID: 8300000, guid: b5b08e0803c49f149a89825f9e01675d, type: 3}
-  _player_UI_info: {fileID: 150640203}
-  _health_regen_delay: 50
+  _health_regen_delay: 25
   _stamina_regen_delay: 2
 --- !u!114 &1264486898
 MonoBehaviour:
@@ -16829,7 +16830,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 125, y: 32.5}
+  m_AnchoredPosition: {x: 125, y: 31}
   m_SizeDelta: {x: 200, y: 15}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1528367124
@@ -16879,7 +16880,7 @@ MonoBehaviour:
   m_MinValue: 0
   m_MaxValue: 1
   m_WholeNumbers: 0
-  m_Value: 0
+  m_Value: 1
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -21406,7 +21407,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1920904958}
-  m_LocalRotation: {x: 0.039274123, y: -0.025608761, z: 0.016129004, w: 0.99877006}
+  m_LocalRotation: {x: 0.039274123, y: -0.025608731, z: 0.016128983, w: 0.99877006}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -24061,7 +24062,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5615770495873344495, guid: 90926102a6d84764db613c424a0ff807, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5615770495873344496, guid: 90926102a6d84764db613c424a0ff807, type: 3}
       propertyPath: player

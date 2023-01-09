@@ -13,11 +13,18 @@ public class Game_over : MonoBehaviour{
     private void Start() {
         _animator = GetComponent<Animator>();
         Player_info.Player_death += Show_death_UI;
+        Player_info.Player_death += Restart_level_begin;
     }
     private void Show_death_UI(){
         _animator.SetTrigger("GameOver");
     }
-
+    private void Restart_level_begin(){
+        Function_timer.Create( Restart_level,5);
+       
+    }
+    private void Restart_level(){
+         SceneManager.LoadScene("Scene_01");
+    }
     // private void Update(){
 
     //     if(player.player_stats.Current_health <=0){

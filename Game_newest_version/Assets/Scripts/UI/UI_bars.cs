@@ -6,28 +6,31 @@ using UnityEngine.UI;
 namespace UI_elements{
     public class UI_bars : MonoBehaviour{
             
-       // public Slider Health_slider;
         public Slider Stamina_slider;
         public Image health_bar;
         public Image health_taken_bar;
         public float health_taken_bar_multiplayer = 0.15f;
         public Text exp_level;
-
-        public void Set_current_health( float Current_health){
-            health_bar.fillAmount = Current_health;
-            //Health_slider.value = Current_health;
+        private void Start() {
+            Player_statistics.Changed_player_hp_UI += Set_current_health;
+            Player_statistics.Changed_player_stamina_UI += Set_current_stamina;
+            Player_statistics.Changed_player_lvl_UI += Set_exp_level;
         }
-        public void Set_current_stamina( float Current_stamina){
-            Stamina_slider.value = Current_stamina;
+
+        public void Set_current_health( float Current_health_in_percentage){
+            health_bar.fillAmount = Current_health_in_percentage;
+        }
+        public void Set_current_stamina( float Current_stamina_in_percentage){
+            Stamina_slider.value = Current_stamina_in_percentage;
         }
         private void Update() {
             if(health_taken_bar.fillAmount > health_bar.fillAmount)
                 health_taken_bar.fillAmount -= Time.deltaTime * health_taken_bar_multiplayer; 
-            else if(health_taken_bar.fillAmount <=health_bar.fillAmount)
+            else if(health_taken_bar.fillAmount < health_bar.fillAmount)
                 health_taken_bar.fillAmount = health_bar.fillAmount;
         }
-        public void Set_exp_level(int exp_amount, int exp_cap,int level){
-            exp_level.text ="Exp: " + exp_amount + "/" + exp_cap + "   level: " + level;
+        public void Set_exp_level(int level,int exp_amount, int exp_cap){
+            exp_level.text = "Lvl: " + level + "Exp: " + exp_amount + "/" + exp_cap;
         }
 
     }

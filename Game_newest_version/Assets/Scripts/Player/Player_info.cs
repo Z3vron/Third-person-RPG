@@ -4,34 +4,44 @@ using UnityEngine;
 using System;
 
 public class Player_info : MonoBehaviour{
-    public bool active_animation = false;
-    public bool player_invulnerability;
-    public bool player_parrying;
-    public bool player_grounded;
-    public bool player_crouching;
-    public bool locked_on_enemy = false;
-    public Player_statistics player_stats;
-    public AudioClip eat_food;
-    public AudioClip drink_potion;
-    [SerializeField] private UI_elements.UI_bars _player_UI_info;
+
+     #region Player flags
+        [field: SerializeField, Header("Player flags")]
+        public bool active_animation {get; private set;} = false;
+        [field: SerializeField] public bool player_invulnerability {get; private set;} = false;
+        [field: SerializeField] public bool player_parrying {get; private set;} = false;
+        [field: SerializeField] public bool player_grounded {get; private set;} = false;    
+        [field: SerializeField] public bool player_crouching {get; private set;} = false;
+        [field: SerializeField] public bool locked_on_enemy {get; set;} = false;
+    #endregion
+    #region Other scripts and components references
+        [field: SerializeField, Header("Other scripts and components references")]
+        public Player_statistics player_stats {get; private set;}
+       // [SerializeField] private UI_elements.UI_bars _player_UI_info;
+        private Animator _animator;
+        private AudioSource _audio_source;
+        public AudioClip eat_food;
+        public AudioClip drink_potion;
+    #endregion
+    
     [SerializeField] private float _health_regen_delay = 5;
     [SerializeField] private float _stamina_regen_delay = 3;
     private float health_regen_timer;
     private float stamina_regen_timer;
-    private Animator _animator;
+    
 
     private bool _healing_process;
     private float _healing_duration_in_sec;
     private float _healing_amount_per_sec;
     private float _healing_timer = 0.0f;
-    private AudioSource _audio_source;
+   
 
     public static event Action Player_death;// same as below - Action is delegate that returns void, event ensure that given delegate/action could be invoke from this script only
     //public delegate void Player_death
     // public static event Player_death player_death
     private void Start() {
         Player_death += Stop_healing_and_stamina_regen;
-        player_stats.Set_defaults_stats(300,100,0.1f,0.08f,20,1,0,100);
+        player_stats.Set_defaults_stats(300,100,4f,8f,20,1,0,100);
         player_stats.level = 1;
         player_stats.exp_to_next_level = 100;
         player_stats.current_exp = 0;
@@ -40,7 +50,7 @@ public class Player_info : MonoBehaviour{
         Cursor.lockState = CursorLockMode.Locked;
     }
     void Update(){
-        Update_UI();
+        //Update_UI();
         player_grounded = GetComponent<Player_Movemnet.Movement>().player_grounded;
         player_crouching = GetComponent<Player_Movemnet.Movement>().player_crouching;
         active_animation = _animator.GetBool("Active_animation");
@@ -55,7 +65,7 @@ public class Player_info : MonoBehaviour{
         }
         health_regen_timer += Time.deltaTime;
         if(health_regen_timer >= _health_regen_delay){
-            player_stats.Health_regen();           
+            player_stats.Health_regen(Time.deltaTime);           
         }
         if(player_stats.Taken_stamina){
             stamina_regen_timer = 0;
@@ -63,7 +73,7 @@ public class Player_info : MonoBehaviour{
         }
         stamina_regen_timer += Time.deltaTime;
         if(stamina_regen_timer >= _stamina_regen_delay){
-            player_stats.Stamina_regen();          
+            player_stats.Stamina_regen(Time.deltaTime);          
         }
         if(player_stats.current_exp >= player_stats.exp_to_next_level){
             player_stats.level += 1;
@@ -71,11 +81,11 @@ public class Player_info : MonoBehaviour{
         }
         Handle_healing_player();  
     }
-    void Update_UI(){
-        _player_UI_info.Set_current_health(player_stats.Current_health/player_stats.Max_health);
-        _player_UI_info.Set_current_stamina(player_stats.Current_stamina/player_stats.Max_stamina);
-        _player_UI_info.Set_exp_level(player_stats.current_exp,player_stats.exp_to_next_level,player_stats.level);
-    }
+    // void Update_UI(){
+    //     _player_UI_info.Set_current_health(player_stats.Current_health/player_stats.Max_health);
+    //     _player_UI_info.Set_current_stamina(player_stats.Current_stamina/player_stats.Max_stamina);
+    //     _player_UI_info.Set_exp_level(player_stats.current_exp,player_stats.exp_to_next_level,player_stats.level);
+    // }
     public void Play_audio_from_player(AudioClip audioclip,float delay){
         Function_timer.Create(() =>  _audio_source.PlayOneShot(audioclip),delay);
     }

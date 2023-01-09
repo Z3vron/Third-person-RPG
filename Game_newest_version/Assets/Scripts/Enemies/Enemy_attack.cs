@@ -8,7 +8,9 @@ public class Enemy_attack : Enemy_action{
     public int attack_chance_score = 3;
     [Tooltip("Time after this attack to start next  action")]
     public float recovery_time = 2f;
+     [Range(0,-180)]
     public float minimum_attack_angle = -35;
+     [Range(0,180)]
     public float maximum_attack_angle = 35;
     public float minimum_distance_to_attack = 0;
     public float maximum_distance_to_attack = 3;

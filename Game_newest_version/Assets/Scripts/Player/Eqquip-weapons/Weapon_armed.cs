@@ -5,7 +5,6 @@ using UnityEngine;
 namespace Weapon_holder{
     public class Weapon_armed : MonoBehaviour{
 
-        //public float weapon_scale_factor;
         public Weapon_info.Weapon current_weapon;
         [SerializeField] private  Transform _hand;
         public bool left_hand = false;

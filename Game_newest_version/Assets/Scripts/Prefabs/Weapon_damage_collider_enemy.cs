@@ -32,7 +32,7 @@ public class Weapon_damage_collider_enemy : MonoBehaviour{
             }
         }
         if(other.CompareTag("Block_collider")){
-            Debug.Log("HITTED BLOCK");
+            //Debug.Log("HITTED BLOCK");
             Disable_collider();
             if(other.GetComponentInParent<Player_info>().player_parrying){
                 enemy_manager.animator.CrossFadeInFixedTime("Take_damage",0f,0);

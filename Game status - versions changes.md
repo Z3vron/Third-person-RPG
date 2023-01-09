@@ -17,8 +17,9 @@ Think about
 - delegates in C#, pointers or their counterparts use var => var.something etc
 - Do I want to be possible to put all weapons to both enemies and player hands? it creates some mess in code
 - Same button for tap and hold - some issues is it even possible?
+- Using game manager to access some values in scripts(specially ones related to player ) or use observer pattern(events)
 
-Next update:
+Update 09.01.2023
 - Added event action to handle player death so that code would be more clean and there would be less references between scripts
 - Changed enemy death handler so that it would be less often checked - i disable script when enemy or player die so that update function won't be called - not sure is there better way
 - Started working on redoing Invenotires script - clearing extra unuseful code and rewriting it to be more easly understand and less complicated - oh boy what a spaghetti code i have made if someone would try to understand it than i can only wish that person good luck
@@ -29,7 +30,7 @@ Next update:
 - Started using static Game manager to connect some scripts - think about it  
 - Fixed issue when player would still be in lock on mode even that he shouldn't
 - Fixed issue when player wouldn't lock on enemy because of the small obstacle between them
-- 
+- Change updating UI so that it is separated from the logic - used C# Events(observer pattern) - with player UI no issue but with enemy there was a problem that event was called on all enemies HUD in world canvas so i pass specifc one to check - not most efficient
 
 
 Update 14.11.2022
