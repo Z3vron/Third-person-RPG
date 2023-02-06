@@ -21,6 +21,12 @@ Think about
 
 - Using game manager to access some values in scripts(specially ones related to player ) or use observer pattern(events)
 
+Next upddate:
+- Fixed GUI issue with showing weapon poison
+- weapon loss all efects when putted in inventory
+- Added logic and GUI for player effects
+- Added boosting dmg potion
+
 Update 09.01.2023
 - Added event action to handle player death so that code would be more clean and there would be less references between scripts
 - Changed enemy death handler so that it would be less often checked - i disable script when enemy or player die so that update function won't be called - not sure is there better way
