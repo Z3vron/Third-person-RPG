@@ -26,6 +26,10 @@ Next upddate:
 - weapon loss all efects when putted in inventory
 - Added logic and GUI for player effects
 - Added boosting dmg potion
+- Added damping to camera so that it wouldn't shake so much while going up the stairs but it is visible that player model is doing some stuttering moves 
+- Used village scene from unity store as 1 level
+- Changed camera,render and lighting values to get better performance( started using profiler)
+- Adjusting some values for the level because sandbox did't cover some cases that i simply didn't think of
 
 Update 09.01.2023
 - Added event action to handle player death so that code would be more clean and there would be less references between scripts
