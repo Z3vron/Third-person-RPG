@@ -4,5 +4,5 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Items/Potions")]
 public class Potions : Item_info.Item{
     [Header("Special potion class values")]
-    public float efect_duration;
+    public float effect_duration_on_player;
 }

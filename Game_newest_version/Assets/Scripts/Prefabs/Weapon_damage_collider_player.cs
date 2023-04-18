@@ -25,7 +25,7 @@ public class Weapon_damage_collider_player : MonoBehaviour
                 other.GetComponent<Enemy_manager>().instance_enemy_stats.Take_damage(_attack.damage_given_right);
                 _player_inventory.current_weapon_for_right_hand.Remove_durability(_attack.attack_durability_cost);
                 if(_player_inventory.current_weapon_for_right_hand.isPoisoned){
-                    other.GetComponent<Enemy_manager>().Poisoning(_player_inventory.current_weapon_for_right_hand.poison_duration,_player_inventory.current_weapon_for_right_hand.poison_damage);
+                    other.GetComponent<Enemy_manager>().Start_poison(_player_inventory.current_weapon_for_right_hand.poison_duration,_player_inventory.current_weapon_for_right_hand.poison_damage);
                 }
             }   
             else{
@@ -34,7 +34,7 @@ public class Weapon_damage_collider_player : MonoBehaviour
                 other.GetComponent<Enemy_manager>().instance_enemy_stats.Take_damage(_attack.damage_given_left);
                 _player_inventory.current_weapon_for_left_hand.Remove_durability(_attack.attack_durability_cost);
                 if(_player_inventory.current_weapon_for_left_hand.isPoisoned){
-                    other.GetComponent<Enemy_manager>().Poisoning(_player_inventory.current_weapon_for_left_hand.poison_duration,_player_inventory.current_weapon_for_left_hand.poison_damage);
+                    other.GetComponent<Enemy_manager>().Start_poison(_player_inventory.current_weapon_for_left_hand.poison_duration,_player_inventory.current_weapon_for_left_hand.poison_damage);
                 }
             }
         }

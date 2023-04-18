@@ -17,5 +17,5 @@ MonoBehaviour:
   max_stack_amount: 8
   Item_weight: 1.5
   item_id: 41
-  efect_duration: 1
-  heal_amount: 100
+  effect_duration_on_player: 3
+  heal_amount: 90

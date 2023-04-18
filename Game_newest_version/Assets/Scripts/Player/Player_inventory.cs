@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Cinemachine;
+using System;
+
 //ctr + k , ctr + 0(zero) collapse(fold) all functions/regions/classes etc
 //ctr + shift+[ collapse(fold) active(where is mouse course) function/region/class etc
 
@@ -34,10 +36,10 @@ namespace Player_inventory_info{
         public Armor_info.Armour player_armour;
         #region Items in player inventory divided by item category
             [Header("Lists of items in player inventory")]
-            public List<Weapon_info.Weapon> inventory_weapons_slots = new List<Weapon_info.Weapon>();
-            public List<Potions> inventory_potions_slots = new List<Potions>();
-            public List<Materials> inventory_materials_slots = new List<Materials>();
-            public List<Item_info.Item> inventory_items_slots = new List<Item_info.Item>();
+            public List<Weapon_info.Weapon> inventory_weapons_items = new List<Weapon_info.Weapon>();
+            public List<Potions> inventory_potions_items = new List<Potions>();
+            public List<Materials> inventory_materials_items = new List<Materials>();
+            public List<Item_info.Item> inventory_items_items = new List<Item_info.Item>();
         #endregion
         [Tooltip("Holds information if player inventory or crafting inventory  is open")]
         public bool inventory_open = false;
@@ -46,31 +48,32 @@ namespace Player_inventory_info{
         #region Other scripts and components references
             [Header("Other scripts and components references")]
             [SerializeField] private Inventories _inventories;
-            [SerializeField] private CinemachineFreeLook _cinemachine_camera;
             private Input_handler _input_handler;
             private Weapon_slot_manager.Weapon_manager weapon_slot_manager;
             private Player_Movemnet.Movement _player_movement;
             private Animator _animator;
         #endregion
-        #region Variables used to store camera values to restore them after freezing camera for browsing inventory
-        private float _cinemachine_camera_x_sensitivity;
-        private float _cinemachine_camera_y_sensitivity;
-        #endregion
         #region Poison weapons variables    
             [Tooltip("Timer how long left weapon will be poison")]
             private float _poison_timer_left_weapon = 0;
             private float _poison_timer_right_weapon = 0;
-            private float _poison_time_left_weapon;
-            private float _poison_time_right_weapon;
-        #endregion
+            private float _poison_duration_left_weapon;
+            private float _poison_duration_right_weapon;
+        #endregion     
+        public static event Action<Potions,int> Update_quick_slots_potion_icon;
+        public static event Action<Player_inventory> Update_quick_slots_potions_amount_text;
+        public static event Action<bool,float,float> Enable_quick_slots_weapon_poison_icon;
+        public static event Action<bool> Disable_quick_slots_weapon_poison_icon;
+
         private void Awake() {
             weapon_slot_manager = GetComponent<Weapon_slot_manager.Weapon_manager>();
-            _input_handler = GetComponent<Input_handler>();
+            _input_handler = Game_manager.Instance.input_handler;
             _player_movement = GetComponent<Player_Movemnet.Movement>();
             _animator = GetComponentInChildren<Animator>();
         }
         private void Start() {
             //just for testing
+            
             _inventories.Add_item_to_player_inv_last_slot(_item_to_add_1,_item_to_add_1_amount);
             _inventories.Add_item_to_player_inv_last_slot(_item_to_add_2,_item_to_add_2_amount);
             _inventories.Add_item_to_player_inv_last_slot(_item_to_add_3,_item_to_add_3_amount);           
@@ -89,7 +92,7 @@ namespace Player_inventory_info{
             for(int i=0;i<4;i++){
                 quick_slots_potions[i].item = null;
                 quick_slots_potions[i].stack_amount = 0;
-                _inventories.player_slots.Update_quick_slot_potions_icon(empty_potion,i);
+                Update_quick_slots_potion_icon?.Invoke(empty_potion,i);
            }
         }
         private void Update() {
@@ -104,22 +107,38 @@ namespace Player_inventory_info{
                 current_weapon_for_right_hand = unarmed;
                 weapon_slot_manager.Load_weapon_to_slot(current_weapon_for_right_hand,true);
             }
-            if(current_weapon_for_right_hand.isPoisoned){
+            if(current_weapon_for_right_hand.isPoisoned || backup_weapon_right.isPoisoned){
                 _poison_timer_right_weapon += Time.deltaTime;
-                if(_poison_timer_right_weapon >= _poison_time_right_weapon){
-                    current_weapon_for_right_hand.isPoisoned = false;
-                    current_weapon_for_right_hand.poison_damage = 0;
-                    current_weapon_for_right_hand.poison_duration = 0;
+                if(_poison_timer_right_weapon >= _poison_duration_right_weapon){
+                    if(current_weapon_for_right_hand == unarmed){
+                        backup_weapon_right.isPoisoned = false;
+                        backup_weapon_right.poison_damage = 0;
+                        backup_weapon_right.poison_duration = 0;
+                    }
+                    else{
+                        current_weapon_for_right_hand.isPoisoned = false;
+                        current_weapon_for_right_hand.poison_damage = 0;
+                        current_weapon_for_right_hand.poison_duration = 0;
+                    }
                     _poison_timer_right_weapon = 0;
+                    Disable_quick_slots_weapon_poison_icon?.Invoke(true);
                 }
             }
-            if(current_weapon_for_left_hand.isPoisoned){
+            if(current_weapon_for_left_hand.isPoisoned || backup_weapon_left.isPoisoned){
                 _poison_timer_left_weapon += Time.deltaTime;
-                if(_poison_timer_left_weapon >= _poison_time_left_weapon){
-                    current_weapon_for_left_hand.isPoisoned = false;
-                    current_weapon_for_left_hand.poison_damage = 0;
-                    current_weapon_for_left_hand.poison_duration = 0;
+                if(_poison_timer_left_weapon >= _poison_duration_left_weapon){
+                    if(current_weapon_for_left_hand == unarmed){
+                        backup_weapon_left.isPoisoned = false;
+                        backup_weapon_left.poison_damage = 0;
+                        backup_weapon_left.poison_duration = 0;
+                    }
+                    else{
+                        current_weapon_for_left_hand.isPoisoned = false;
+                        current_weapon_for_left_hand.poison_damage = 0;
+                        current_weapon_for_left_hand.poison_duration = 0;
+                    }
                     _poison_timer_left_weapon = 0;
+                    Disable_quick_slots_weapon_poison_icon?.Invoke(false);
                 }
             }
         }
@@ -128,11 +147,14 @@ namespace Player_inventory_info{
                 backup_weapon_left = current_weapon_for_left_hand;
                 current_weapon_for_left_hand = unarmed;
                 weapon_slot_manager.Load_weapon_to_slot(current_weapon_for_left_hand,false);
+                Disable_quick_slots_weapon_poison_icon?.Invoke(false);
             }
             else if(current_weapon_for_left_hand == unarmed &&  backup_weapon_left.durability > 0){
                 current_weapon_for_left_hand = backup_weapon_left;
                 weapon_slot_manager.Load_weapon_to_slot(current_weapon_for_left_hand,false);
                 backup_weapon_left = unarmed;
+                if(current_weapon_for_left_hand.isPoisoned)
+                    Enable_quick_slots_weapon_poison_icon?.Invoke(false,_poison_duration_left_weapon,_poison_timer_left_weapon/_poison_duration_left_weapon);
             }
         }
         public void Check_right_weapon(){
@@ -141,15 +163,20 @@ namespace Player_inventory_info{
                 backup_weapon_right = current_weapon_for_right_hand;
                 current_weapon_for_right_hand = unarmed;
                 weapon_slot_manager.Load_weapon_to_slot(current_weapon_for_right_hand,true);
+                Disable_quick_slots_weapon_poison_icon?.Invoke(true);
             }
             else if(current_weapon_for_right_hand == unarmed && backup_weapon_right.durability > 0){
                 current_weapon_for_right_hand = backup_weapon_right;
                 weapon_slot_manager.Load_weapon_to_slot(current_weapon_for_right_hand,true);
                 backup_weapon_right = unarmed;
+                if(current_weapon_for_right_hand.isPoisoned)
+                    Enable_quick_slots_weapon_poison_icon?.Invoke(true,_poison_duration_right_weapon,_poison_timer_right_weapon/_poison_duration_right_weapon);
             }
         }
         //this two functions might be combined/ to one 
         public void Change_weapon_for_left_hand(Slot weapon_slot_inv,bool slot_in_playyer_inv){
+            if(current_weapon_for_left_hand.isPoisoned)
+                Disable_quick_slots_weapon_poison_icon?.Invoke(false);
             Weapon_info.Weapon temp_weapon;
             temp_weapon = (Weapon_info.Weapon)weapon_slot_inv.item;
             while(true){
@@ -160,56 +187,60 @@ namespace Player_inventory_info{
                         if(weapon_slot_inv.stack_amount == 0){
                             // Debug.Log("removing weapon - no copy left in slot");
                             if(slot_in_playyer_inv)
-                                inventory_weapons_slots.RemoveAt(weapon_slot_inv.slot_number);
+                                inventory_weapons_items.RemoveAt(weapon_slot_inv.slot_number);
                             else
                                 _inventories.object_inv_to_show.Remove_item_from_object(weapon_slot_inv.slot_number);
                             _inventories.Move_slots_to_left_inv(weapon_slot_inv,amount_of_items_slots);
                         }
                     }  
-                    else if(current_weapon_for_left_hand != unarmed && inventory_weapons_slots.Count < amount_of_items_slots){
+                    else if(current_weapon_for_left_hand != unarmed && inventory_weapons_items.Count < amount_of_items_slots){
+                        Reset_weapon_bonuses_status(current_weapon_for_left_hand);
                         Add_item_to_player_inv_list(current_weapon_for_left_hand);
-                        _inventories.Get_player_inv_slots().inventory_weapons_slots[inventory_weapons_slots.Count-1].item = current_weapon_for_left_hand;
-                        _inventories.Get_player_inv_slots().inventory_weapons_slots[inventory_weapons_slots.Count-1].stack_amount = 1;
+                        _inventories.Get_player_inv_slots().inventory_weapons_slots[inventory_weapons_items.Count-1].item = current_weapon_for_left_hand;
+                        _inventories.Get_player_inv_slots().inventory_weapons_slots[inventory_weapons_items.Count-1].stack_amount = 1;
                         current_weapon_for_left_hand = (Weapon_info.Weapon) weapon_slot_inv.item;
                         weapon_slot_inv.stack_amount -= 1;
                         if(weapon_slot_inv.stack_amount == 0){
                             // Debug.Log("removing weapon - no copy left in slot");
                             if(slot_in_playyer_inv)
-                                inventory_weapons_slots.RemoveAt(weapon_slot_inv.slot_number);
+                                inventory_weapons_items.RemoveAt(weapon_slot_inv.slot_number);
                             else
                                 _inventories.object_inv_to_show.Remove_item_from_object(weapon_slot_inv.slot_number);
                             _inventories.Move_slots_to_left_inv(weapon_slot_inv,amount_of_items_slots);
                         }
                     }
-                    else if(current_weapon_for_left_hand != unarmed && inventory_weapons_slots.Count == amount_of_items_slots && weapon_slot_inv.stack_amount == 1){
+                    else if(current_weapon_for_left_hand != unarmed && inventory_weapons_items.Count == amount_of_items_slots && weapon_slot_inv.stack_amount == 1){
+                        Reset_weapon_bonuses_status(current_weapon_for_left_hand);
                         temp_weapon = current_weapon_for_left_hand;
                         if(slot_in_playyer_inv)
-                            inventory_weapons_slots[weapon_slot_inv.slot_number] = current_weapon_for_left_hand;
+                            inventory_weapons_items[weapon_slot_inv.slot_number] = current_weapon_for_left_hand;
                         else
                             _inventories.object_inv_to_show.items_in_object[weapon_slot_inv.slot_number] = current_weapon_for_left_hand;
                         current_weapon_for_left_hand = (Weapon_info.Weapon) weapon_slot_inv.item;
                         weapon_slot_inv.item = temp_weapon;
                         
                     } 
-                    else if(backup_weapon_left != unarmed && inventory_weapons_slots.Count < amount_of_items_slots){
+                    else if(backup_weapon_left != unarmed && inventory_weapons_items.Count < amount_of_items_slots){
+                        Reset_weapon_bonuses_status(backup_weapon_left);
                         Add_item_to_player_inv_list(backup_weapon_left);
-                        _inventories.Get_player_inv_slots().inventory_weapons_slots[inventory_weapons_slots.Count-1].item = backup_weapon_left;
-                        _inventories.Get_player_inv_slots().inventory_weapons_slots[inventory_weapons_slots.Count-1].stack_amount = 1;
+                        _inventories.Get_player_inv_slots().inventory_weapons_slots[inventory_weapons_items.Count-1].item = backup_weapon_left;
+                        _inventories.Get_player_inv_slots().inventory_weapons_slots[inventory_weapons_items.Count-1].stack_amount = 1;
                         backup_weapon_left = unarmed;
                         current_weapon_for_left_hand = (Weapon_info.Weapon) weapon_slot_inv.item;
                         weapon_slot_inv.stack_amount -= 1;
                         if(weapon_slot_inv.stack_amount == 0){
                             // Debug.Log("removing weapon - no copy left in slot");
                             if(slot_in_playyer_inv)
-                                inventory_weapons_slots.RemoveAt(weapon_slot_inv.slot_number);
+                                inventory_weapons_items.RemoveAt(weapon_slot_inv.slot_number);
                             else
                                 _inventories.object_inv_to_show.Remove_item_from_object(weapon_slot_inv.slot_number);
                             _inventories.Move_slots_to_left_inv(weapon_slot_inv,amount_of_items_slots);
                         }
                     }
-                    else if(backup_weapon_left != unarmed && inventory_weapons_slots.Count == amount_of_items_slots && weapon_slot_inv.stack_amount == 1){
+                    else if(backup_weapon_left != unarmed && inventory_weapons_items.Count == amount_of_items_slots && weapon_slot_inv.stack_amount == 1){
+                        Reset_weapon_bonuses_status(backup_weapon_left);
                         if(slot_in_playyer_inv)
-                            inventory_weapons_slots[weapon_slot_inv.slot_number] = backup_weapon_left;
+                            inventory_weapons_items[weapon_slot_inv.slot_number] = backup_weapon_left;
                         else
                             _inventories.object_inv_to_show.items_in_object[weapon_slot_inv.slot_number] = backup_weapon_left;
                         current_weapon_for_left_hand = (Weapon_info.Weapon) weapon_slot_inv.item;
@@ -220,6 +251,7 @@ namespace Player_inventory_info{
                         Debug.Log("capped inv");
                         break;
                     }
+                    Disable_quick_slots_weapon_poison_icon?.Invoke(false);
                     //load weapon to right hand
                     weapon_slot_manager.Load_weapon_to_slot(current_weapon_for_left_hand,false);
                     break;                
@@ -242,57 +274,61 @@ namespace Player_inventory_info{
                         if(weapon_slot_inv.stack_amount == 0){
                             // Debug.Log("removing weapon - no copy left in slot");
                             if(slot_in_playyer_inv)
-                                inventory_weapons_slots.RemoveAt(weapon_slot_inv.slot_number);
+                                inventory_weapons_items.RemoveAt(weapon_slot_inv.slot_number);
                             else
                                 _inventories.object_inv_to_show.Remove_item_from_object(weapon_slot_inv.slot_number);
                             _inventories.Move_slots_to_left_inv(weapon_slot_inv,amount_of_items_slots);
                         }
                     }  
-                    else if(current_weapon_for_right_hand != unarmed && inventory_weapons_slots.Count < amount_of_items_slots){
+                    else if(current_weapon_for_right_hand != unarmed && inventory_weapons_items.Count < amount_of_items_slots){
+                        Reset_weapon_bonuses_status(current_weapon_for_right_hand);
                         Add_item_to_player_inv_list(current_weapon_for_right_hand);
-                        _inventories.Get_player_inv_slots().inventory_weapons_slots[inventory_weapons_slots.Count-1].item = current_weapon_for_right_hand;
-                        _inventories.Get_player_inv_slots().inventory_weapons_slots[inventory_weapons_slots.Count-1].stack_amount = 1;
+                        _inventories.Get_player_inv_slots().inventory_weapons_slots[inventory_weapons_items.Count-1].item = current_weapon_for_right_hand;
+                        _inventories.Get_player_inv_slots().inventory_weapons_slots[inventory_weapons_items.Count-1].stack_amount = 1;
                         current_weapon_for_right_hand = (Weapon_info.Weapon) weapon_slot_inv.item;
                         weapon_slot_inv.stack_amount -= 1;
                         if(weapon_slot_inv.stack_amount == 0){
                             // Debug.Log("removing weapon - no copy left in slot");
                             if(slot_in_playyer_inv)
-                                inventory_weapons_slots.RemoveAt(weapon_slot_inv.slot_number);
+                                inventory_weapons_items.RemoveAt(weapon_slot_inv.slot_number);
                                 
                             else
                                 _inventories.object_inv_to_show.Remove_item_from_object(weapon_slot_inv.slot_number);
                             _inventories.Move_slots_to_left_inv(weapon_slot_inv,amount_of_items_slots);
                         }
                     }
-                    else if(current_weapon_for_right_hand != unarmed && inventory_weapons_slots.Count == amount_of_items_slots && weapon_slot_inv.stack_amount == 1){
+                    else if(current_weapon_for_right_hand != unarmed && inventory_weapons_items.Count == amount_of_items_slots && weapon_slot_inv.stack_amount == 1){
+                        Reset_weapon_bonuses_status(current_weapon_for_right_hand);
                         temp_weapon = current_weapon_for_right_hand;
                         if(slot_in_playyer_inv)
-                            inventory_weapons_slots[weapon_slot_inv.slot_number] = current_weapon_for_right_hand;
+                            inventory_weapons_items[weapon_slot_inv.slot_number] = current_weapon_for_right_hand;
                         else
                             _inventories.object_inv_to_show.items_in_object[weapon_slot_inv.slot_number] = current_weapon_for_right_hand;
                         current_weapon_for_right_hand = (Weapon_info.Weapon) weapon_slot_inv.item;
                         weapon_slot_inv.item = temp_weapon;
                         
                     } 
-                    else if(backup_weapon_right != unarmed && inventory_weapons_slots.Count < amount_of_items_slots){
+                    else if(backup_weapon_right != unarmed && inventory_weapons_items.Count < amount_of_items_slots){
+                        Reset_weapon_bonuses_status(backup_weapon_right);
                         Add_item_to_player_inv_list(backup_weapon_right);
-                        _inventories.Get_player_inv_slots().inventory_weapons_slots[inventory_weapons_slots.Count-1].item = backup_weapon_right;
-                        _inventories.Get_player_inv_slots().inventory_weapons_slots[inventory_weapons_slots.Count-1].stack_amount = 1;
+                        _inventories.Get_player_inv_slots().inventory_weapons_slots[inventory_weapons_items.Count-1].item = backup_weapon_right;
+                        _inventories.Get_player_inv_slots().inventory_weapons_slots[inventory_weapons_items.Count-1].stack_amount = 1;
                         backup_weapon_right = unarmed;
                         current_weapon_for_right_hand = (Weapon_info.Weapon) weapon_slot_inv.item;
                         weapon_slot_inv.stack_amount -= 1;
                         if(weapon_slot_inv.stack_amount == 0){
                             // Debug.Log("removing weapon - no copy left in slot");
                             if(slot_in_playyer_inv)
-                                inventory_weapons_slots.RemoveAt(weapon_slot_inv.slot_number);
+                                inventory_weapons_items.RemoveAt(weapon_slot_inv.slot_number);
                             else
                                 _inventories.object_inv_to_show.Remove_item_from_object(weapon_slot_inv.slot_number);
                             _inventories.Move_slots_to_left_inv(weapon_slot_inv,amount_of_items_slots);
                         }
                     }
-                    else if(backup_weapon_right != unarmed && inventory_weapons_slots.Count == amount_of_items_slots && weapon_slot_inv.stack_amount == 1){
+                    else if(backup_weapon_right != unarmed && inventory_weapons_items.Count == amount_of_items_slots && weapon_slot_inv.stack_amount == 1){
+                        Reset_weapon_bonuses_status(backup_weapon_right);
                         if(slot_in_playyer_inv)
-                            inventory_weapons_slots[weapon_slot_inv.slot_number] = backup_weapon_right;
+                            inventory_weapons_items[weapon_slot_inv.slot_number] = backup_weapon_right;
                         else
                             _inventories.object_inv_to_show.items_in_object[weapon_slot_inv.slot_number] = backup_weapon_right;
                         current_weapon_for_right_hand = (Weapon_info.Weapon) weapon_slot_inv.item;
@@ -303,6 +339,7 @@ namespace Player_inventory_info{
                         Debug.Log("capped inv");
                         break;
                     }
+                        Disable_quick_slots_weapon_poison_icon?.Invoke(true);
                     //load weapon to right hand
                     weapon_slot_manager.Load_weapon_to_slot(current_weapon_for_right_hand,true);
                     break;                
@@ -316,6 +353,7 @@ namespace Player_inventory_info{
         }
         public void Change_potion_in_slot(Slot potion_slot_inv,int quick_slot_number,bool slot_in_playyer_inv){
             Potions temp_potion;
+            Potions potion = (Potions)potion_slot_inv.item;
             if(quick_slots_potions[quick_slot_number].item == null){
                 quick_slots_potions[quick_slot_number].item = potion_slot_inv.item;
                 if(quick_slots_potions[quick_slot_number].max_stack_amount >= potion_slot_inv.stack_amount){
@@ -347,7 +385,7 @@ namespace Player_inventory_info{
                     quick_slots_potions[quick_slot_number].stack_amount = quick_slots_potions[quick_slot_number].max_stack_amount;
                 }
             }
-            else if(quick_slots_potions[quick_slot_number].item != null && inventory_potions_slots.Count < amount_of_items_slots){
+            else if(quick_slots_potions[quick_slot_number].item != null && inventory_potions_items.Count < amount_of_items_slots){
                 
                 _inventories.Add_item_to_player_inv_check_for_same_object(quick_slots_potions[quick_slot_number].item,quick_slots_potions[quick_slot_number].stack_amount);
                //Add_item_to_player_inv_list(quick_slots_potions[slot_number].item);
@@ -368,7 +406,7 @@ namespace Player_inventory_info{
                     potion_slot_inv.stack_amount -= quick_slots_potions[quick_slot_number].max_stack_amount;
                 }
             }
-            else if(quick_slots_potions[quick_slot_number].item != null && inventory_potions_slots.Count == amount_of_items_slots){ 
+            else if(quick_slots_potions[quick_slot_number].item != null && inventory_potions_items.Count == amount_of_items_slots){ 
                 temp_potion = (Potions)quick_slots_potions[quick_slot_number].item;
                 int temp_stack_amount = quick_slots_potions[quick_slot_number].stack_amount;
                 quick_slots_potions[quick_slot_number].item = potion_slot_inv.item;
@@ -396,37 +434,49 @@ namespace Player_inventory_info{
                     }
                 }
             }
+            
+            Update_quick_slots_potion_icon?.Invoke(potion,quick_slot_number);
+            Update_quick_slots_potions_amount_text?.Invoke(this);
         }
         public void Use_potion_from_quick_slot(int slot_number){
             if(quick_slots_potions[slot_number].item == null)
                 return ;
             else{
                 quick_slots_potions[slot_number].stack_amount -= 1;
-                Health_potion health_potion = (Health_potion) quick_slots_potions[slot_number].item;
-                GetComponent<Player_info>().Start_healing_player_process(health_potion.efect_duration,health_potion.heal_amount);
+                if(quick_slots_potions[slot_number].item is Health_potion){
+                    Health_potion health_potion = (Health_potion) quick_slots_potions[slot_number].item;
+                    GetComponent<Player_info>().Start_healing_player_process(health_potion.effect_duration_on_player,health_potion.heal_amount);
+                }
+                else if(quick_slots_potions[slot_number].item is Boost_dmg_potion){
+                    Boost_dmg_potion dmg_potion = (Boost_dmg_potion) quick_slots_potions[slot_number].item;
+                    GetComponent<Player_info>().Start_dmg_boost(dmg_potion.effect_duration_on_player,dmg_potion.percent_to_add_dmg_multiplayer,dmg_potion.Item_name,dmg_potion.Item_icon);
+                }
                 if(quick_slots_potions[slot_number].stack_amount == 0){
                     quick_slots_potions[slot_number].item = null;
-                    _inventories.player_slots.Update_quick_slot_potions_icon(empty_potion,slot_number);
+                    Update_quick_slots_potion_icon?.Invoke(empty_potion,slot_number);
                 }
+                else
+                    Update_quick_slots_potions_amount_text?.Invoke(this);
             }
+            GetComponent<Player_info>().Play_audio_from_player(GetComponent<Player_info>().drink_potion,1);
+
         }
         public void Poison_weapon(Poison_potion poison_potion,bool right_weapon){
             if(right_weapon){
-                if( current_weapon_for_right_hand.isPoisoned)
-                    _poison_timer_right_weapon = 0;
+                _poison_timer_right_weapon = 0;
                 current_weapon_for_right_hand.isPoisoned = true;
                 current_weapon_for_right_hand.poison_damage = poison_potion.poison_damage;
                 current_weapon_for_right_hand.poison_duration = poison_potion.poison_duration;
-                _poison_time_right_weapon = poison_potion.efect_duration;
+                _poison_duration_right_weapon = poison_potion.effect_duration_on_player;
             }
             else{
-                if( current_weapon_for_left_hand.isPoisoned)
-                    _poison_timer_left_weapon = 0;
+                _poison_timer_left_weapon = 0;
                 current_weapon_for_left_hand.isPoisoned = true;
                 current_weapon_for_left_hand.poison_damage = poison_potion.poison_damage;
                 current_weapon_for_left_hand.poison_duration = poison_potion.poison_duration;
-                _poison_time_left_weapon = poison_potion.efect_duration;
+                _poison_duration_left_weapon = poison_potion.effect_duration_on_player;
             }
+            Enable_quick_slots_weapon_poison_icon?.Invoke(right_weapon,poison_potion.effect_duration_on_player,0);
         }
         public void Handle_inventory(){
             if(inventory_open){
@@ -435,10 +485,8 @@ namespace Player_inventory_info{
                 _inventories.Hide_change_inv_buttons();
                 _inventories.Hide_player_inventory();
                 _inventories.Hide_crafting_menu();
-                Cursor.lockState = CursorLockMode.Locked;
                 inventory_open = false;
-                _cinemachine_camera.m_XAxis.m_MaxSpeed = _cinemachine_camera_x_sensitivity;
-                _cinemachine_camera.m_YAxis.m_MaxSpeed = _cinemachine_camera_y_sensitivity;
+                Game_manager.Instance.Unlock_camera_and_mouse();
             }
             else{
                 _animator.SetFloat("Speed_percent",-1f);
@@ -451,19 +499,19 @@ namespace Player_inventory_info{
                 Game_manager.Instance.player_info.player_stats.Invoke_change_player_lvl_UI_event();
                 Cursor.lockState = CursorLockMode.Confined;
                 inventory_open = true;
-                _cinemachine_camera_x_sensitivity = _cinemachine_camera.m_XAxis.m_MaxSpeed;
-                _cinemachine_camera_y_sensitivity = _cinemachine_camera.m_YAxis.m_MaxSpeed;
-                _cinemachine_camera.m_XAxis.m_MaxSpeed = 0.0f;
-                _cinemachine_camera.m_YAxis.m_MaxSpeed = 0.0f;
+                Game_manager.Instance.Lock_camera_and_mouse();
             }
         }
         public void Remove_weapon_from_hand_slot(bool isRight){
-             if(isRight){
+            if(isRight){
                 if(current_weapon_for_right_hand != unarmed)
                     _inventories.Add_item_to_player_inv_check_for_same_object(current_weapon_for_right_hand,1);
                 else if(backup_weapon_right != unarmed)
                     _inventories.Add_item_to_player_inv_check_for_same_object(backup_weapon_right,1);
                 if(_inventories.added_all_items){
+                    if(current_weapon_for_right_hand.isPoisoned)
+                        Disable_quick_slots_weapon_poison_icon?.Invoke(true);
+                    Reset_weapon_bonuses_status(current_weapon_for_right_hand);
                     current_weapon_for_right_hand = backup_weapon_right = unarmed;
                     weapon_slot_manager.Load_weapon_to_slot(current_weapon_for_right_hand,true);
                 }
@@ -474,10 +522,12 @@ namespace Player_inventory_info{
                 else if(backup_weapon_left != unarmed)
                     _inventories.Add_item_to_player_inv_check_for_same_object(backup_weapon_left,1);
                 if(_inventories.added_all_items){
+                    if(current_weapon_for_left_hand.isPoisoned)
+                        Disable_quick_slots_weapon_poison_icon?.Invoke(false);
+                    Reset_weapon_bonuses_status(current_weapon_for_left_hand);
                     current_weapon_for_left_hand = backup_weapon_left = unarmed;
                     weapon_slot_manager.Load_weapon_to_slot(current_weapon_for_left_hand,false);
                 }
-               
             }
         }
         public void Remove_potion_from_quick_slot(int slot_number){
@@ -488,35 +538,40 @@ namespace Player_inventory_info{
                 if(_inventories.added_all_items){
                     quick_slots_potions[slot_number].item = null;
                     quick_slots_potions[slot_number].stack_amount = 0;
-                    _inventories.player_slots.Update_quick_slot_potions_icon(empty_potion,slot_number);
+                    Update_quick_slots_potion_icon?.Invoke(empty_potion,slot_number);
                 }
             }
         }
         public void Remove_item_from_player_inv(Slot slot){
             if(slot.item is Weapon_info.Weapon)
-                inventory_weapons_slots.RemoveAt(slot.slot_number);
+                inventory_weapons_items.RemoveAt(slot.slot_number);
             else if(slot.item is Potions)
-                inventory_potions_slots.RemoveAt(slot.slot_number);
+                inventory_potions_items.RemoveAt(slot.slot_number);
             else if(slot.item is Materials){
-                inventory_materials_slots.RemoveAt(slot.slot_number);
+                inventory_materials_items.RemoveAt(slot.slot_number);
             }  
             else if(slot.item is Item_info.Item){
-                inventory_items_slots.RemoveAt(slot.slot_number);
+                inventory_items_items.RemoveAt(slot.slot_number);
             }
         }
         public void Add_item_to_player_inv_list(Item_info.Item item){
-            if(item is Weapon_info.Weapon && inventory_weapons_slots.Count < 6){
-                inventory_weapons_slots.Add((Weapon_info.Weapon)item);
+            if(item is Weapon_info.Weapon && inventory_weapons_items.Count < 6){
+                inventory_weapons_items.Add((Weapon_info.Weapon)item);
             }
-            else if(item is Potions && inventory_potions_slots.Count < 6){
-                inventory_potions_slots.Add((Potions) item);
+            else if(item is Potions && inventory_potions_items.Count < 6){
+                inventory_potions_items.Add((Potions) item);
             }   
-            else if(item is Materials && inventory_materials_slots.Count < 6){
-                inventory_materials_slots.Add((Materials) item);
+            else if(item is Materials && inventory_materials_items.Count < 6){
+                inventory_materials_items.Add((Materials) item);
             }
-            else if(item is Item_info.Item && inventory_items_slots.Count < 6){
-                inventory_items_slots.Add(item);
+            else if(item is Item_info.Item && inventory_items_items.Count < 6){
+                inventory_items_items.Add(item);
             }   
+        }
+        public void Reset_weapon_bonuses_status(Weapon_info.Weapon weapon){
+            weapon.isPoisoned = false;
+            weapon.poison_damage = 0;
+            weapon.poison_duration = 0;
         }
     }
 }

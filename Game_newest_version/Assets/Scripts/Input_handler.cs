@@ -2,11 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System;
 
 public class Input_handler : MonoBehaviour
 {
     //all variables about input have flags at the end of name
     // can i use delegates to listen to change in input?? could be easier to track input in other scripts etc
+    // could use PlayerInputActions instead of input actions - than i would need to write in manually name of action as string
+    // for pause I use event action - could use it for other input - than i dont need to check individual flags in other scripts
     #region Player_action_map
         public bool sprint_flag;
         public bool crouch_flag;
@@ -55,6 +58,7 @@ public class Input_handler : MonoBehaviour
         private InputAction _lock_on_action;
         private InputAction _switch_action_player;
         private InputAction _dash_action;
+        private InputAction _pause_action;
         private InputActionPhase attack_strong_last_phase;
         
         private InputAction _help_action;
@@ -92,6 +96,7 @@ public class Input_handler : MonoBehaviour
         private InputAction _mouse_pos;
     #endregion
     private PlayerInput _player_input;
+    public static event Action Pause_game;
     void Start(){
         //Player action map
         _player_input = GetComponent<PlayerInput>();
@@ -118,6 +123,7 @@ public class Input_handler : MonoBehaviour
         _lock_on_action = _player_input.actions["Lock_on"];
         _switch_action_player = _player_input.actions["Switch_player"];
         _dash_action = _player_input.actions["Dash"];
+        _pause_action = _player_input.actions["Pause"];
 
         //Inventory action map
         _close_inventory_action = _player_input.actions["Exit"];
@@ -146,13 +152,14 @@ public class Input_handler : MonoBehaviour
         if(_weapon_left_action.triggered)            left_weapon_flag = true;{}
         if(_weapon_right_action.triggered)           right_weapon_flag = true;{}
         if(_first_potion_action.triggered)           first_potion_flag = true;{}
-        if(_second_potion_action.triggered)           second_potion_flag = true;{}
+        if(_second_potion_action.triggered)          second_potion_flag = true;{}
         if(_third_potion_action.triggered)           third_potion_flag = true;{}
-        if(_fourth_potion_action.triggered)           fourth_potion_flag = true;{}
+        if(_fourth_potion_action.triggered)          fourth_potion_flag = true;{}
         if(_interact_action.triggered)               interact_flag = true;{}
         if(_lock_on_action.triggered)                lock_on_flag = true;{}
-        if(_switch_action_player.triggered)                 switch_flag = true;{}
+        if(_switch_action_player.triggered)          switch_flag = true;{}
         if(_dash_action.triggered)                   dash_flag = true;{}
+        if(_pause_action.triggered)                  Pause_game?.Invoke();{} 
         if(_block_attack_action.ReadValue<float>() == 1) block_attacks_flag = true;{}
         if(_parry_attack_action.triggered)           parry_attack_flag = true;{}
         if(_attack_1_action.triggered)               attack_light_flag = true;{}
@@ -198,10 +205,58 @@ public class Input_handler : MonoBehaviour
         mouse_position = _mouse_pos.ReadValue<Vector2>();
                
     }
+     private void Set_input_flags_false(){
+            #region  Player action map 
+                sprint_flag = false;
+                crouch_flag = false;
+                jump_flag = false;
+                left_weapon_flag = false;
+                right_weapon_flag = false;
+                first_potion_flag = false;
+                second_potion_flag = false;
+                third_potion_flag = false;
+                fourth_potion_flag = false;
+                interact_flag = false;
+                block_attacks_flag = false;
+                parry_attack_flag = false;
+                attack_light_flag = false;
+                attack_strong_performed_flag = false;
+                attack_special_flag = false;
+                attack_air_flag = false;
+                attack_combo_flag = false;
+                inventory_flag = false;
+                attack_strong_canceled_flag = false;
+                lock_on_flag = false;
+                switch_flag = false;
+                dash_flag = false;
+            #endregion
+            #region  Inventory action map
+                inventory_close_inv_flag = false;
+                mouse_right_pressed_inv_flag = false;
+                mouse_left_pressed_inv_flag = false;
+                transfer_items_inv_flag = false;
+                drop_items_inv_flag = false;
+                use_item_inv_flag = false;
+                confirmed_action_inv_flag = false;
+                left_weapon_inv_flag = false;
+                right_weapn_inv_flag = false;
+                first_potion_inv_flag = false;
+                second_potion_inv_flag = false;
+                third_potion_inv_flag = false;
+                fourth_potion_inv_flag = false;
+            #endregion
+        }
     public void Switch_action_map_to_inv(){
         _player_input.SwitchCurrentActionMap("Inventory");
     }
     public void Switch_action_map_to_player(){
         _player_input.SwitchCurrentActionMap("Player");
     }
+    private void Update() {
+        Check_flags();
+    }
+    private void LateUpdate() {
+        Set_input_flags_false();
+    }
+
 }

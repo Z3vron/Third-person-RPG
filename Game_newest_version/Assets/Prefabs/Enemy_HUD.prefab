@@ -70,7 +70,7 @@ MonoBehaviour:
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
-  m_FillAmount: 1
+  m_FillAmount: 0.956
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
@@ -401,7 +401,6 @@ MonoBehaviour:
   _health_bar: {fileID: 8560521940721028297}
   _health_taken_bar: {fileID: 8560521938982493182}
   _poisoned_indication: {fileID: 5583787554794090650}
-  _poisoned_filler: {fileID: 6418669025750876028}
 --- !u!1 &8560521940112069474
 GameObject:
   m_ObjectHideFlags: 0

@@ -21,6 +21,7 @@ public class Enemy_manager : MonoBehaviour
     [SerializeField] private float health_regen_delay = 10;
     [SerializeField] private float _enemy_speed = 15;
     public bool performing_action = false;
+    [SerializeField] private bool _isPoisoned = false;
     #region Other scripts and components references
         [Header("Other scripts references")]
         public Enemy_statistics enemy_stats;
@@ -49,9 +50,9 @@ public class Enemy_manager : MonoBehaviour
     private float _health_regen_timer;
     private float _current_recovery_time = 0.0f;
     private float _poison_timer =0;
-    private float _poison_time=0;
+    private float _poison_duration=0;
     private float _poison_damage = 0;
-    [SerializeField] private bool _isPoisoned = false;
+    
     
 
     private void Awake() {
@@ -76,7 +77,7 @@ public class Enemy_manager : MonoBehaviour
         if(_isPoisoned){
             _poison_timer += Time.deltaTime;
             instance_enemy_stats.Take_damage_bypass_armour(_poison_damage * Time.deltaTime);
-            if(_poison_timer > _poison_time){
+            if(_poison_timer > _poison_duration){
                 _isPoisoned = false;
                 _instance_enemy_HUD.GetComponent<Enemy_HUD>().End_poisoned();
                 _poison_timer = 0;
@@ -138,12 +139,13 @@ public class Enemy_manager : MonoBehaviour
             performing_action = false;
         }
     }
-    public void Poisoning(float poison_time, float poison_damage){
+    public void Start_poison(float poison_time, float poison_damage){
         //Debug.Log("enemy poisoned");
         _isPoisoned = true;
-        _poison_time = poison_time;
+        _poison_duration = poison_time;
         _poison_damage = poison_damage;
-        _instance_enemy_HUD.GetComponent<Enemy_HUD>().Start_poisoned(_poison_time);
+        _poison_timer = 0;
+        _instance_enemy_HUD.GetComponent<Enemy_HUD>().Start_poisoned(_poison_duration);
     }
     public void Get_new_attack(){
         Vector3 target_direction = targeted_character.transform.position - transform.position;

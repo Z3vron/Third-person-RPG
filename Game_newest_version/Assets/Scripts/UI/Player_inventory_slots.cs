@@ -24,9 +24,7 @@ public class Player_inventory_slots : Inventory_slots{
     public List<Slot> inventory_materials_slots = new List<Slot>();
     
 
-    private void Start() {
-
-        
+    private void Awake() {
         // compiler gives error ifI use same varaible for drop slot
         for(int i=0;i < 6;i++){
             if(inventory_weapons_images_slots[i].transform.parent.TryGetComponent( out Drop_slot drop_slot_01)){
@@ -57,16 +55,16 @@ public class Player_inventory_slots : Inventory_slots{
     }
     public void Update_inventory_player_UI(Player_inventory_info.Player_inventory player_inventory){
         //weapons
-        List<Item_info.Item> list_of_items = player_inventory.inventory_weapons_slots.Cast<Item_info.Item>().ToList();
+        List<Item_info.Item> list_of_items = player_inventory.inventory_weapons_items.Cast<Item_info.Item>().ToList();
         Update_inventory_player_row_UI(player_inventory,list_of_items,inventory_weapons_images_slots,inventory_weapons_slots);
         //materials
-        list_of_items = player_inventory.inventory_materials_slots.Cast<Item_info.Item>().ToList();
+        list_of_items = player_inventory.inventory_materials_items.Cast<Item_info.Item>().ToList();
         Update_inventory_player_row_UI(player_inventory,list_of_items,inventory_materials_images_slots,inventory_materials_slots);
         //potions
-        list_of_items = player_inventory.inventory_potions_slots.Cast<Item_info.Item>().ToList();
+        list_of_items = player_inventory.inventory_potions_items.Cast<Item_info.Item>().ToList();
         Update_inventory_player_row_UI(player_inventory,list_of_items,inventory_potions_images_slots,inventory_potions_slots);
         //items
-        Update_inventory_player_row_UI(player_inventory,player_inventory.inventory_items_slots,inventory_items_images_slots,inventory_items_slots);
+        Update_inventory_player_row_UI(player_inventory,player_inventory.inventory_items_items,inventory_items_images_slots,inventory_items_slots);
     }
     private void Update_inventory_player_row_UI(Player_inventory_info.Player_inventory player_inventory,List<Item_info.Item> list_of_items,List<Image> list_of_icons,List<Slot> list_of_slots){
         for(int i=0;i<list_of_items.Count;i++){

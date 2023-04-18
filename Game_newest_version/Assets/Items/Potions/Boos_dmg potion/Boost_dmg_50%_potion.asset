@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4346a554164436f4481964e138c14310, type: 3}
+  m_Name: Boost_dmg_50%_potion
+  m_EditorClassIdentifier: 
+  Item_icon: {fileID: 21300000, guid: 9a3a3cda43a9dee45ba402a467590406, type: 3}
+  Item_name: Boost dmg 50%
+  max_stack_amount: 3
+  Item_weight: 1.1
+  item_id: 125.1249214214
+  effect_duration_on_player: 60
+  percent_to_add_dmg_multiplayer: 50

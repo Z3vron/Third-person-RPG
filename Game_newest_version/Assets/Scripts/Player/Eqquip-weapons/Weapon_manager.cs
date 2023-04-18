@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using System;
 
 namespace Weapon_slot_manager{
     public class Weapon_manager : MonoBehaviour{
@@ -10,7 +10,7 @@ namespace Weapon_slot_manager{
         private Weapon_holder.Weapon_armed _right_slot;
         private Weapon_damage_collider_player _left_hand_weapon_collider;
         private Weapon_damage_collider_player _right_hand_weapon_collider;
-        private Player_slots _player_quick_access_slots;
+        public static event Action<Weapon_info.Weapon,bool> Update_quick_slots_weapon_icon;
         private void Awake() {
             Weapon_holder.Weapon_armed[] Weapons_slots = GetComponentsInChildren<Weapon_holder.Weapon_armed>();
             foreach (Weapon_holder.Weapon_armed slot in Weapons_slots){
@@ -21,21 +21,14 @@ namespace Weapon_slot_manager{
                     _right_slot = slot;
                 }
             }
-            _player_quick_access_slots = FindObjectOfType<Player_slots>();   
         }
         public void Load_weapon_to_slot(Weapon_info.Weapon weapon, bool hand){
-            //load to right hand
-            if(hand){
+            if(hand)
                 _right_slot.Equip_weapon(weapon);
-                _player_quick_access_slots.Update_quick_slot_weapon_icon(weapon,true);
-               // Debug.Log("Right");
-            }
-            //Load to left hand
-            else{
+            else
                 _left_slot.Equip_weapon(weapon);
-                _player_quick_access_slots.Update_quick_slot_weapon_icon(weapon,false);  
-               // Debug.Log("Left");            
-            }
+                
+            Update_quick_slots_weapon_icon?.Invoke(weapon,hand);
         }
         private void Update() {
             //for weapon

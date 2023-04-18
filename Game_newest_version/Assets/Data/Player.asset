@@ -14,14 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   armour_effectiveness: 0
   Max_health: 300
-  Current_health: 176
-  Regenerate_healh_rate: 0.1
-  Regenerate_stamina_rate: 0.08
+  Current_health: 300
+  Regenerate_healh_rate: 4
+  Regenerate_stamina_rate: 8
   Raw_strength: 20
   Max_stamina: 100
-  Current_stamina: 9.529444
+  Current_stamina: 100.00778
   Taken_dmg: 0
   Taken_stamina: 0
-  level: 2
-  current_exp: 150
-  exp_to_next_level: 200
+  level: 1
+  current_exp: 0
+  exp_to_next_level: 100
+  damage_multiplayer: 1.5

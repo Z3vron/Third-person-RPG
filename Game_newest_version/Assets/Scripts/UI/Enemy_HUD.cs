@@ -37,5 +37,6 @@ public class Enemy_HUD : MonoBehaviour{
     }
     public void End_poisoned(){
         _poisoned_indication.SetActive(false);
+        _enemy_poisoned = false;
     }
 }

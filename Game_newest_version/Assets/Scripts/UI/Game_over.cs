@@ -19,11 +19,10 @@ public class Game_over : MonoBehaviour{
         _animator.SetTrigger("GameOver");
     }
     private void Restart_level_begin(){
-        Function_timer.Create( Restart_level,5);
-       
+        Function_timer.Create( Restart_level,5); 
     }
     private void Restart_level(){
-         SceneManager.LoadScene("Scene_01");
+        SceneManager.LoadScene("Village");
     }
     // private void Update(){
 

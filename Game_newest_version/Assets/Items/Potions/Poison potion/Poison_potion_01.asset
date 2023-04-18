@@ -17,6 +17,6 @@ MonoBehaviour:
   max_stack_amount: 2
   Item_weight: 1
   item_id: 51
-  efect_duration: 60
+  effect_duration_on_player: 10
   poison_damage: 10
   poison_duration: 8

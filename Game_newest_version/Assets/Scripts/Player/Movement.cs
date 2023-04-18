@@ -58,8 +58,7 @@ using Cinemachine;
 namespace Player_Movemnet{
 
     [RequireComponent(typeof(CharacterController))]
-    public class Movement : MonoBehaviour
-    {
+    public class Movement : MonoBehaviour{
         //figure out wayy to use pointers and addresses
         public int dropped_item_new_amount;
        
@@ -205,7 +204,7 @@ namespace Player_Movemnet{
             _player_info = GetComponent<Player_info>();
             _player_statistics =  _player_info.player_stats;
             _player_inventory = GetComponent<Player_inventory_info.Player_inventory>();
-            _input_handler = GetComponent<Input_handler>();
+            _input_handler = Game_manager.Instance.input_handler;
 
             _player_speed = 1;
             _timer_between_landing_next_jump = _time_between_jumps;
@@ -221,7 +220,6 @@ namespace Player_Movemnet{
             // Move_player();
         }
         void Update(){
-            _input_handler.Check_flags();
             if(_player_info.locked_on_enemy && _closest_enemy != null){
                 Handle_state_while_lock_on_enemy();
             }
@@ -245,9 +243,6 @@ namespace Player_Movemnet{
                 Handle_jump_on_top_of_enemy();
                 Move_controller();
             }
-        }
-        private void LateUpdate() {
-            Set_input_flags_false();
         }
         private void  Equip_items(){
             if(_input_handler.inventory_flag && player_grounded)
@@ -420,8 +415,8 @@ namespace Player_Movemnet{
                     _object_inventory.SetActive(true);
                     
                     _inventories.object_inv_to_show = _object_to_interact.GetComponent<Interactable_objects>();
+                    _inventories.Assign_items_and_amounts_in_object_to_obj_slots();
                     _inventories.Get_object_inv_slots().Update_inventory_object_UI(_inventories.object_inv_to_show);
-                    _inventories.Assign_weapons_amount_to_slots();
                     _player_inventory.Handle_inventory();
                 }
                 else if(_in_area_to_interact_bush){
@@ -529,7 +524,6 @@ namespace Player_Movemnet{
         }
         private void Attack(){
                 if(_input_handler.attack_light_flag){
-                    //Debug.Log("Light attack button pressed");
                     _handle_attacks.Handle_light_attack(_input_handler.sprint_flag && _input_vector != Vector2.zero && !_animator.GetBool("Combat_movement"));
                 }
                 else if(_input_handler.attack_combo_flag){
@@ -675,10 +669,10 @@ namespace Player_Movemnet{
             if(_animator.GetBool("Movement_driven_by_animation"))
                 return ;
             Vector3 move_player;
-            if(player_grounded)
+           // if(player_grounded)
                 move_player = new Vector3(_Move.x * _player_speed,_Move.y,_Move.z * _player_speed);
-            else
-                move_player = new Vector3(_Move.x * _player_speed/2,_Move.y,_Move.z * _player_speed/2);  
+            // else
+            //     move_player = new Vector3(_Move.x * _player_speed/2,_Move.y,_Move.z * _player_speed/2);  
             _controller.Move(move_player * Time.deltaTime);
         }        
         private void Ground_check(){
@@ -688,8 +682,9 @@ namespace Player_Movemnet{
             //Debug.Log("Grounded: " + player_grounded);
         }
         private void Handle_jump_on_top_of_enemy(){
-            Vector3 Sphere_position = new Vector3(transform.position.x,transform.position.y + 2 * _grounded_help,transform.position.z);
+            Vector3 Sphere_position = new Vector3(transform.position.x,transform.position.y - 0.3f,transform.position.z);
             if(Physics.CheckSphere(Sphere_position,_grounded_check_radious,128,QueryTriggerInteraction.Ignore)){
+              //Debug.Log((int)Mathf.Log(128,2));
                 _Move.z = -4;
                 _player_speed = 1;
             }
@@ -827,47 +822,6 @@ namespace Player_Movemnet{
                 
             Gizmos.DrawSphere(new Vector3(transform.position.x, transform.position.y - _grounded_help, transform.position.z), _grounded_check_radious);
             Gizmos.DrawSphere(new Vector3(transform.position.x, transform.position.y - _ceiling_help, transform.position.z), _grounded_check_radious);
-        }
-        private void Set_input_flags_false(){
-            #region  Player action map 
-                _input_handler.sprint_flag = false;
-                _input_handler.crouch_flag = false;
-                _input_handler.jump_flag = false;
-                _input_handler.left_weapon_flag = false;
-                _input_handler.right_weapon_flag = false;
-                _input_handler.first_potion_flag = false;
-                _input_handler.second_potion_flag = false;
-                _input_handler.third_potion_flag = false;
-                _input_handler.fourth_potion_flag = false;
-                _input_handler.interact_flag = false;
-                _input_handler.block_attacks_flag = false;
-                _input_handler.parry_attack_flag = false;
-                _input_handler.attack_light_flag = false;
-                _input_handler.attack_strong_performed_flag = false;
-                _input_handler.attack_special_flag = false;
-                _input_handler.attack_air_flag = false;
-                _input_handler.attack_combo_flag = false;
-                _input_handler.inventory_flag = false;
-                _input_handler.attack_strong_canceled_flag = false;
-                _input_handler.lock_on_flag = false;
-                _input_handler.switch_flag = false;
-                _input_handler.dash_flag = false;
-            #endregion
-            #region  Inventory action map
-                _input_handler.inventory_close_inv_flag = false;
-                _input_handler.mouse_right_pressed_inv_flag = false;
-                _input_handler.mouse_left_pressed_inv_flag = false;
-                _input_handler.transfer_items_inv_flag = false;
-                _input_handler.drop_items_inv_flag = false;
-                _input_handler.use_item_inv_flag = false;
-                _input_handler.confirmed_action_inv_flag = false;
-                _input_handler.left_weapon_inv_flag = false;
-                _input_handler.right_weapn_inv_flag = false;
-                _input_handler.first_potion_inv_flag = false;
-                _input_handler.second_potion_inv_flag = false;
-                _input_handler.third_potion_inv_flag = false;
-                _input_handler.fourth_potion_inv_flag = false;
-            #endregion
         }
         private void Disable_movement(){
             this.enabled = false;

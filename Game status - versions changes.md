@@ -21,7 +21,7 @@ Think about
 
 - Using game manager to access some values in scripts(specially ones related to player ) or use observer pattern(events)
 
-Next upddate:
+Upddate 17.04.2023:
 - Fixed GUI issue with showing weapon poison
 - weapon loss all efects when putted in inventory
 - Added logic and GUI for player effects

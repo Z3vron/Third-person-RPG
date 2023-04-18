@@ -12,7 +12,7 @@ namespace Weapon_info{
         public bool unarmed;
         public int weapon_lvl;
         
-        [Header("Poison efect")]
+        [Header("Poison effect")]
         public float poison_damage;
         public float poison_duration;
         public bool isPoisoned = false;
@@ -20,8 +20,8 @@ namespace Weapon_info{
         [Header("Damages values")]
         public float Light_attack_damage;
         public float Strong_attack_damage;
-        public float combo_dmg_bonus;
-        public float air_attack_damage;
+        public float Combo_attack_damage;
+        public float Air_attack_damage;
 
         [Header("Defense values")]
         public int blocking_value;

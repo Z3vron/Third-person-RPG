@@ -18,6 +18,13 @@ public class Function_timer:MonoBehaviour{
         function_timer.Set_function_timer(action,timer,gameObject,timer_name);
         return function_timer;
     }
+    public static bool Find_timer(string timer_name){
+        for(int i = 0; i < _active_timers.Count; i++){
+            if(_active_timers[i]._timer_name == timer_name)
+                return true;
+        }
+        return false;
+    }
     public static void Stop_timer(string timer_name){
         // throwing errors about changing collection
         // foreach(Function_timer timer in _active_timers){

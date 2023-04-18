@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Skeleton_lvl_2
   m_EditorClassIdentifier: 
   armour_effectiveness: 24
-  Max_health: 200
-  Current_health: 200
+  Max_health: 2000
+  Current_health: 2000
   Regenerate_healh_rate: 0.1
   Regenerate_stamina_rate: 0.01
   Raw_strength: 20
@@ -25,3 +25,4 @@ MonoBehaviour:
   level: 2
   character_name: Skeleton
   exp_reward: 150
+  enemy_HUD_to_this_stats: {fileID: 0}

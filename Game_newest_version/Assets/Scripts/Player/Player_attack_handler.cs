@@ -61,8 +61,8 @@ public class Player_attack_handler : MonoBehaviour{
 
                 if( _player_stamina >= (_player_inventory.current_weapon_for_left_hand.combo_attack_stamina_cost + _player_inventory.current_weapon_for_right_hand.combo_attack_stamina_cost)){
 
-                    damage_given_left = _player_inventory.current_weapon_for_left_hand.Light_attack_damage +  _player_strength + _player_inventory.current_weapon_for_left_hand.combo_dmg_bonus;
-                    damage_given_right = _player_inventory.current_weapon_for_right_hand.Light_attack_damage + _player_strength + _player_inventory.current_weapon_for_right_hand.combo_dmg_bonus;
+                    damage_given_left = (_player_inventory.current_weapon_for_left_hand.Combo_attack_damage +  _player_strength) * _player_stats.damage_multiplayer;
+                    damage_given_right = (_player_inventory.current_weapon_for_right_hand.Combo_attack_damage +  _player_strength) * _player_stats.damage_multiplayer;
                     _player_stats.Take_stamina(_player_inventory.current_weapon_for_left_hand.combo_attack_stamina_cost + _player_inventory.current_weapon_for_right_hand.combo_attack_stamina_cost);
 
 
@@ -92,11 +92,11 @@ public class Player_attack_handler : MonoBehaviour{
             if(_player_inventory.current_weapon_for_left_hand == _player_inventory.unarmed && _player_inventory.current_weapon_for_right_hand == _player_inventory.unarmed)
                 Debug.Log("Fist light attack here");
             //weapon in only right hand
-            if(_player_inventory.current_weapon_for_right_hand != _player_inventory.unarmed && _player_inventory.current_weapon_for_left_hand == _player_inventory.unarmed || _player_inventory.current_weapon_for_left_hand is Shield ){
+            if(_player_inventory.current_weapon_for_right_hand != _player_inventory.unarmed && !(_player_inventory.current_weapon_for_right_hand is Shield) && (_player_inventory.current_weapon_for_left_hand == _player_inventory.unarmed || _player_inventory.current_weapon_for_left_hand is Shield )){
                 Start_right_light_attack(is_player_running);
             }
             //weapon in only left hand
-            else if(_player_inventory.current_weapon_for_left_hand != _player_inventory.unarmed && _player_inventory.current_weapon_for_right_hand == _player_inventory.unarmed){
+            else if(_player_inventory.current_weapon_for_left_hand != _player_inventory.unarmed && !(_player_inventory.current_weapon_for_left_hand is Shield) && (_player_inventory.current_weapon_for_right_hand == _player_inventory.unarmed || _player_inventory.current_weapon_for_right_hand is Shield)){ // is not available from C# 9.0 that's supported from unity 2021.2
                 Start_left_light_attack(is_player_running);
             }
             // weapons in both hands
@@ -153,30 +153,29 @@ public class Player_attack_handler : MonoBehaviour{
         if(_player_inventory.current_weapon_for_left_hand != _player_inventory.unarmed && _player_inventory.current_weapon_for_right_hand == _player_inventory.unarmed){
             if(_player_stats.Current_stamina < _player_inventory.current_weapon_for_left_hand.air_attack_stamina_cost)
                 return ;
-            damage_given_left = _player_inventory.current_weapon_for_left_hand.air_attack_damage + _player_strength;
+            damage_given_left = (_player_inventory.current_weapon_for_left_hand.Air_attack_damage + _player_strength) * _player_stats.damage_multiplayer;
             _player_stats.Take_stamina(_player_inventory.current_weapon_for_left_hand.air_attack_stamina_cost);
         } 
         else if(_player_inventory.current_weapon_for_right_hand != _player_inventory.unarmed && _player_inventory.current_weapon_for_left_hand == _player_inventory.unarmed){
             if(_player_stats.Current_stamina < _player_inventory.current_weapon_for_right_hand.air_attack_stamina_cost)
                 return ;
-            damage_given_right = _player_inventory.current_weapon_for_right_hand.air_attack_damage + _player_strength;
+            damage_given_right = (_player_inventory.current_weapon_for_right_hand.Air_attack_damage + _player_strength) * _player_stats.damage_multiplayer;
             _player_stats.Take_stamina(_player_inventory.current_weapon_for_right_hand.air_attack_stamina_cost);
         }
         else if(_player_inventory.current_weapon_for_left_hand != _player_inventory.unarmed && _player_inventory.current_weapon_for_right_hand != _player_inventory.unarmed){
             if(_player_stats.Current_stamina < _player_inventory.current_weapon_for_left_hand.air_attack_stamina_cost + _player_inventory.current_weapon_for_right_hand.air_attack_stamina_cost)
                 return ;
-            damage_given_left = _player_inventory.current_weapon_for_left_hand.air_attack_damage + _player_strength;
-            damage_given_right = _player_inventory.current_weapon_for_right_hand.air_attack_damage + _player_strength;
+            damage_given_left = (_player_inventory.current_weapon_for_left_hand.Air_attack_damage + _player_strength) * _player_stats.damage_multiplayer;
+            damage_given_right = (_player_inventory.current_weapon_for_right_hand.Air_attack_damage + _player_strength) * _player_stats.damage_multiplayer;
             _player_stats.Take_stamina(_player_inventory.current_weapon_for_left_hand.air_attack_stamina_cost + _player_inventory.current_weapon_for_right_hand.air_attack_stamina_cost);
         }
         animator.CrossFadeInFixedTime("Override.Air_attack_01",0f,1);
     }
-    
     public void Start_left_light_attack(bool is_player_running){
         if(_player_stamina < _player_inventory.current_weapon_for_left_hand.light_attack_stamina_cost)
             return;
 
-        damage_given_left = _player_inventory.current_weapon_for_left_hand.Light_attack_damage +  _player_strength;
+        damage_given_left = (_player_inventory.current_weapon_for_left_hand.Light_attack_damage +  _player_strength) * _player_stats.damage_multiplayer;
         if(is_player_running)
             damage_given_left *= 1.5f;
         //_player_inventory.current_weapon_for_left_hand.GetType()
@@ -208,7 +207,7 @@ public class Player_attack_handler : MonoBehaviour{
     public void Start_right_light_attack(bool is_player_running){
         if(_player_stamina < _player_inventory.current_weapon_for_right_hand.light_attack_stamina_cost)
             return;
-        damage_given_right = _player_inventory.current_weapon_for_right_hand.Light_attack_damage + _player_strength;
+        damage_given_right = (_player_inventory.current_weapon_for_right_hand.Light_attack_damage + _player_strength) * _player_stats.damage_multiplayer;
         if(is_player_running)
             damage_given_right *= 1.5f;
         if(_player_inventory.current_weapon_for_right_hand is Dagger){
@@ -240,7 +239,7 @@ public class Player_attack_handler : MonoBehaviour{
     public void Start_right_heavy_attack(){
         if(_player_stamina < _player_inventory.current_weapon_for_right_hand.strong_attack_stamina_cost)
             return;
-        damage_given_right = _player_inventory.current_weapon_for_right_hand.Strong_attack_damage + _player_strength;
+        damage_given_right = (_player_inventory.current_weapon_for_right_hand.Strong_attack_damage + _player_strength) * _player_stats.damage_multiplayer;
         if(_player_inventory.current_weapon_for_right_hand is Dagger){
             Dagger dagger = (Dagger)_player_inventory.current_weapon_for_right_hand;
             animator.SetFloat("Attack_speed_multiplayer",dagger.attack_speed_multiplayer);
@@ -264,7 +263,7 @@ public class Player_attack_handler : MonoBehaviour{
     public void Start_left_heavy_attack(){
         if(_player_stamina < _player_inventory.current_weapon_for_left_hand.strong_attack_stamina_cost)
             return;
-        damage_given_left = _player_inventory.current_weapon_for_left_hand.Strong_attack_damage + _player_strength;
+        damage_given_left = (_player_inventory.current_weapon_for_left_hand.Strong_attack_damage + _player_strength) * _player_stats.damage_multiplayer;
         if(_player_inventory.current_weapon_for_left_hand is Dagger){
             Dagger dagger = (Dagger)_player_inventory.current_weapon_for_left_hand;
             animator.SetFloat("Attack_speed_multiplayer",dagger.attack_speed_multiplayer);
@@ -286,12 +285,12 @@ public class Player_attack_handler : MonoBehaviour{
         _player_stats.Take_stamina(_player_inventory.current_weapon_for_left_hand.strong_attack_stamina_cost);
     }
     public void Start_blocking_attacks(){
-        if(_player_inventory.current_weapon_for_left_hand != _player_inventory.unarmed && !animator.GetBool("Blocking") ){
+        if(_player_inventory.current_weapon_for_left_hand != _player_inventory.unarmed && !animator.GetBool("Blocking") && _player_stats.Current_stamina > _player_inventory.current_weapon_for_left_hand.blocking_stamina_cost){
             animator.SetBool("Blocking",true);
             animator.CrossFadeInFixedTime("Blocking_with_shield_begin",0f,2);
             _player_inventory.current_blocking_weapon = _player_inventory.current_weapon_for_left_hand;
         }
-        else if(_player_inventory.current_weapon_for_right_hand != _player_inventory.unarmed && !animator.GetBool("Blocking") ){
+        else if(_player_inventory.current_weapon_for_right_hand != _player_inventory.unarmed && !animator.GetBool("Blocking") && _player_stats.Current_stamina > _player_inventory.current_weapon_for_right_hand.blocking_stamina_cost ){
             animator.SetBool("Blocking",true);
             animator.CrossFadeInFixedTime("Blocking_with_swords_begin",0f,2);
             _player_inventory.current_blocking_weapon = _player_inventory.current_weapon_for_right_hand;
@@ -306,5 +305,4 @@ public class Player_attack_handler : MonoBehaviour{
         animator.CrossFadeInFixedTime("Shield_parry",0f,1);
         _player_stats.Take_stamina(_player_inventory.current_weapon_for_left_hand.parry_stamina_cost);
     }
-    
 }

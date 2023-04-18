@@ -7,7 +7,7 @@ using System;
 public class Player_statistics : Character_statistics{
    public int current_exp;
    public int exp_to_next_level = 100;
-   
+   public float damage_multiplayer = 1;
    public static event Action<float> Changed_player_hp_UI;
    public static event Action<float> Changed_player_stamina_UI;
    public static event Action<int,int,int> Changed_player_lvl_UI;
